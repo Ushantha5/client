@@ -48,42 +48,15 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 
 			// Call API (don't send confirmPassword)
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { confirmPassword: _cp, ...registerData } = validated;
-			const response = await apiFetch<{
-				success: boolean;
-				data: {
-					user: {
-						id: string;
-						name: string;
-						email: string;
-						role: string;
-						status: string;
-					};
-					token: string;
-				};
-			}>("/auth/register", {
-				method: "POST",
-				body: JSON.stringify({ ...registerData, role: "student" }),
-			});
-
-			if (response.success) {
-				// Redirect to student dashboard
-				router.push("/student");
-				onOpenChange(false);
-			}
-		} catch (error) {
-			if (error instanceof z.ZodError) {
-				const fieldErrors: Record<string, string> = {};
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				(error as any).errors.forEach((err: any) => {
-					if (err.path[0]) {
-						fieldErrors[err.path[0]] = err.message;
-					}
-				});
-				setErrors(fieldErrors);
-			} else if (error instanceof Error) {
-				setErrors({ general: error.message });
-			}
+			await register(
+				formData.name,
+				formData.email,
+				formData.password,
+				formData.role as "student" | "teacher",
+			);
+			onOpenChange(false);
+		} catch (err: any) {
+			setError(err.message || "Registration failed. Please try again.");
 		} finally {
 			setLoading(false);
 		}
@@ -91,95 +64,35 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-[500px] bg-white">
-				<DialogHeader>
-					<DialogTitle>Join MR5 School</DialogTitle>
-					<DialogDescription>
-						Create an account to get started. Be careful to select the correct role if applicable.
+			<DialogContent className="sm:max-w-[450px] bg-background/80 backdrop-blur-xl border-white/10 shadow-2xl">
+				<DialogHeader className="space-y-3">
+					<DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+						Join MR5 School
+					</DialogTitle>
+					<DialogDescription className="text-center text-muted-foreground">
+						Create your account to start learning or teaching
 					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="space-y-4">
-					{errors.general && (
-						<div className="bg-destructive/10 text-destructive px-4 py-2 rounded-md text-sm">
-							{errors.general}
+					{error && (
+						<div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+							<div className="h-1.5 w-1.5 rounded-full bg-destructive" />
+							{error}
 						</div>
 					)}
-					<div className="space-y-2">
-						<Label htmlFor="name">Full Name</Label>
-						<Input
-							id="name"
-							name="name"
-							placeholder="John Doe"
-							value={formData.name}
-							onChange={handleChange}
-							className={errors.name ? "border-destructive" : ""}
+					className={errors.confirmPassword ? "border-destructive" : ""}
 						/>
-						{errors.name && (
-							<p className="text-sm text-destructive">{errors.name}</p>
-						)}
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
-						<Input
-							id="email"
-							name="email"
-							type="email"
-							placeholder="you@example.com"
-							value={formData.email}
-							onChange={handleChange}
-							className={errors.email ? "border-destructive" : ""}
-						/>
-						{errors.email && (
-							<p className="text-sm text-destructive">{errors.email}</p>
-						)}
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="phone">Phone (Optional)</Label>
-						<Input
-							id="phone"
-							name="phone"
-							placeholder="+1234567890"
-							value={formData.phone}
-							onChange={handleChange}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="password">Password</Label>
-						<Input
-							id="password"
-							name="password"
-							type="password"
-							placeholder="••••••••"
-							value={formData.password}
-							onChange={handleChange}
-							className={errors.password ? "border-destructive" : ""}
-						/>
-						{errors.password && (
-							<p className="text-sm text-destructive">{errors.password}</p>
-						)}
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="confirmPassword">Confirm Password</Label>
-						<Input
-							id="confirmPassword"
-							name="confirmPassword"
-							type="password"
-							placeholder="••••••••"
-							value={formData.confirmPassword}
-							onChange={handleChange}
-							className={errors.confirmPassword ? "border-destructive" : ""}
-						/>
-						{errors.confirmPassword && (
-							<p className="text-sm text-destructive">
-								{errors.confirmPassword}
-							</p>
-						)}
-					</div>
-					<Button type="submit" className="w-full" disabled={loading}>
-						{loading ? "Creating account..." : "Sign Up"}
-					</Button>
-				</form>
-			</DialogContent>
-		</Dialog>
+					{errors.confirmPassword && (
+						<p className="text-sm text-destructive">
+							{errors.confirmPassword}
+						</p>
+					)}
+				</div>
+				<Button type="submit" className="w-full" disabled={loading}>
+					{loading ? "Creating account..." : "Sign Up"}
+				</Button>
+			</form>
+		</DialogContent>
+		</Dialog >
 	);
 }

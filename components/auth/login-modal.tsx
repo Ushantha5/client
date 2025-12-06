@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
-import { Info } from "lucide-react";
+import { Info, Lock, Mail } from "lucide-react";
 
 interface LoginModalProps {
 	open: boolean;
@@ -54,85 +54,94 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-[500px] bg-white dark:bg-white">
-				<DialogHeader>
-					<DialogTitle>Sign In to MR5 School</DialogTitle>
-					<DialogDescription>
-						Enter your email and password to access your account.
+			<DialogContent className="sm:max-w-[450px] bg-background/80 backdrop-blur-xl border-white/10 shadow-2xl">
+				<DialogHeader className="space-y-3">
+					<DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+						Welcome Back
+					</DialogTitle>
+					<DialogDescription className="text-center text-muted-foreground">
+						Access your personalized learning dashboard
 					</DialogDescription>
 				</DialogHeader>
 
 				{/* Demo Credentials */}
-				<Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
-					<CardContent className="pt-4">
+				<Card className="bg-primary/5 border-primary/10 shadow-none mb-4">
+					<CardContent className="pt-4 pb-4">
 						<div className="flex items-start gap-2 mb-3">
-							<Info className="h-4 w-4 text-blue-600 mt-0.5" />
-							<p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-								Demo Credentials:
+							<Info className="h-4 w-4 text-primary mt-0.5" />
+							<p className="text-sm font-semibold text-primary">
+								Try Demo Accounts:
 							</p>
 						</div>
 						<div className="grid grid-cols-3 gap-2">
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => fillDemoCredentials("admin")}
-								className="text-xs"
-							>
-								Admin
-							</Button>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => fillDemoCredentials("teacher")}
-								className="text-xs"
-							>
-								Teacher
-							</Button>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => fillDemoCredentials("student")}
-								className="text-xs"
-							>
-								Student
-							</Button>
+							{["Admin", "Teacher", "Student"].map((role) => (
+								<Button
+									key={role}
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={() => fillDemoCredentials(role.toLowerCase() as any)}
+									className="text-xs border-primary/20 hover:bg-primary/10 hover:text-primary transition-colors"
+								>
+									{role}
+								</Button>
+							))}
 						</div>
 					</CardContent>
 				</Card>
 
 				<form onSubmit={handleSubmit} className="space-y-4">
 					{error && (
-						<div className="bg-destructive/10 text-destructive px-4 py-2 rounded-md text-sm">
+						<div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+							<div className="h-1.5 w-1.5 rounded-full bg-destructive" />
 							{error}
 						</div>
 					)}
-					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
-						<Input
-							id="email"
-							type="email"
-							placeholder="you@example.com"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							required
-						/>
+					<div className="space-y-4">
+						<div className="space-y-2">
+							<Label htmlFor="email">Email Address</Label>
+							<div className="relative">
+								<Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+								<Input
+									id="email"
+									type="email"
+									placeholder="you@example.com"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+									required
+									className="pl-9 bg-background/50"
+								/>
+							</div>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="password">Password</Label>
+							<div className="relative">
+								<Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+								<Input
+									id="password"
+									type="password"
+									placeholder="••••••••"
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									required
+									className="pl-9 bg-background/50"
+								/>
+							</div>
+						</div>
 					</div>
-					<div className="space-y-2">
-						<Label htmlFor="password">Password</Label>
-						<Input
-							id="password"
-							type="password"
-							placeholder="••••••••"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							required
-						/>
-					</div>
-					<Button type="submit" className="w-full" disabled={loading}>
-						{loading ? "Signing in..." : "Sign In"}
+					<Button
+						type="submit"
+						className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg shadow-primary/25 h-11"
+						disabled={loading}
+					>
+						{loading ? (
+							<div className="flex items-center gap-2">
+								<div className="h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+								Signing in...
+							</div>
+						) : (
+							"Sign In"
+						)}
 					</Button>
 				</form>
 			</DialogContent>
