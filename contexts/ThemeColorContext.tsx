@@ -22,7 +22,7 @@ export function ThemeColorProvider({ children }: { children: React.ReactNode }) 
     }, []);
 
     useEffect(() => {
-        const root = window.document.body;
+        const root = window.document.documentElement;
         // Remove previous theme attributes if any
         root.setAttribute("data-theme", themeColor);
         localStorage.setItem("themeColor", themeColor);
