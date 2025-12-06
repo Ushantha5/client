@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Minimize2, Maximize2, Loader2 } from 'lucide-react';
-import { aiAssistantAPI } from '@/lib/api/aiAssistant';
+import { aiAssistantService } from '@/services/aiAssistant.service';
 import { toast } from 'sonner';
 
 interface Message {
@@ -63,7 +63,7 @@ export default function AIChatWidget({
         setIsLoading(true);
 
         try {
-            const interaction = await aiAssistantAPI.createInteraction({
+            const interaction = await aiAssistantService.createInteraction({
                 user: userId,
                 course: courseId,
                 question: inputMessage,
@@ -74,7 +74,7 @@ export default function AIChatWidget({
                 const aiResponseText = generateAIResponse(inputMessage);
 
                 if (interaction.data._id) {
-                    await aiAssistantAPI.updateInteraction(interaction.data._id, {
+                    await aiAssistantService.updateInteraction(interaction.data._id, {
                         response: aiResponseText
                     });
                 }
@@ -175,10 +175,10 @@ export default function AIChatWidget({
                                         >
                                             <div
                                                 className={`max-w-[80%] rounded-xl px-4 py-2 ${message.type === 'user'
-                                                        ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
-                                                        : theme === 'dark'
-                                                            ? 'bg-slate-700/50 text-gray-100'
-                                                            : 'bg-gray-100 text-gray-900'
+                                                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
+                                                    : theme === 'dark'
+                                                        ? 'bg-slate-700/50 text-gray-100'
+                                                        : 'bg-gray-100 text-gray-900'
                                                     }`}
                                             >
                                                 <p className="text-sm">{message.content}</p>
@@ -220,8 +220,8 @@ export default function AIChatWidget({
                                             placeholder="Type your message..."
                                             disabled={isLoading}
                                             className={`flex-1 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 ${theme === 'dark'
-                                                    ? 'bg-slate-800 border border-white/10 text-white placeholder-gray-500'
-                                                    : 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400'
+                                                ? 'bg-slate-800 border border-white/10 text-white placeholder-gray-500'
+                                                : 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400'
                                                 } disabled:opacity-50`}
                                         />
                                         <button

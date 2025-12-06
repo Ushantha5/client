@@ -40,6 +40,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
+    "js-cookie": "^3.0.5",
     "livekit-client": "^2.16.0",
     "lucide-react": "^0.554.0",
     "microsoft-cognitiveservices-speech-sdk": "^1.47.0",
@@ -60,6 +61,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

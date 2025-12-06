@@ -8,86 +8,83 @@ import {
 	ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-
-interface User {
-	id: string;
-	name: string;
-	email: string;
-	role: "student" | "teacher" | "admin";
-	status: string;
-}
+import Cookies from "js-cookie";
+import { authService } from "@/services/auth.service";
+import { User } from "@/types/user";
+import { handleApiError } from "@/lib/errorHandler";
 
 interface AuthContextType {
 	user: User | null;
+	loading: boolean;
+	isAuthenticated: boolean;
 	login: (email: string, password: string) => Promise<void>;
+	register: (name: string, email: string, password: string, role?: "student" | "teacher") => Promise<void>;
 	logout: () => void;
-	isLoading: boolean;
+	refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
+	const [loading, setLoading] = useState(true);
 	const router = useRouter();
 
-	useEffect(() => {
-		// Try to get current user from API (preferred when using cookies)
-		(async () => {
-			try {
-				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
-					{ credentials: "include" },
-					// Note: no CORS headers here; `app.js` allows credentials from 3000
-				);
-				if (res.ok) {
-					const data = await res.json();
-					if (data && data.success && data.data) {
-						setUser(data.data);
-						localStorage.setItem("user", JSON.stringify(data.data));
-					}
-				} else {
-					// Expected 401 when not logged in - clear localStorage
-					localStorage.removeItem("user");
-					localStorage.removeItem("token");
-				}
-			} catch (err) {
-				// Network error - check localStorage as fallback
-				const storedUser = localStorage.getItem("user");
-				if (storedUser) {
-					try {
-						setUser(JSON.parse(storedUser));
-					} catch (parseErr) {
-						// Invalid stored user - clear it
-						localStorage.removeItem("user");
-						localStorage.removeItem("token");
-					}
-				}
-			} finally {
-				setIsLoading(false);
+	const isAuthenticated = !!user;
+
+	/**
+	 * Refresh user data from the server
+	 */
+	const refreshUser = async () => {
+		try {
+			const response = await authService.getCurrentUser();
+			if (response.success && response.data) {
+				setUser(response.data);
 			}
-		})();
+		} catch (error) {
+			// If refresh fails (e.g., 401), clear user state
+			setUser(null);
+			Cookies.remove("token");
+		}
+	};
+
+	// Initialize auth state on mount
+	useEffect(() => {
+		const initAuth = async () => {
+			const token = Cookies.get("token");
+			if (token) {
+				try {
+					await refreshUser();
+				} catch (error) {
+					// Token exists but is invalid - clear it
+					Cookies.remove("token");
+					setUser(null);
+				}
+			}
+			setLoading(false);
+		};
+
+		initAuth();
 	}, []);
 
+	/**
+	 * Login with email and password
+	 */
 	const login = async (email: string, password: string) => {
 		try {
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					credentials: "include",
-					body: JSON.stringify({ email, password }),
-				},
-			);
+			const response = await authService.login({ email, password });
 
-			const data = await response.json();
+			if (response.success && response.data) {
+				const { token, user: userData } = response.data;
 
-			if (data.success) {
-				const userData = data.data.user;
+				// Store token in cookie
+				Cookies.set("token", token, {
+					expires: 7, // 7 days
+					sameSite: "strict",
+					secure: process.env.NODE_ENV === "production",
+				});
+
 				setUser(userData);
-				localStorage.setItem("user", JSON.stringify(userData));
-				localStorage.setItem("token", data.data.token);
 
 				// Redirect based on role
 				switch (userData.role) {
@@ -103,23 +100,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					default:
 						router.push("/");
 				}
-			} else {
-				throw new Error(data.message || "Login failed");
 			}
 		} catch (error) {
-			throw error;
+			const errorMessage = handleApiError(error, "Login");
+			throw new Error(errorMessage);
 		}
 	};
 
+	/**
+	 * Register a new user
+	 */
+	const register = async (
+		name: string,
+		email: string,
+		password: string,
+		role?: "student" | "teacher",
+	) => {
+		try {
+			const response = await authService.register({
+				name,
+				email,
+				password,
+				role,
+			});
+
+			if (response.success && response.data) {
+				// After successful registration, log the user in
+				// The backend might return a token, or we need to login separately
+				// For now, let's redirect to login
+				router.push("/");
+			}
+		} catch (error) {
+			const errorMessage = handleApiError(error, "Registration");
+			throw new Error(errorMessage);
+		}
+	};
+
+	/**
+	 * Logout user
+	 */
 	const logout = () => {
 		setUser(null);
-		localStorage.removeItem("user");
-		localStorage.removeItem("token");
+		Cookies.remove("token");
 		router.push("/");
+
+		// Optionally call backend logout endpoint
+		try {
+			authService.logout();
+		} catch (error) {
+			// Ignore logout errors - user is already logged out on client
+		}
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, login, logout, isLoading }}>
+		<AuthContext.Provider
+			value={{ user, loading, isAuthenticated, login, register, logout, refreshUser }}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

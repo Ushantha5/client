@@ -3,13 +3,9 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import { Card } from "@/components/ui/card";
-
-type Teacher = {
-	_id: string;
-	specialization?: string;
-	bio?: string;
-	user?: { name?: string; email?: string };
-};
+import { teacherService } from "@/services/teacher.service";
+import { Teacher } from "@/types/teacher";
+import { handleApiError } from "@/lib/errorHandler";
 
 export default function AvathorListPage() {
 	const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -17,26 +13,23 @@ export default function AvathorListPage() {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const fetchTeachers = async () => {
-			setLoading(true);
-			setError(null);
-			try {
-				const API =
-					(process.env.NEXT_PUBLIC_API_URL as string) ||
-					"http://localhost:5000/api";
-				const res = await fetch(`${API}/avathor/teachers`);
-				if (!res.ok) throw new Error(`API error ${res.status}`);
-				const json = await res.json();
-				setTeachers(json.data || []);
-			} catch (err: unknown) {
-				setError((err as Error).message || "Failed to fetch teachers");
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchTeachers();
+		loadTeachers();
 	}, []);
+
+	const loadTeachers = async () => {
+		setLoading(true);
+		setError(null);
+		try {
+			const response = await teacherService.getAllTeachers();
+			if (response.success) {
+				setTeachers(response.data || []);
+			}
+		} catch (err: unknown) {
+			setError(handleApiError(err, "Fetch Teachers"));
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	return (
 		<div className="min-h-screen flex flex-col">

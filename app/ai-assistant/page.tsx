@@ -21,7 +21,8 @@ import {
     History,
     Download
 } from 'lucide-react';
-import { aiAssistantAPI, AIInteraction } from '@/lib/api/aiAssistant';
+import { aiAssistantService } from '@/services/aiAssistant.service';
+import { AIInteraction } from '@/types/aiAssistant';
 import { toast } from 'sonner';
 
 interface Message {
@@ -118,7 +119,7 @@ export default function AIAssistantPage() {
 
     const loadHistory = async () => {
         try {
-            const response = await aiAssistantAPI.getUserHistory(currentUserId, 1, 10);
+            const response = await aiAssistantService.getUserHistory(currentUserId, 1, 10);
             if (response.success) {
                 setInteractionHistory(response.data);
             }
@@ -143,7 +144,7 @@ export default function AIAssistantPage() {
 
         try {
             // Create interaction in backend
-            const interaction = await aiAssistantAPI.createInteraction({
+            const interaction = await aiAssistantService.createInteraction({
                 user: currentUserId,
                 question: inputMessage,
                 mode: isMicOn ? 'voice' : 'text'
@@ -155,7 +156,7 @@ export default function AIAssistantPage() {
 
                 // Update interaction with response
                 if (interaction.data._id) {
-                    await aiAssistantAPI.updateInteraction(interaction.data._id, {
+                    await aiAssistantService.updateInteraction(interaction.data._id, {
                         response: aiResponseText
                     });
                 }
