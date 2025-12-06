@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import "@/lib/suppress-auth-errors";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeColorProvider } from "@/contexts/ThemeColorContext";
 
 export const metadata: Metadata = {
   title: "MR5 School - Learn with AI",
@@ -17,9 +19,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="bg-white dark:bg-white" suppressHydrationWarning>
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-background text-foreground" suppressHydrationWarning>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ThemeColorProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </ThemeColorProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

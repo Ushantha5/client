@@ -16,6 +16,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeCustomizer } from "@/components/theme-customizer";
 
 export function Navbar() {
 	const { user, logout } = useAuth();
@@ -80,6 +81,7 @@ export function Navbar() {
 
 					{/* Auth Buttons */}
 					<div className="flex items-center gap-4">
+						<ThemeCustomizer />
 						{user ? (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
