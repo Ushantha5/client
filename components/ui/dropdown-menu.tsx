@@ -24,7 +24,7 @@ export const DropdownMenuTrigger = ({ children, asChild, ...props }: any) => {
   );
 };
 
-export const DropdownMenuContent = ({ children, className = "", ...props }: any) => {
+export const DropdownMenuContent = ({ children, className = "", forceMount, ...props }: any) => {
   return (
     <div
       className={`absolute right-0 z-50 mt-2 w-56 rounded-md border bg-popover p-1 shadow-lg ${className}`}
@@ -35,7 +35,9 @@ export const DropdownMenuContent = ({ children, className = "", ...props }: any)
   );
 };
 
-export const DropdownMenuItem = ({ children, className = "", ...props }: any) => {
+export const DropdownMenuItem = ({ children, className = "", asChild, ...props }: any) => {
+  // Consume asChild to prevent passing it to DOM
+
   return (
     <div
       role="menuitem"

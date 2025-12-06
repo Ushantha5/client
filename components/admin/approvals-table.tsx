@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -133,9 +133,11 @@ export default function AdminApprovalsTable() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Reject Registration</DialogTitle>
+              <DialogDescription>
+                Provide a reason for rejecting this registration (min 5 chars).
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
-              <p>Provide a reason for rejecting this registration (min 5 chars).</p>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}

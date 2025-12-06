@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { MoodDetector } from '@/components/classroom/MoodDetector';
 import { cn } from '@/lib/utils';
 
@@ -78,6 +78,9 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
             {isOpen && (
                 <Dialog open={isOpen} onOpenChange={onClose}>
                     <DialogContent className="sm:max-w-[1100px] p-0 border-0 bg-transparent shadow-none overflow-hidden">
+                        <DialogDescription className="sr-only">
+                            Interactive AI Tutor session where you can ask questions and get real-time feedback.
+                        </DialogDescription>
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -123,7 +126,7 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                             <Bot className="w-6 h-6 text-white" />
                                         </div>
                                         <div>
-                                            <h2 className="text-lg font-bold text-white">AI Tutor</h2>
+                                            <DialogTitle className="text-lg font-bold text-white">AI Tutor</DialogTitle>
                                             <div className="flex items-center gap-2">
                                                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                                 <span className="text-xs text-cyan-400">Online & Listening</span>

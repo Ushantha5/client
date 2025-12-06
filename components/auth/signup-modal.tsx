@@ -7,6 +7,7 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
+	DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,6 +94,9 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 			<DialogContent className="sm:max-w-[500px] bg-white">
 				<DialogHeader>
 					<DialogTitle>Join MR5 School</DialogTitle>
+					<DialogDescription>
+						Create an account to get started. Be careful to select the correct role if applicable.
+					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					{errors.general && (
