@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import apiClient from "@/lib/apiClient";
+import { handleApiError } from "@/lib/errorHandler";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -37,13 +38,13 @@ export default function AdminApprovalsTable() {
   async function fetchPending() {
     setLoading(true);
     try {
-      const res = await apiFetch<{ success: boolean; data: PendingItem[] }>(
-        "/admin/registrations/pending",
-        { method: "GET" },
+      const res = await apiClient.get<{ success: boolean; data: PendingItem[] }>(
+        "/admin/registrations/pending"
       );
-      setItems(res.data || []);
+      setItems(res.data.data || []);
     } catch (err: any) {
-      toast.error(err.message || "Failed to load pending registrations");
+      const errorMessage = handleApiError(err, "Fetch Pending Registrations");
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -52,14 +53,14 @@ export default function AdminApprovalsTable() {
   async function handleApprove(item: PendingItem) {
     if (!confirm(`Approve ${item.name} (${item.email})?`)) return;
     try {
-      await apiFetch("/admin/registrations/" + item.id + "/approve", {
-        method: "POST",
-        body: JSON.stringify({ note: `Approved by ${user?.name || "admin"}` }),
+      await apiClient.post("/admin/registrations/" + item.id + "/approve", {
+        note: `Approved by ${user?.name || "admin"}`,
       });
       toast.success("Approved");
       setItems((s) => s.filter((i) => i.id !== item.id));
     } catch (err: any) {
-      toast.error(err.message || "Approve failed");
+      const errorMessage = handleApiError(err, "Approve Registration");
+      toast.error(errorMessage);
     }
   }
 
@@ -78,16 +79,16 @@ export default function AdminApprovalsTable() {
 
     if (!selected) return;
     try {
-      await apiFetch("/admin/registrations/" + selected.id + "/reject", {
-        method: "POST",
-        body: JSON.stringify({ reason: rejectReason }),
+      await apiClient.post("/admin/registrations/" + selected.id + "/reject", {
+        reason: rejectReason,
       });
       toast.success("Rejected");
       setItems((s) => s.filter((i) => i.id !== selected.id));
       setShowRejectDialog(false);
       setSelected(null);
     } catch (err: any) {
-      toast.error(err.message || "Reject failed");
+      const errorMessage = handleApiError(err, "Reject Registration");
+      toast.error(errorMessage);
     }
   }
 

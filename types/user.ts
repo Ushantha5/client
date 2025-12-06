@@ -4,6 +4,7 @@ export interface User {
     email: string;
     role: "student" | "teacher" | "admin";
     status: string;
+    avatarUrl?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }

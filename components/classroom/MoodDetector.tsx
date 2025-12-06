@@ -13,7 +13,7 @@ export function MoodDetector() {
     const [mood, setMood] = useState<"Happy" | "Neutral" | "Focused" | "Distracted">("Neutral");
     const [engagement, setEngagement] = useState(0);
     const [modelLoaded, setModelLoaded] = useState(false);
-    const requestRef = useRef<number>();
+    const requestRef = useRef<number | null>(null);
 
     useEffect(() => {
         if (!isCameraOn) {

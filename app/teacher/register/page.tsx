@@ -6,7 +6,8 @@ import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiFetch } from "@/lib/api";
+import { authService } from "@/services/auth.service";
+import { handleApiError } from "@/lib/errorHandler";
 
 import { z } from "zod";
 
@@ -36,32 +37,30 @@ export default function TeacherRegisterPage() {
 		setLoading(true);
 
 		try {
-			// First register as user with teacher role
-			 
-			const {
-				bio: _bio,
-				qualifications: _q,
-				experience: _e,
-				confirmPassword: _cp,
-				...userData
-			} = formData;
+			// Validate password match
+			if (formData.password !== formData.confirmPassword) {
+				setErrors({ confirmPassword: "Passwords do not match" });
+				setLoading(false);
+				return;
+			}
 
 			// Validate user data
 			const userValidation = z
 				.object({
-					name: z.string().min(2),
-					email: z.string().email(),
-					password: z.string().min(6),
+					name: z.string().min(2, "Name must be at least 2 characters"),
+					email: z.string().email("Invalid email address"),
+					password: z.string().min(6, "Password must be at least 6 characters"),
 				})
-				.parse(userData);
+				.parse({
+					name: formData.name,
+					email: formData.email,
+					password: formData.password,
+				});
 
-			// Register user
-			const response = await apiFetch<{
-				success: boolean;
-				data: { user: { id: string; status: string } };
-			}>("/auth/register", {
-				method: "POST",
-				body: JSON.stringify({ ...userValidation, role: "teacher" }),
+			// Register user with teacher role
+			const response = await authService.register({
+				...userValidation,
+				role: "teacher",
 			});
 
 			if (response.success) {
@@ -74,15 +73,15 @@ export default function TeacherRegisterPage() {
 		} catch (error) {
 			if (error instanceof z.ZodError) {
 				const fieldErrors: Record<string, string> = {};
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				(error as any).errors.forEach((err: any) => {
+				error.issues.forEach((err) => {
 					if (err.path[0]) {
-						fieldErrors[err.path[0]] = err.message;
+						fieldErrors[err.path[0] as string] = err.message;
 					}
 				});
 				setErrors(fieldErrors);
-			} else if (error instanceof Error) {
-				setErrors({ general: error.message });
+			} else {
+				const errorMessage = handleApiError(error, "Teacher Registration");
+				setErrors({ general: errorMessage });
 			}
 		} finally {
 			setLoading(false);

@@ -86,7 +86,7 @@ export default function ProfilePage() {
             y: 0,
             opacity: 1,
             transition: {
-                type: "spring",
+                type: "spring" as const,
                 stiffness: 100,
                 damping: 15
             }
@@ -196,7 +196,7 @@ export default function ProfilePage() {
                                             <span className="text-muted-foreground">Server Load</span>
                                             <span className="text-emerald-500 font-medium">12%</span>
                                         </div>
-                                        <Progress value={12} className="h-1.5 bg-emerald-500/10" indicatorClassName="bg-emerald-500" />
+                                        <Progress value={12} className="h-1.5 bg-emerald-500/10" />
                                         <div className="flex justify-between items-center text-sm">
                                             <span className="text-muted-foreground">Database</span>
                                             <span className="text-emerald-500 font-medium">Healthy</span>
