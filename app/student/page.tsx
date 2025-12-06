@@ -48,28 +48,28 @@ export default function StudentDashboard() {
 			value: "6",
 			icon: BookOpen,
 			color: "text-blue-600",
-			bgColor: "bg-blue-50 dark:bg-blue-950",
+			bgColor: "bg-blue-500/10",
 		},
 		{
 			title: "Completed Assignments",
 			value: "24",
 			icon: CheckCircle2,
 			color: "text-green-600",
-			bgColor: "bg-green-50 dark:bg-green-950",
+			bgColor: "bg-green-500/10",
 		},
 		{
 			title: "Average Grade",
 			value: "87%",
 			icon: Award,
 			color: "text-purple-600",
-			bgColor: "bg-purple-50 dark:bg-purple-950",
+			bgColor: "bg-purple-500/10",
 		},
 		{
 			title: "Upcoming Classes",
 			value: "5",
 			icon: Calendar,
 			color: "text-orange-600",
-			bgColor: "bg-orange-50 dark:bg-orange-950",
+			bgColor: "bg-orange-500/10",
 		},
 	];
 
@@ -158,9 +158,9 @@ export default function StudentDashboard() {
 	];
 
 	return (
-		<div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+		<div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
 			{/* Sidebar */}
-			<aside className="hidden md:block">
+			<aside className="hidden md:block border-r border-border/40">
 				<DashboardSidebar navigation={studentNavigation} />
 			</aside>
 
@@ -171,21 +171,21 @@ export default function StudentDashboard() {
 					navigation={studentNavigation}
 				/>
 
-				<main className="flex-1 p-6 space-y-6">
+				<main className="flex-1 p-6 space-y-8 max-w-7xl mx-auto w-full">
 					{/* Stats Grid */}
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 						{stats.map((stat, index) => (
-							<Card key={index} className="hover:shadow-lg transition-shadow">
+							<Card key={index} className="border-border/50 shadow-sm hover:shadow-md transition-all hover:bg-accent/5">
 								<CardHeader className="flex flex-row items-center justify-between pb-2">
 									<CardTitle className="text-sm font-medium text-muted-foreground">
 										{stat.title}
 									</CardTitle>
-									<div className={`p-2 rounded-lg ${stat.bgColor}`}>
+									<div className={`p-2.5 rounded-xl ${stat.bgColor}`}>
 										<stat.icon className={`h-5 w-5 ${stat.color}`} />
 									</div>
 								</CardHeader>
 								<CardContent>
-									<div className="text-3xl font-bold">{stat.value}</div>
+									<div className="text-3xl font-bold tracking-tight">{stat.value}</div>
 								</CardContent>
 							</Card>
 						))}
@@ -193,14 +193,14 @@ export default function StudentDashboard() {
 
 					<div className="grid gap-6 md:grid-cols-2">
 						{/* Enrolled Courses */}
-						<Card>
+						<Card className="border-border/50 shadow-sm">
 							<CardHeader>
-								<CardTitle>My Courses</CardTitle>
+								<CardTitle className="text-xl font-semibold">My Courses</CardTitle>
 								<CardDescription>
 									Continue learning from where you left off
 								</CardDescription>
 							</CardHeader>
-							<CardContent className="space-y-4">
+							<CardContent className="space-y-6">
 								{enrolledCourses.map((course, index) => (
 									<div key={index} className="space-y-2">
 										<div className="flex items-start justify-between">
@@ -210,7 +210,7 @@ export default function StudentDashboard() {
 													{course.instructor}
 												</p>
 											</div>
-											<Badge variant="secondary">{course.status}</Badge>
+											<Badge variant="secondary" className="font-normal">{course.status}</Badge>
 										</div>
 										<Progress value={course.progress} className="h-2" />
 										<div className="flex items-center justify-between text-xs">
@@ -219,33 +219,33 @@ export default function StudentDashboard() {
 											</span>
 											<span className="font-medium">{course.progress}%</span>
 										</div>
-										<Button size="sm" className="w-full gap-2" variant="outline">
+										<Button size="sm" className="w-full gap-2 mt-2" variant="outline">
 											<PlayCircle className="h-4 w-4" />
 											Continue Learning
 										</Button>
 									</div>
 								))}
-								<Button className="w-full" variant="outline" asChild>
+								<Button className="w-full mt-2" variant="outline" asChild>
 									<Link href="/student/courses">View All Courses</Link>
 								</Button>
 							</CardContent>
 						</Card>
 
 						{/* Upcoming Assignments */}
-						<Card>
+						<Card className="border-border/50 shadow-sm">
 							<CardHeader>
-								<CardTitle>Upcoming Assignments</CardTitle>
+								<CardTitle className="text-xl font-semibold">Upcoming Assignments</CardTitle>
 								<CardDescription>
 									Stay on track with your deadlines
 								</CardDescription>
 							</CardHeader>
-							<CardContent className="space-y-4">
+							<CardContent className="space-y-6">
 								{upcomingAssignments.map((assignment, index) => (
 									<div
 										key={index}
-										className="flex items-start gap-4 border-b pb-3 last:border-0"
+										className="flex items-start gap-4 border-b border-border/40 pb-4 last:border-0 last:pb-0"
 									>
-										<div className="p-2 rounded-lg bg-primary/10">
+										<div className="p-2.5 rounded-lg bg-primary/10">
 											<FileText className="h-5 w-5 text-primary" />
 										</div>
 										<div className="flex-1 space-y-1">
@@ -260,7 +260,7 @@ export default function StudentDashboard() {
 															? "destructive"
 															: "secondary"
 													}
-													className="text-xs"
+													className="text-xs font-normal"
 												>
 													{assignment.priority}
 												</Badge>
@@ -271,7 +271,7 @@ export default function StudentDashboard() {
 										</div>
 									</div>
 								))}
-								<Button className="w-full" variant="outline" asChild>
+								<Button className="w-full mt-2" variant="outline" asChild>
 									<Link href="/student/assignments">View All Assignments</Link>
 								</Button>
 							</CardContent>
@@ -280,18 +280,18 @@ export default function StudentDashboard() {
 
 					<div className="grid gap-6 md:grid-cols-2">
 						{/* Recent Grades */}
-						<Card>
+						<Card className="border-border/50 shadow-sm">
 							<CardHeader>
-								<CardTitle>Recent Grades</CardTitle>
+								<CardTitle className="text-xl font-semibold">Recent Grades</CardTitle>
 								<CardDescription>
 									Your latest assignment results
 								</CardDescription>
 							</CardHeader>
-							<CardContent className="space-y-4">
+							<CardContent className="space-y-6">
 								{recentGrades.map((grade, index) => (
 									<div
 										key={index}
-										className="flex items-center justify-between border-b pb-3 last:border-0"
+										className="flex items-center justify-between border-b border-border/40 pb-4 last:border-0 last:pb-0"
 									>
 										<div className="space-y-1">
 											<p className="font-medium text-sm">{grade.assignment}</p>
@@ -307,27 +307,27 @@ export default function StudentDashboard() {
 										</div>
 									</div>
 								))}
-								<Button className="w-full" variant="outline" asChild>
+								<Button className="w-full mt-2" variant="outline" asChild>
 									<Link href="/student/grades">View All Grades</Link>
 								</Button>
 							</CardContent>
 						</Card>
 
 						{/* Upcoming Classes */}
-						<Card>
+						<Card className="border-border/50 shadow-sm">
 							<CardHeader>
-								<CardTitle>Upcoming Classes</CardTitle>
+								<CardTitle className="text-xl font-semibold">Upcoming Classes</CardTitle>
 								<CardDescription>
 									Your scheduled classes for today and tomorrow
 								</CardDescription>
 							</CardHeader>
-							<CardContent className="space-y-4">
+							<CardContent className="space-y-6">
 								{upcomingClasses.map((classItem, index) => (
 									<div
 										key={index}
-										className="flex items-start gap-4 border-b pb-3 last:border-0"
+										className="flex items-start gap-4 border-b border-border/40 pb-4 last:border-0 last:pb-0"
 									>
-										<div className="p-2 rounded-lg bg-primary/10">
+										<div className="p-2.5 rounded-lg bg-primary/10">
 											<Calendar className="h-5 w-5 text-primary" />
 										</div>
 										<div className="flex-1 space-y-1">
@@ -345,7 +345,7 @@ export default function StudentDashboard() {
 										</div>
 									</div>
 								))}
-								<Button className="w-full" variant="outline" asChild>
+								<Button className="w-full mt-2" variant="outline" asChild>
 									<Link href="/student/schedule">View Full Schedule</Link>
 								</Button>
 							</CardContent>

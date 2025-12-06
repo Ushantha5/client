@@ -48,8 +48,8 @@ export default function AdminDashboard() {
 			change: "+12.5%",
 			trend: "up",
 			icon: Users,
-			color: "text-blue-600",
-			bgColor: "bg-blue-50 dark:bg-blue-950",
+			color: "text-primary",
+			bgColor: "bg-primary/10",
 		},
 		{
 			title: "Total Teachers",
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
 			trend: "up",
 			icon: GraduationCap,
 			color: "text-green-600",
-			bgColor: "bg-green-50 dark:bg-green-950",
+			bgColor: "bg-green-500/10",
 		},
 		{
 			title: "Active Courses",
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
 			trend: "up",
 			icon: BookOpen,
 			color: "text-purple-600",
-			bgColor: "bg-purple-50 dark:bg-purple-950",
+			bgColor: "bg-purple-500/10",
 		},
 		{
 			title: "Revenue",
@@ -75,8 +75,8 @@ export default function AdminDashboard() {
 			change: "+23.5%",
 			trend: "up",
 			icon: DollarSign,
-			color: "text-yellow-600",
-			bgColor: "bg-yellow-50 dark:bg-yellow-950",
+			color: "text-orange-600",
+			bgColor: "bg-orange-500/10",
 		},
 	];
 
@@ -109,9 +109,9 @@ export default function AdminDashboard() {
 	];
 
 	return (
-		<div className="flex min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+		<div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
 			{/* Sidebar */}
-			<aside className="hidden md:block">
+			<aside className="hidden md:block border-r border-border/40">
 				<DashboardSidebar navigation={adminNavigation} />
 			</aside>
 
@@ -119,21 +119,21 @@ export default function AdminDashboard() {
 			<div className="flex-1 flex flex-col">
 				<DashboardHeader title="Admin Dashboard" navigation={adminNavigation} />
 
-				<main className="flex-1 p-6 space-y-6">
+				<main className="flex-1 p-6 space-y-8 max-w-7xl mx-auto w-full">
 					{/* Stats Grid */}
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 						{stats.map((stat, index) => (
-							<Card key={index} className="hover:shadow-lg transition-shadow">
+							<Card key={index} className="border-border/50 shadow-sm hover:shadow-md transition-all hover:bg-accent/5">
 								<CardHeader className="flex flex-row items-center justify-between pb-2">
 									<CardTitle className="text-sm font-medium text-muted-foreground">
 										{stat.title}
 									</CardTitle>
-									<div className={`p-2 rounded-lg ${stat.bgColor}`}>
+									<div className={`p-2.5 rounded-xl ${stat.bgColor}`}>
 										<stat.icon className={`h-5 w-5 ${stat.color}`} />
 									</div>
 								</CardHeader>
 								<CardContent>
-									<div className="text-3xl font-bold">{stat.value}</div>
+									<div className="text-3xl font-bold tracking-tight">{stat.value}</div>
 									<div className="flex items-center text-sm mt-1">
 										<TrendingUp className="h-4 w-4 text-green-600 mr-1" />
 										<span className="text-green-600 font-medium">
@@ -149,9 +149,9 @@ export default function AdminDashboard() {
 					</div>
 
 					{/* Admin Approvals */}
-					<Card>
+					<Card className="border-border/50 shadow-sm">
 						<CardHeader>
-							<CardTitle>Pending Approvals</CardTitle>
+							<CardTitle className="text-xl font-semibold">Pending Approvals</CardTitle>
 							<CardDescription>
 								Review and approve teacher and Avathor AI registrations
 							</CardDescription>
@@ -162,16 +162,16 @@ export default function AdminDashboard() {
 					</Card>
 
 					{/* Tabs Section */}
-					<Tabs defaultValue="overview" className="space-y-4">
-						<TabsList>
+					<Tabs defaultValue="overview" className="space-y-6">
+						<TabsList className="bg-muted/50 p-1 border border-border/40">
 							<TabsTrigger value="overview">Overview</TabsTrigger>
 							<TabsTrigger value="courses">Courses</TabsTrigger>
 							<TabsTrigger value="activity">Recent Activity</TabsTrigger>
 						</TabsList>
 
-						<TabsContent value="overview" className="space-y-4">
-							<div className="grid gap-4 md:grid-cols-2">
-								<Card>
+						<TabsContent value="overview" className="space-y-6">
+							<div className="grid gap-6 md:grid-cols-2">
+								<Card className="border-border/50 shadow-sm">
 									<CardHeader>
 										<CardTitle>Enrollment Trends</CardTitle>
 										<CardDescription>
@@ -179,14 +179,16 @@ export default function AdminDashboard() {
 										</CardDescription>
 									</CardHeader>
 									<CardContent>
-										<div className="h-[200px] flex items-center justify-center text-muted-foreground">
-											<BarChart className="h-16 w-16 opacity-20" />
-											<span className="ml-2">Chart placeholder</span>
+										<div className="h-[250px] flex items-center justify-center text-muted-foreground bg-accent/5 rounded-lg border border-border/20 border-dashed">
+											<div className="text-center">
+												<BarChart className="h-10 w-10 mx-auto mb-2 opacity-20" />
+												<span className="text-sm">Chart placeholder</span>
+											</div>
 										</div>
 									</CardContent>
 								</Card>
 
-								<Card>
+								<Card className="border-border/50 shadow-sm">
 									<CardHeader>
 										<CardTitle>Revenue Growth</CardTitle>
 										<CardDescription>
@@ -194,24 +196,26 @@ export default function AdminDashboard() {
 										</CardDescription>
 									</CardHeader>
 									<CardContent>
-										<div className="h-[200px] flex items-center justify-center text-muted-foreground">
-											<TrendingUp className="h-16 w-16 opacity-20" />
-											<span className="ml-2">Chart placeholder</span>
+										<div className="h-[250px] flex items-center justify-center text-muted-foreground bg-accent/5 rounded-lg border border-border/20 border-dashed">
+											<div className="text-center">
+												<TrendingUp className="h-10 w-10 mx-auto mb-2 opacity-20" />
+												<span className="text-sm">Chart placeholder</span>
+											</div>
 										</div>
 									</CardContent>
 								</Card>
 							</div>
 						</TabsContent>
 
-						<TabsContent value="courses" className="space-y-4">
-							<Card>
+						<TabsContent value="courses" className="space-y-6">
+							<Card className="border-border/50 shadow-sm">
 								<CardHeader>
 									<CardTitle>Top Courses</CardTitle>
 									<CardDescription>
 										Most popular courses by enrollment
 									</CardDescription>
 								</CardHeader>
-								<CardContent className="space-y-4">
+								<CardContent className="space-y-6">
 									{courseStats.map((course, index) => (
 										<div key={index} className="space-y-2">
 											<div className="flex items-center justify-between">
@@ -232,8 +236,8 @@ export default function AdminDashboard() {
 							</Card>
 						</TabsContent>
 
-						<TabsContent value="activity" className="space-y-4">
-							<Card>
+						<TabsContent value="activity" className="space-y-6">
+							<Card className="border-border/50 shadow-sm">
 								<CardHeader>
 									<CardTitle>Recent Activity</CardTitle>
 									<CardDescription>
@@ -245,18 +249,18 @@ export default function AdminDashboard() {
 										{recentActivity.map((activity, index) => (
 											<div
 												key={index}
-												className="flex items-center gap-4 border-b pb-3 last:border-0"
+												className="flex items-center gap-4 border-b border-border/40 pb-4 last:border-0 last:pb-0"
 											>
-												<div className="p-2 rounded-lg bg-muted">
-													<activity.icon className="h-5 w-5 text-muted-foreground" />
+												<div className="p-2.5 rounded-lg bg-primary/10">
+													<activity.icon className="h-5 w-5 text-primary" />
 												</div>
 												<div className="flex-1">
-													<p className="font-medium text-sm">{activity.action}</p>
+													<p className="font-medium text-sm text-foreground">{activity.action}</p>
 													<p className="text-sm text-muted-foreground">
 														{activity.user}
 													</p>
 												</div>
-												<span className="text-sm text-muted-foreground">
+												<span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
 													{activity.time}
 												</span>
 											</div>
