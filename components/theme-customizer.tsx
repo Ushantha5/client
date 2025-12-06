@@ -1,12 +1,10 @@
-"use client";
-
+import { useState } from "react";
 import { useTheme } from "next-themes";
 import { useThemeColor } from "@/contexts/ThemeColorContext";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
@@ -17,6 +15,7 @@ import { cn } from "@/lib/utils";
 export function ThemeCustomizer() {
     const { setTheme, theme } = useTheme();
     const { themeColor, setThemeColor } = useThemeColor();
+    const [open, setOpen] = useState(false);
 
     const colors = [
         { name: "blue", class: "bg-blue-600" },
@@ -27,7 +26,7 @@ export function ThemeCustomizer() {
     ];
 
     return (
-        <DropdownMenu>
+        <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9">
                     <Paintbrush className="h-4 w-4" />
@@ -46,7 +45,10 @@ export function ThemeCustomizer() {
                             variant={theme === "light" ? "default" : "outline"}
                             size="sm"
                             className="w-full"
-                            onClick={() => setTheme("light")}
+                            onClick={() => {
+                                setTheme("light");
+                                setOpen(false);
+                            }}
                         >
                             <Sun className="h-4 w-4 mr-2" />
                             Light
@@ -55,7 +57,10 @@ export function ThemeCustomizer() {
                             variant={theme === "dark" ? "default" : "outline"}
                             size="sm"
                             className="w-full"
-                            onClick={() => setTheme("dark")}
+                            onClick={() => {
+                                setTheme("dark");
+                                setOpen(false);
+                            }}
                         >
                             <Moon className="h-4 w-4 mr-2" />
                             Dark
@@ -79,7 +84,10 @@ export function ThemeCustomizer() {
                                         ? "border-primary"
                                         : "border-transparent hover:border-muted-foreground/50"
                                 )}
-                                onClick={() => setThemeColor(color.name as any)}
+                                onClick={() => {
+                                    setThemeColor(color.name as any);
+                                    setOpen(false);
+                                }}
                             >
                                 <span
                                     className={cn(

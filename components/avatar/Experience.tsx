@@ -14,7 +14,7 @@ export const Experience = ({ isSpeaking }: { isSpeaking: boolean }) => {
 			/>
 
 			{/* Environment & Background */}
-			<Environment preset="city" />
+			{/* <Environment preset="city" /> */}
 			<Stars
 				radius={100}
 				depth={50}
