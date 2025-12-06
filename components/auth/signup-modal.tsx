@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
 	Dialog,
 	DialogContent,
@@ -12,9 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiFetch } from "@/lib/api";
-import { registerSchema } from "@/lib/schemas";
-import { z } from "zod";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { User, Mail, Lock } from "lucide-react";
 
 interface SignupModalProps {
 	open: boolean;
@@ -22,37 +27,27 @@ interface SignupModalProps {
 }
 
 export function SignupModal({ open, onOpenChange }: SignupModalProps) {
-	const router = useRouter();
+	const { register } = useAuth();
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",
 		password: "",
-		confirmPassword: "",
-		phone: "",
+		role: "student",
 	});
-	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setFormData({ ...formData, [e.target.name]: e.target.value });
-	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setErrors({});
+		setError("");
 		setLoading(true);
 
 		try {
-			// Validate with Zod
-			const validated = registerSchema.parse(formData);
-
-			// Call API (don't send confirmPassword)
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			await register(
 				formData.name,
 				formData.email,
 				formData.password,
-				formData.role as "student" | "teacher",
+				formData.role as "student" | "teacher"
 			);
 			onOpenChange(false);
 		} catch (err: any) {
@@ -80,19 +75,92 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 							{error}
 						</div>
 					)}
-					className={errors.confirmPassword ? "border-destructive" : ""}
-						/>
-					{errors.confirmPassword && (
-						<p className="text-sm text-destructive">
-							{errors.confirmPassword}
-						</p>
-					)}
-				</div>
-				<Button type="submit" className="w-full" disabled={loading}>
-					{loading ? "Creating account..." : "Sign Up"}
-				</Button>
-			</form>
-		</DialogContent>
-		</Dialog >
+					<div className="space-y-4">
+						<div className="space-y-2">
+							<Label htmlFor="name">Full Name</Label>
+							<div className="relative">
+								<User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+								<Input
+									id="name"
+									type="text"
+									placeholder="John Doe"
+									value={formData.name}
+									onChange={(e) =>
+										setFormData({ ...formData, name: e.target.value })
+									}
+									required
+									className="pl-9 bg-background/50"
+								/>
+							</div>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="email">Email Address</Label>
+							<div className="relative">
+								<Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+								<Input
+									id="email"
+									type="email"
+									placeholder="you@example.com"
+									value={formData.email}
+									onChange={(e) =>
+										setFormData({ ...formData, email: e.target.value })
+									}
+									required
+									className="pl-9 bg-background/50"
+								/>
+							</div>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="password">Password</Label>
+							<div className="relative">
+								<Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+								<Input
+									id="password"
+									type="password"
+									placeholder="••••••••"
+									value={formData.password}
+									onChange={(e) =>
+										setFormData({ ...formData, password: e.target.value })
+									}
+									required
+									className="pl-9 bg-background/50"
+								/>
+							</div>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="role">I want to join as a</Label>
+							<Select
+								value={formData.role}
+								onValueChange={(value) =>
+									setFormData({ ...formData, role: value })
+								}
+							>
+								<SelectTrigger className="bg-background/50">
+									<SelectValue placeholder="Select role" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="student">Student</SelectItem>
+									<SelectItem value="teacher">Teacher</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+					</div>
+					<Button
+						type="submit"
+						className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg shadow-primary/25 h-11"
+						disabled={loading}
+					>
+						{loading ? (
+							<div className="flex items-center gap-2">
+								<div className="h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+								Creating Account...
+							</div>
+						) : (
+							"Create Account"
+						)}
+					</Button>
+				</form>
+			</DialogContent>
+		</Dialog>
 	);
 }
