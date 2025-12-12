@@ -11,7 +11,7 @@ import { handleApiError } from "@/lib/errorHandler";
 
 import { z } from "zod";
 
-export default function TeacherRegisterPage() {
+export default function AI-TEACHERRegisterPage() {
 	const router = useRouter();
 	const [formData, setFormData] = useState({
 		name: "",
@@ -57,16 +57,16 @@ export default function TeacherRegisterPage() {
 					password: formData.password,
 				});
 
-			// Register user with teacher role
+			// Register user with AI-TEACHER role
 			const response = await authService.register({
 				...userValidation,
-				role: "teacher",
+				role: "AI-TEACHER",
 			});
 
 			if (response.success) {
 				// Show success message
 				alert(
-					"Teacher registration submitted! Your account is pending admin approval. You will be notified once approved.",
+					"AI-TEACHER registration submitted! Your account is pending admin approval. You will be notified once approved.",
 				);
 				router.push("/");
 			}
@@ -80,7 +80,7 @@ export default function TeacherRegisterPage() {
 				});
 				setErrors(fieldErrors);
 			} else {
-				const errorMessage = handleApiError(error, "Teacher Registration");
+				const errorMessage = handleApiError(error, "AI-TEACHER Registration");
 				setErrors({ general: errorMessage });
 			}
 		} finally {
@@ -93,7 +93,7 @@ export default function TeacherRegisterPage() {
 			<Navbar />
 			<main className="flex-1 container mx-auto px-4 py-12">
 				<div className="max-w-2xl mx-auto">
-					<h1 className="text-3xl font-bold mb-2">Become a Teacher</h1>
+					<h1 className="text-3xl font-bold mb-2">Become a AI-TEACHER</h1>
 					<p className="text-muted-foreground mb-8">
 						Join our community of expert educators. Your application will be
 						reviewed by our admin team.

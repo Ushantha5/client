@@ -4,6 +4,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import "@/lib/suppress-auth-errors";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeColorProvider } from "@/contexts/ThemeColorContext";
+import { Toaster } from "@/components/ui/sonner";
+import { AIConsentModal } from "@/components/ai/consent-modal";
 
 export const metadata: Metadata = {
   title: "MR5 School - Learn with AI",
@@ -28,7 +30,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ThemeColorProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+              <AIConsentModal />
+            </AuthProvider>
           </ThemeColorProvider>
         </ThemeProvider>
       </body>

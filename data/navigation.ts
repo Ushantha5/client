@@ -57,8 +57,8 @@ export const adminNavigation: NavigationSection[] = [
                 icon: Users,
             },
             {
-                title: "Teachers",
-                href: "/admin/teachers",
+                title: "AI-TEACHERs",
+                href: "/admin/AI-TEACHERs",
                 icon: GraduationCap,
             },
             {
@@ -110,14 +110,14 @@ export const adminNavigation: NavigationSection[] = [
     },
 ];
 
-// Teacher Navigation
+// AI-TEACHER Navigation
 export const teacherNavigation: NavigationSection[] = [
     {
         title: "Overview",
         items: [
             {
                 title: "Dashboard",
-                href: "/teacher",
+                href: "/AI-TEACHER",
                 icon: LayoutDashboard,
             },
         ],
@@ -127,22 +127,22 @@ export const teacherNavigation: NavigationSection[] = [
         items: [
             {
                 title: "My Courses",
-                href: "/teacher/courses",
+                href: "/AI-TEACHER/courses",
                 icon: BookOpen,
             },
             {
                 title: "Students",
-                href: "/teacher/students",
+                href: "/AI-TEACHER/students",
                 icon: Users,
             },
             {
                 title: "Assignments",
-                href: "/teacher/assignments",
+                href: "/AI-TEACHER/assignments",
                 icon: FileText,
             },
             {
                 title: "Schedule",
-                href: "/teacher/schedule",
+                href: "/AI-TEACHER/schedule",
                 icon: Calendar,
             },
         ],
@@ -152,7 +152,7 @@ export const teacherNavigation: NavigationSection[] = [
         items: [
             {
                 title: "Messages",
-                href: "/teacher/messages",
+                href: "/AI-TEACHER/messages",
                 icon: MessageSquare,
             },
         ],
@@ -162,7 +162,7 @@ export const teacherNavigation: NavigationSection[] = [
         items: [
             {
                 title: "Settings",
-                href: "/teacher/settings",
+                href: "/AI-TEACHER/settings",
                 icon: Settings,
             },
         ],

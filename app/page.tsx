@@ -170,7 +170,7 @@ export default function HomePage() {
 								{
 									icon: BookOpen,
 									title: "Expert Curriculum",
-									desc: "Access world-class content curated by industry professionals and certified teachers.",
+									desc: "Access world-class content curated by industry professionals and certified AI-TEACHERs.",
 									color: "bg-purple-500/10 text-purple-500"
 								},
 								{

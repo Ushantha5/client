@@ -1,21 +1,21 @@
 import apiClient from "@/lib/apiClient";
-import { Teacher } from "@/types/teacher";
+import { AI-TEACHER } from "@/types/AI-TEACHER";
 import { ApiResponse } from "@/types/api";
 
-export const teacherService = {
+export const AI-TEACHERService = {
     /**
-     * Get all teachers
+     * Get all AI-TEACHERs
      */
-    getAllTeachers: async (): Promise<ApiResponse<Teacher[]>> => {
-        const response = await apiClient.get("/avathor/teachers");
+    getAllAI - TEACHERs: async (): Promise<ApiResponse<AI-TEACHER[] >> => {
+        const response = await apiClient.get("/avathor/AI-TEACHERs");
         return response.data;
     },
 
     /**
-     * Get teacher by ID
+     * Get AI-TEACHER by ID
      */
-    getTeacherById: async (id: string): Promise<ApiResponse<Teacher>> => {
-        const response = await apiClient.get(`/avathor/teachers/${id}`);
+    getAI - TEACHERById: async (id: string): Promise<ApiResponse<AI-TEACHER >> => {
+        const response = await apiClient.get(`/avathor/AI-TEACHERs/${id}`);
         return response.data;
     },
 };

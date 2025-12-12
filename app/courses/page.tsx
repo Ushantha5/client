@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -35,145 +36,107 @@ import {
   TrendingUp,
   Award,
   Play,
-  X
+  X,
+  Loader2,
+  ShoppingCart,
 } from "lucide-react";
+import { courseService, Course } from "@/services/course.service";
+import { paymentService } from "@/services/payment.service";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
-const COURSES_DATA = [
-  {
-    id: 1,
-    title: "Complete Web Development Bootcamp",
-    instructor: "Dr. Angela Yu",
-    category: "Development",
-    level: "Beginner",
-    students: 12453,
-    rating: 4.8,
-    duration: "52 hours",
-    price: 89.99,
-    image: "bg-gradient-to-br from-blue-500 to-purple-600",
-    description: "Master HTML, CSS, JavaScript, React, Node.js and more in this comprehensive course."
-  },
-  {
-    id: 2,
-    title: "Machine Learning A-Z™",
-    instructor: "Kirill Eremenko",
-    category: "Data Science",
-    level: "Intermediate",
-    students: 8932,
-    rating: 4.9,
-    duration: "44 hours",
-    price: 94.99,
-    image: "bg-gradient-to-br from-green-500 to-teal-600",
-    description: "Learn to create Machine Learning Algorithms in Python and R from two Data Science experts."
-  },
-  {
-    id: 3,
-    title: "The Complete Digital Marketing Course",
-    instructor: "Rob Percival",
-    category: "Marketing",
-    level: "Beginner",
-    students: 15678,
-    rating: 4.7,
-    duration: "23 hours",
-    price: 79.99,
-    image: "bg-gradient-to-br from-orange-500 to-red-600",
-    description: "12 Courses in 1: SEO, YouTube, Facebook, Google Ads, Instagram, Email & More!"
-  },
-  {
-    id: 4,
-    title: "iOS & Swift - The Complete iOS App Development",
-    instructor: "Dr. Angela Yu",
-    category: "Mobile Development",
-    level: "Beginner",
-    students: 9234,
-    rating: 4.8,
-    duration: "59 hours",
-    price: 99.99,
-    image: "bg-gradient-to-br from-purple-500 to-pink-600",
-    description: "Learn iOS app development from scratch. Build real apps including clones of Instagram and Uber."
-  },
-  {
-    id: 5,
-    title: "Complete Python Developer in 2024",
-    instructor: "Andrei Neagoie",
-    category: "Programming",
-    level: "All Levels",
-    students: 11567,
-    rating: 4.9,
-    duration: "31 hours",
-    price: 84.99,
-    image: "bg-gradient-to-br from-yellow-500 to-orange-600",
-    description: "Learn Python like a Professional! Start from the basics and go all the way to creating your own applications."
-  },
-  {
-    id: 6,
-    title: "The Complete 2024 Web Development Bootcamp",
-    instructor: "Dr. Angela Yu",
-    category: "Development",
-    level: "Beginner",
-    students: 18923,
-    rating: 4.8,
-    duration: "65 hours",
-    price: 89.99,
-    image: "bg-gradient-to-br from-cyan-500 to-blue-600",
-    description: "Become a Full-Stack Web Developer with just ONE course. HTML, CSS, Javascript, Node, React, MongoDB, Web3 and DApps."
-  },
-  {
-    id: 7,
-    title: "Advanced React Patterns",
-    instructor: "Kent C. Dodds",
-    category: "Development",
-    level: "Advanced",
-    students: 7234,
-    rating: 4.9,
-    duration: "38 hours",
-    price: 99.99,
-    image: "bg-gradient-to-br from-indigo-500 to-blue-600",
-    description: "Master advanced React patterns and techniques used by top companies worldwide."
-  },
-  {
-    id: 8,
-    title: "Data Science Masterclass",
-    instructor: "Jose Portilla",
-    category: "Data Science",
-    level: "Intermediate",
-    students: 13456,
-    rating: 4.8,
-    duration: "48 hours",
-    price: 89.99,
-    image: "bg-gradient-to-br from-teal-500 to-green-600",
-    description: "Complete data science bootcamp covering Python, Pandas, NumPy, Matplotlib, and Machine Learning."
-  }
+const gradientColors = [
+  "bg-gradient-to-br from-blue-500 to-purple-600",
+  "bg-gradient-to-br from-green-500 to-teal-600",
+  "bg-gradient-to-br from-orange-500 to-red-600",
+  "bg-gradient-to-br from-purple-500 to-pink-600",
+  "bg-gradient-to-br from-yellow-500 to-orange-600",
+  "bg-gradient-to-br from-cyan-500 to-blue-600",
+  "bg-gradient-to-br from-indigo-500 to-blue-600",
+  "bg-gradient-to-br from-teal-500 to-green-600",
 ];
 
 export default function CoursesPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("popular");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [enrollingCourseId, setEnrollingCourseId] = useState<string | null>(null);
+
+  // Fetch courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await courseService.getAllCourses({
+          isApproved: true,
+        });
+        setCourses(response.data || []);
+      } catch (error: any) {
+        console.error("Failed to fetch courses:", error);
+        toast.error("Failed to load courses");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   // Extract unique categories and levels
   const categories = useMemo(() => {
-    const cats = Array.from(new Set(COURSES_DATA.map(c => c.category)));
+    const cats = Array.from(new Set(courses.map(c => c.category).filter(Boolean)));
     return ["all", ...cats];
-  }, []);
+  }, [courses]);
 
   const levels = useMemo(() => {
-    const lvls = Array.from(new Set(COURSES_DATA.map(c => c.level)));
+    const lvls = Array.from(new Set(courses.map(c => c.level).filter(Boolean)));
     return ["all", ...lvls];
-  }, []);
+  }, [courses]);
+
+  // Handle enrollment
+  const handleEnroll = async (courseId: string) => {
+    if (!user) {
+      toast.error("Please login to enroll in courses");
+      router.push("/");
+      return;
+    }
+
+    if (user.role !== "student") {
+      toast.error("Only students can enroll in courses");
+      return;
+    }
+
+    try {
+      setEnrollingCourseId(courseId);
+      const response = await paymentService.createCheckoutSession(courseId);
+      if (response.url) {
+        window.location.href = response.url;
+      }
+    } catch (error: any) {
+      console.error("Enrollment error:", error);
+      toast.error(error.response?.data?.error || "Failed to start enrollment process");
+    } finally {
+      setEnrollingCourseId(null);
+    }
+  };
 
   // Filter and sort courses
   const filteredCourses = useMemo(() => {
-    let filtered = COURSES_DATA;
+    let filtered = courses;
 
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(course =>
         course.title.toLowerCase().includes(query) ||
-        course.description.toLowerCase().includes(query) ||
-        course.instructor.toLowerCase().includes(query)
+        course.description?.toLowerCase().includes(query) ||
+        course.AI - TEACHER?.name.toLowerCase().includes(query)
       );
     }
 
@@ -189,12 +152,6 @@ export default function CoursesPage() {
 
     // Sort
     switch (sortBy) {
-      case "popular":
-        filtered = [...filtered].sort((a, b) => b.students - a.students);
-        break;
-      case "rating":
-        filtered = [...filtered].sort((a, b) => b.rating - a.rating);
-        break;
       case "price-low":
         filtered = [...filtered].sort((a, b) => a.price - b.price);
         break;
@@ -202,11 +159,15 @@ export default function CoursesPage() {
         filtered = [...filtered].sort((a, b) => b.price - a.price);
         break;
       default:
+        // Default: sort by creation date (newest first)
+        filtered = [...filtered].sort((a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
         break;
     }
 
     return filtered;
-  }, [searchQuery, selectedCategory, selectedLevel, sortBy]);
+  }, [courses, searchQuery, selectedCategory, selectedLevel, sortBy]);
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -349,8 +310,7 @@ export default function CoursesPage() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="popular">Most Popular</SelectItem>
-                              <SelectItem value="rating">Highest Rated</SelectItem>
+                              <SelectItem value="popular">Newest First</SelectItem>
                               <SelectItem value="price-low">Price: Low to High</SelectItem>
                               <SelectItem value="price-high">Price: High to Low</SelectItem>
                             </SelectContent>
@@ -408,7 +368,11 @@ export default function CoursesPage() {
 
         {/* Courses Grid */}
         <AnimatePresence mode="wait">
-          {filteredCourses.length > 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : filteredCourses.length > 0 ? (
             <motion.div
               key="courses-grid"
               variants={containerVariants}
@@ -417,17 +381,26 @@ export default function CoursesPage() {
               exit="hidden"
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {filteredCourses.map((course) => (
-                <motion.div key={course.id} variants={itemVariants} layout>
-                  <Card className="group border-border/50 overflow-hidden hover:shadow-xl transition-all cursor-pointer h-full flex flex-col">
+              {filteredCourses.map((course, index) => (
+                <motion.div key={course._id} variants={itemVariants} layout>
+                  <Card className="group border-border/50 overflow-hidden hover:shadow-xl transition-all h-full flex flex-col">
                     {/* Course Image */}
-                    <div className={`h-48 ${course.image} relative overflow-hidden`}>
+                    <div className={`h-48 ${gradientColors[index % gradientColors.length]} relative overflow-hidden`}>
+                      {course.thumbnail ? (
+                        <img
+                          src={course.thumbnail}
+                          alt={course.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : null}
                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
-                      <div className="absolute top-4 left-4">
-                        <Badge className="bg-white/90 text-black hover:bg-white">
-                          {course.category}
-                        </Badge>
-                      </div>
+                      {course.category && (
+                        <div className="absolute top-4 left-4">
+                          <Badge className="bg-white/90 text-black hover:bg-white">
+                            {course.category}
+                          </Badge>
+                        </div>
+                      )}
                       <div className="absolute top-4 right-4">
                         <Badge variant="secondary" className="bg-black/60 text-white border-0">
                           {course.level}
@@ -446,36 +419,44 @@ export default function CoursesPage() {
                         {course.title}
                       </CardTitle>
                       <CardDescription className="line-clamp-2">
-                        {course.description}
+                        {course.description || "No description available"}
                       </CardDescription>
                     </CardHeader>
 
                     <CardContent className="space-y-4">
                       <div className="text-sm text-muted-foreground">
-                        By {course.instructor}
+                        By {course.AI - TEACHER?.name || "Unknown Instructor"}
                       </div>
 
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-4">
-                          <span className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                            <span className="font-medium">{course.rating}</span>
-                          </span>
                           <span className="flex items-center gap-1 text-muted-foreground">
-                            <Users className="h-4 w-4" />
-                            {course.students.toLocaleString()}
+                            <BookOpen className="h-4 w-4" />
+                            {course.language}
                           </span>
                         </div>
-                        <span className="flex items-center gap-1 text-muted-foreground">
-                          <Clock className="h-4 w-4" />
-                          {course.duration}
-                        </span>
                       </div>
 
                       <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                        <span className="text-2xl font-bold text-primary">${course.price}</span>
-                        <Button className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                          Enroll Now
+                        <span className="text-2xl font-bold text-primary">
+                          ${course.price.toFixed(2)}
+                        </span>
+                        <Button
+                          onClick={() => handleEnroll(course._id)}
+                          disabled={enrollingCourseId === course._id}
+                          className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                        >
+                          {enrollingCourseId === course._id ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingCart className="mr-2 h-4 w-4" />
+                              Enroll Now
+                            </>
+                          )}
                         </Button>
                       </div>
                     </CardContent>

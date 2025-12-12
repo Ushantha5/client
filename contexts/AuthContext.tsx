@@ -18,7 +18,7 @@ interface AuthContextType {
 	loading: boolean;
 	isAuthenticated: boolean;
 	login: (email: string, password: string) => Promise<void>;
-	register: (name: string, email: string, password: string, role?: "student" | "teacher") => Promise<void>;
+	register: (name: string, email: string, password: string, role?: "student" | "AI-TEACHER") => Promise<void>;
 	logout: () => void;
 	refreshUser: () => Promise<void>;
 }
@@ -91,8 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					case "admin":
 						router.push("/admin");
 						break;
-					case "teacher":
-						router.push("/teacher");
+					case "AI-TEACHER":
+						router.push("/AI-TEACHER");
 						break;
 					case "student":
 						router.push("/student");
@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		name: string,
 		email: string,
 		password: string,
-		role?: "student" | "teacher",
+		role?: "student" | "AI-TEACHER",
 	) => {
 		try {
 			const response = await authService.register({

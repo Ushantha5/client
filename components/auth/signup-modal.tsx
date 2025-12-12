@@ -47,7 +47,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 				formData.name,
 				formData.email,
 				formData.password,
-				formData.role as "student" | "teacher"
+				formData.role as "student" | "AI-TEACHER"
 			);
 			onOpenChange(false);
 		} catch (err: any) {
@@ -140,7 +140,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="student">Student</SelectItem>
-									<SelectItem value="teacher">Teacher</SelectItem>
+									<SelectItem value="AI-TEACHER">AI-TEACHER</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>

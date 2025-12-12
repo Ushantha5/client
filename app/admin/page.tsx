@@ -52,7 +52,7 @@ export default function AdminDashboard() {
 			bgColor: "bg-primary/10",
 		},
 		{
-			title: "Total Teachers",
+			title: "Total AI-TEACHERs",
 			value: "56",
 			change: "+4.2%",
 			trend: "up",
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
 			icon: BookOpen,
 		},
 		{
-			action: "Teacher approved",
+			action: "AI-TEACHER approved",
 			user: "Mike Johnson",
 			time: "3 hours ago",
 			icon: Award,
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
 						<CardHeader>
 							<CardTitle className="text-xl font-semibold">Pending Approvals</CardTitle>
 							<CardDescription>
-								Review and approve teacher and Avathor AI registrations
+								Review and approve AI-TEACHER and Avathor AI registrations
 							</CardDescription>
 						</CardHeader>
 						<CardContent>

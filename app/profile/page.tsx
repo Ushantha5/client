@@ -1,416 +1,194 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
-import { Navbar } from "@/components/layout/navbar";
-import { motion } from "framer-motion";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-    BookOpen,
-    Clock,
-    Edit2,
-    GraduationCap,
-    Mail,
-    MapPin,
-    Shield,
-    Star,
-    Trophy,
-    Calendar,
-    Users,
-    TrendingUp,
-    Share2,
-    Settings,
-    MoreHorizontal,
-    Server,
-    Activity,
-    DollarSign,
-    AlertTriangle,
-    CheckCircle2
-} from "lucide-react";
-import { toast } from "sonner";
+import Image from "next/image";
+import { Footer } from "@/components/layout/footer";
+import { LiquidProgressBar } from "@/components/dashboard/progress-bar";
+import { Trophy, Star, Zap, Clock, BookOpen, Activity } from "lucide-react";
 
 export default function ProfilePage() {
-    const { user } = useAuth();
-
-    if (!user) {
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="animate-pulse flex flex-col items-center gap-4">
-                    <div className="h-16 w-16 bg-muted rounded-full animate-bounce"></div>
-                    <div className="h-4 w-32 bg-muted rounded"></div>
-                </div>
-            </div>
-        );
-    }
-
-    const isAdmin = user.role === "admin";
-
-    const handleEditProfile = () => {
-        toast.info("Edit Profile feature coming soon!", {
-            description: "We are currently updating the profile editor."
-        });
-    };
-
-    const handleShareProfile = () => {
-        toast.success("Profile link copied!", {
-            description: "You can now share your profile with others."
-        });
-        // Navigator clipboard mockup
-        // navigator.clipboard.writeText(window.location.href);
-    };
-
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.2
-            }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            transition: {
-                type: "spring" as const,
-                stiffness: 100,
-                damping: 15
-            }
-        }
-    };
-
     return (
-        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-            <Navbar />
+        <div className="min-h-screen w-full bg-[#0b1226] overflow-x-hidden relative font-sans selection:bg-purple-500/30">
+            {/* Cosmic Background */}
+            <div className="fixed inset-0 bg-gradient-to-br from-[#0b1226] via-[#1a1f3c] to-[#0f172a] z-0" />
+            <div className="fixed top-[-20%] right-[-10%] w-[60%] h-[60%] bg-purple-600/10 rounded-full blur-[120px] animate-pulse z-0" />
+            <div className="fixed bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse delay-700 z-0" />
 
-            {/* Hero Section */}
-            <div className="relative h-64 md:h-80 w-full overflow-hidden">
-                <div className={`absolute inset-0 bg-gradient-to-r ${isAdmin ? "from-slate-900 via-amber-600/80 to-yellow-600/80" : "from-primary/80 via-purple-600/80 to-blue-600/80"} animate-gradient-x blur-md scale-110`}></div>
-                <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"></div>
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent"></div>
-            </div>
+            <main className="relative z-10 container mx-auto px-4 py-8 md:py-16">
 
-            <main className="container max-w-7xl mx-auto px-4 sm:px-6 relative -mt-32 pb-12">
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="grid grid-cols-1 lg:grid-cols-12 gap-8"
-                >
-                    {/* Left Column: Profile Card */}
-                    <motion.div variants={itemVariants} className="lg:col-span-4 space-y-6">
-                        <Card className="border-border/50 shadow-2xl backdrop-blur-xl bg-card/80 overflow-hidden">
-                            <CardContent className="pt-8 px-6 pb-8 flex flex-col items-center text-center relative">
-                                <Button variant="ghost" size="icon" className="absolute top-4 right-4 text-muted-foreground hover:text-foreground" onClick={() => toast("Settings opened")}>
-                                    <Settings className="h-5 w-5" />
-                                </Button>
+                {/* Header / Hero Section */}
+                <div className="flex flex-col md:flex-row items-center gap-8 mb-16 animate-[float_6s_ease-in-out_infinite]">
+                    {/* Avatar Section */}
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500" />
+                        {/* Holographic Ring */}
+                        <div className="absolute -inset-4 border border-cyan-500/30 rounded-full animate-[spin_10s_linear_infinite]" />
+                        <div className="absolute -inset-4 border border-purple-500/20 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
 
-                                <div className="relative mb-6">
-                                    <Avatar className={`h-32 w-32 border-4 border-background shadow-xl ring-4 ${isAdmin ? "ring-amber-500/30" : "ring-primary/20"}`}>
-                                        <AvatarImage src={user.avatarUrl} className="object-cover" />
-                                        <AvatarFallback className={`text-3xl font-bold ${isAdmin ? "bg-amber-500/10 text-amber-600" : "bg-primary/10 text-primary"}`}>
-                                            {user.name.slice(0, 2).toUpperCase()}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="absolute bottom-1 right-1 bg-green-500 h-5 w-5 rounded-full border-4 border-background" title="Online"></div>
-                                </div>
-
-                                <h1 className="text-3xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-                                    {user.name}
-                                </h1>
-                                <p className="text-muted-foreground font-medium mb-4 flex items-center gap-2">
-                                    {isAdmin ? "System Administrator" : user.role === "teacher" ? "Senior Instructor" : "Enthusiastic Learner"}
-                                    {isAdmin && <Shield className="h-4 w-4 text-amber-500 fill-amber-500/20" />}
-                                </p>
-
-                                <div className="grid grid-cols-2 gap-3 w-full mb-6">
-                                    <Button
-                                        className={`w-full ${isAdmin ? "bg-amber-600 hover:bg-amber-700 shadow-amber-600/20" : "bg-primary hover:bg-primary/90 shadow-primary/20"} shadow-lg`}
-                                        onClick={handleEditProfile}
-                                    >
-                                        <Edit2 className="h-4 w-4 mr-2" />
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className={`w-full ${isAdmin ? "border-amber-500/20 hover:bg-amber-500/5" : "border-primary/20 hover:bg-primary/5"}`}
-                                        onClick={handleShareProfile}
-                                    >
-                                        <Share2 className="h-4 w-4 mr-2" />
-                                        Share
-                                    </Button>
-                                </div>
-
-                                <div className="w-full space-y-4 pt-6 border-t border-border/50">
-                                    <div className="flex items-center justify-between text-sm group">
-                                        <span className="text-muted-foreground flex items-center gap-2">
-                                            <Mail className={`h-4 w-4 ${isAdmin ? "text-amber-500/70 group-hover:text-amber-500" : "text-primary/70 group-hover:text-primary"} transition-colors`} />
-                                            Email
-                                        </span>
-                                        <span className="font-medium truncate max-w-[180px]">{user.email}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm group">
-                                        <span className="text-muted-foreground flex items-center gap-2">
-                                            <MapPin className={`h-4 w-4 ${isAdmin ? "text-amber-500/70 group-hover:text-amber-500" : "text-primary/70 group-hover:text-primary"} transition-colors`} />
-                                            Location
-                                        </span>
-                                        <span className="font-medium">San Francisco, CA</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm group">
-                                        <span className="text-muted-foreground flex items-center gap-2">
-                                            <Calendar className={`h-4 w-4 ${isAdmin ? "text-amber-500/70 group-hover:text-amber-500" : "text-primary/70 group-hover:text-primary"} transition-colors`} />
-                                            Joined
-                                        </span>
-                                        <span className="font-medium">Nov 2023</span>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Achievements / Status Mini Card */}
-                        <Card className="border-border/50 shadow-lg bg-card/60 backdrop-blur-sm">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base font-semibold flex items-center gap-2">
-                                    {isAdmin ? <Server className="h-4 w-4 text-emerald-500" /> : <Trophy className="h-4 w-4 text-yellow-500" />}
-                                    {isAdmin ? "System Status" : "Top Achievements"}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {isAdmin ? (
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-muted-foreground">Server Load</span>
-                                            <span className="text-emerald-500 font-medium">12%</span>
-                                        </div>
-                                        <Progress value={12} className="h-1.5 bg-emerald-500/10" />
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-muted-foreground">Database</span>
-                                            <span className="text-emerald-500 font-medium">Healthy</span>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-wrap gap-2">
-                                        <Badge variant="outline" className="py-1 px-3 bg-yellow-500/10 text-yellow-600 border-yellow-500/20 hover:bg-yellow-500/20 transition-colors cursor-default">
-                                            Early Adopter
-                                        </Badge>
-                                        <Badge variant="outline" className="py-1 px-3 bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/20 transition-colors cursor-default">
-                                            Top Rated
-                                        </Badge>
-                                        <Badge variant="outline" className="py-1 px-3 bg-purple-500/10 text-purple-600 border-purple-500/20 hover:bg-purple-500/20 transition-colors cursor-default">
-                                            Mentor
-                                        </Badge>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-
-                    {/* Right Column: Content */}
-                    <motion.div variants={itemVariants} className="lg:col-span-8 space-y-6">
-
-                        {/* Stats Overview */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            {isAdmin ? [
-                                { label: "Total Users", value: "24.5k", icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
-                                { label: "Revenue", value: "$1.2M", icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-                                { label: "Active Now", value: "342", icon: Activity, color: "text-amber-500", bg: "bg-amber-500/10" },
-                                { label: "Issues", value: "3", icon: AlertTriangle, color: "text-rose-500", bg: "bg-rose-500/10" },
-                            ].map((stat, i) => (
-                                <Card key={i} className="border-border/50 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
-                                    <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-                                        <div className={`p-3 rounded-2xl mb-3 ${stat.bg}`}>
-                                            <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                                        </div>
-                                        <div className="text-2xl font-bold tracking-tight">{stat.value}</div>
-                                        <div className="text-xs text-muted-foreground font-medium mt-1">
-                                            {stat.label}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )) : [
-                                { label: "Students", value: "1,204", icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
-                                { label: "Courses", value: "12", icon: BookOpen, color: "text-purple-500", bg: "bg-purple-500/10" },
-                                { label: "Rating", value: "4.9", icon: Star, color: "text-yellow-500", bg: "bg-yellow-500/10" },
-                                { label: "Reviews", value: "850+", icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" },
-                            ].map((stat, i) => (
-                                <Card key={i} className="border-border/50 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
-                                    <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-                                        <div className={`p-3 rounded-2xl mb-3 ${stat.bg}`}>
-                                            <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                                        </div>
-                                        <div className="text-2xl font-bold tracking-tight">{stat.value}</div>
-                                        <div className="text-xs text-muted-foreground font-medium mt-1">
-                                            {stat.label}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
+                        <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-full bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
+                            {/* Placeholder for Avatar since generation failed */}
+                            <div className="text-6xl text-white/20 font-bold">
+                                AI
+                            </div>
+                            {/* If we had the image:
+							<Image src="/assets/profile/avatar-3d.png" alt="Student" fill className="object-cover" />
+							*/}
                         </div>
 
-                        {/* Main Tabs */}
-                        <Tabs defaultValue={isAdmin ? "system" : "overview"} className="w-full">
-                            <div className="flex items-center justify-between mb-6">
-                                <TabsList className="bg-muted/50 p-1 border border-border/50 backdrop-blur-sm">
-                                    {isAdmin ? (
-                                        <>
-                                            <TabsTrigger value="system" className="px-6">System</TabsTrigger>
-                                            <TabsTrigger value="users" className="px-6">Users</TabsTrigger>
-                                            <TabsTrigger value="audit" className="px-6">Audit Log</TabsTrigger>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <TabsTrigger value="overview" className="px-6">Overview</TabsTrigger>
-                                            <TabsTrigger value="courses" className="px-6">Courses</TabsTrigger>
-                                            <TabsTrigger value="reviews" className="px-6">Reviews</TabsTrigger>
-                                        </>
-                                    )}
-                                </TabsList>
-                                <Button variant="ghost" size="sm" className="hidden sm:flex text-muted-foreground">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
+                        <div className="absolute bottom-0 right-0 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform translate-x-2 translate-y-2">
+                            Lvl 12
+                        </div>
+                    </div>
+
+                    {/* Student Info */}
+                    <div className="text-center md:text-left space-y-2">
+                        <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-200 to-cyan-200">
+                            Alex Chen
+                        </h1>
+                        <div className="flex flex-wrap justify-center md:justify-start gap-3">
+                            <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium backdrop-blur-sm">
+                                Cadet Rank
+                            </span>
+                            <span className="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium backdrop-blur-sm">
+                                Science Track
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Dashboard Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    {/* Left Col: Stats & Badges */}
+                    <div className="space-y-8 lg:col-span-1">
+                        {/* Summary Panel */}
+                        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[30px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:bg-white/10 transition-colors duration-300">
+                            <h3 className="text-white/80 font-bold mb-4 flex items-center gap-2">
+                                <Activity className="h-5 w-5 text-cyan-400" />
+                                Current Activity
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-blue-200/60">Learning Streak</span>
+                                    <span className="text-white font-bold flex items-center gap-1">
+                                        <Zap className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                                        14 Days
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-blue-200/60">Hours Learned</span>
+                                    <span className="text-white font-bold flex items-center gap-1">
+                                        <Clock className="h-4 w-4 text-cyan-400" />
+                                        32.5 hrs
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-blue-200/60">Modules Completed</span>
+                                    <span className="text-white font-bold flex items-center gap-1">
+                                        <BookOpen className="h-4 w-4 text-purple-400" />
+                                        8/12
+                                    </span>
+                                </div>
                             </div>
+                        </div>
 
-                            {isAdmin ? (
-                                /* ADMIN TABS */
-                                <>
-                                    <TabsContent value="system" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-                                        <Card className="border-border/50 shadow-sm">
-                                            <CardHeader>
-                                                <CardTitle>System Health</CardTitle>
-                                                <CardDescription>Real-time performance metrics</CardDescription>
-                                            </CardHeader>
-                                            <CardContent className="space-y-6">
-                                                <div className="space-y-2">
-                                                    <div className="flex justify-between text-sm">
-                                                        <span>CPU Usage</span>
-                                                        <span className="text-muted-foreground">45%</span>
-                                                    </div>
-                                                    <Progress value={45} className="h-2" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <div className="flex justify-between text-sm">
-                                                        <span>Memory Usage</span>
-                                                        <span className="text-muted-foreground">62%</span>
-                                                    </div>
-                                                    <Progress value={62} className="h-2" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <div className="flex justify-between text-sm">
-                                                        <span>Storage</span>
-                                                        <span className="text-muted-foreground">28%</span>
-                                                    </div>
-                                                    <Progress value={28} className="h-2" />
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </TabsContent>
-                                    <TabsContent value="users" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-                                        <Card className="border-border/50 shadow-sm">
-                                            <CardHeader>
-                                                <CardTitle>Recent Registrations</CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="space-y-4">
-                                                    {[1, 2, 3].map((i) => (
-                                                        <div key={i} className="flex items-center justify-between border-b border-border/50 pb-4 last:border-0 last:pb-0">
-                                                            <div className="flex items-center gap-3">
-                                                                <Avatar className="h-9 w-9">
-                                                                    <AvatarFallback>U{i}</AvatarFallback>
-                                                                </Avatar>
-                                                                <div>
-                                                                    <p className="text-sm font-medium">New User {i}</p>
-                                                                    <p className="text-xs text-muted-foreground">user{i}@example.com</p>
-                                                                </div>
-                                                            </div>
-                                                            <Badge variant="outline" className="text-xs">Student</Badge>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </TabsContent>
-                                </>
-                            ) : (
-                                /* TEACHER/STUDENT TABS */
-                                <>
-                                    <TabsContent value="overview" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-                                        <Card className="border-border/50 shadow-sm">
-                                            <CardHeader>
-                                                <CardTitle>Biography</CardTitle>
-                                            </CardHeader>
-                                            <CardContent className="space-y-4">
-                                                <p className="text-muted-foreground leading-relaxed">
-                                                    Passionate educator and technologist with over 10 years of experience in Full Stack Development.
-                                                    Dedicated to empowering the next generation of developers through interactive learning and real-world projects.
-                                                </p>
-                                            </CardContent>
-                                        </Card>
-                                        <Card className="border-border/50 shadow-sm">
-                                            <CardHeader>
-                                                <CardTitle>Skills</CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {["React", "Next.js", "TypeScript", "Node.js"].map((skill) => (
-                                                        <Badge key={skill} variant="secondary">{skill}</Badge>
-                                                    ))}
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </TabsContent>
+                        {/* Badges Panel */}
+                        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[30px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                            <h3 className="text-white/80 font-bold mb-4 flex items-center gap-2">
+                                <Trophy className="h-5 w-5 text-yellow-400" />
+                                Achievements
+                            </h3>
+                            <div className="grid grid-cols-3 gap-4">
+                                {[1, 2, 3, 4, 5, 6].map((i) => (
+                                    <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center group hover:bg-white/10 transition-all cursor-pointer relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <Star className={`h-8 w-8 ${i <= 3 ? 'text-yellow-400 fill-yellow-400' : 'text-slate-600'} drop-shadow-lg transform group-hover:scale-110 transition-transform`} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
 
-                                    <TabsContent value="courses" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {[1, 2, 3, 4].map((i) => (
-                                                <Card key={i} className="group border-border/50 overflow-hidden hover:shadow-lg transition-all cursor-pointer">
-                                                    <div className="h-32 bg-secondary/30 relative overflow-hidden">
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                                        <div className="absolute bottom-3 left-4 text-white font-bold text-lg">
-                                                            Course {i}
-                                                        </div>
-                                                    </div>
-                                                    <CardContent className="p-4">
-                                                        <div className="flex items-center justify-between text-sm text-muted-foreground">
-                                                            <span>1.2k Students</span>
-                                                            <span className="flex items-center gap-1 text-yellow-500"><Star className="h-3 w-3 fill-current" /> 4.9</span>
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
+                    {/* Right Col: Progress & Courses */}
+                    <div className="space-y-8 lg:col-span-2">
+
+                        {/* Liquid Progress Card */}
+                        <div className="bg-gradient-to-br from-blue-900/40 to-[#0b1226]/80 backdrop-blur-xl border border-cyan-500/20 p-8 rounded-[40px] relative overflow-hidden group">
+                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl group-hover:bg-cyan-500/30 transition-colors" />
+
+                            <div className="relative z-10">
+                                <div className="flex justify-between items-end mb-6">
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-white mb-1">Weekly Goal</h2>
+                                        <p className="text-blue-200/60 text-sm">Keep up the great momentum!</p>
+                                    </div>
+                                    <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                                        78%
+                                    </span>
+                                </div>
+
+                                <LiquidProgressBar progress={78} className="h-8" />
+
+                                <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {['Physics', 'Math', 'Coding', 'History'].map((subject) => (
+                                        <div key={subject} className="bg-black/20 rounded-xl p-3 border border-white/5 text-center">
+                                            <div className="text-xs text-blue-300/60 mb-1">{subject}</div>
+                                            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                                <div className="h-full bg-cyan-500 w-3/4 rounded-full" />
+                                            </div>
                                         </div>
-                                    </TabsContent>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
 
-                                    <TabsContent value="reviews" className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-                                        <div className="space-y-4">
-                                            {[1, 2].map((i) => (
-                                                <Card key={i} className="border-border/50">
-                                                    <CardContent className="p-5">
-                                                        <p className="text-sm text-muted-foreground">"Great course!"</p>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
+                        {/* Recent Activity / Course Strip */}
+                        <div className="space-y-4">
+                            <h3 className="text-white/80 font-bold px-2">Continue Learning</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Course Card 1 */}
+                                <div className="group relative h-48 rounded-[30px] bg-white/5 backdrop-blur-md border border-white/10 overflow-hidden hover:-translate-y-2 transition-transform duration-300">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                                    {/* Placeholder for course image */}
+                                    <div className="absolute inset-0 bg-blue-900/30 group-hover:bg-blue-800/40 transition-colors" />
+
+                                    <div className="absolute bottom-0 left-0 w-full p-6 z-20">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500 text-black uppercase tracking-wider">
+                                                In Progress
+                                            </span>
+                                            <span className="text-white/80 text-xs">2h left</span>
                                         </div>
-                                    </TabsContent>
-                                </>
-                            )}
-                        </Tabs>
-                    </motion.div>
-                </motion.div>
+                                        <h4 className="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">
+                                            Advanced Quantum Mechanics
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                {/* Course Card 2 */}
+                                <div className="group relative h-48 rounded-[30px] bg-white/5 backdrop-blur-md border border-white/10 overflow-hidden hover:-translate-y-2 transition-transform duration-300">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                                    <div className="absolute inset-0 bg-purple-900/30 group-hover:bg-purple-800/40 transition-colors" />
+
+                                    <div className="absolute bottom-0 left-0 w-full p-6 z-20">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500 text-white uppercase tracking-wider">
+                                                New
+                                            </span>
+                                            <span className="text-white/80 text-xs">Video</span>
+                                        </div>
+                                        <h4 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                                            Astro-Biology Basics
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
+
+            <Footer />
         </div>
     );
 }

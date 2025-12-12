@@ -150,9 +150,43 @@ export default function AIAssistantPage() {
                 mode: isMicOn ? 'voice' : 'text'
             });
 
-            // Simulate AI response (in production, this would come from your AI service)
-            setTimeout(async () => {
-                const aiResponseText = generateAIResponse(inputMessage);
+            // Get AI response from API
+            try {
+                let aiResponseText = '';
+                
+                // Try OpenAI first, fallback to Gemini
+                try {
+                    const openaiResponse = await fetch('/api/ai/openai', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: inputMessage }),
+                    });
+                    
+                    if (openaiResponse.ok) {
+                        const data = await openaiResponse.json();
+                        aiResponseText = data.response || generateAIResponse(inputMessage);
+                    } else {
+                        throw new Error('OpenAI failed');
+                    }
+                } catch (openaiError) {
+                    // Fallback to Gemini
+                    try {
+                        const geminiResponse = await fetch('/api/ai/gemini', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: inputMessage }),
+                        });
+                        
+                        if (geminiResponse.ok) {
+                            const data = await geminiResponse.json();
+                            aiResponseText = data.response || generateAIResponse(inputMessage);
+                        } else {
+                            aiResponseText = generateAIResponse(inputMessage);
+                        }
+                    } catch (geminiError) {
+                        aiResponseText = generateAIResponse(inputMessage);
+                    }
+                }
 
                 // Update interaction with response
                 if (interaction.data._id) {
@@ -176,7 +210,28 @@ export default function AIAssistantPage() {
                 loadHistory();
 
                 toast.success('AI response generated');
-            }, 1500);
+            } catch (aiError) {
+                console.error('AI response error:', aiError);
+                const fallbackResponse = generateAIResponse(inputMessage);
+                
+                if (interaction.data._id) {
+                    await aiAssistantService.updateInteraction(interaction.data._id, {
+                        response: fallbackResponse
+                    });
+                }
+
+                const aiResponse: Message = {
+                    id: (Date.now() + 1).toString(),
+                    type: 'ai',
+                    content: fallbackResponse,
+                    timestamp: new Date(),
+                    interactionId: interaction.data._id
+                };
+
+                setMessages(prev => [...prev, aiResponse]);
+                setIsLoading(false);
+                loadHistory();
+            }
         } catch (error) {
             console.error('Failed to send message:', error);
             toast.error('Failed to send message. Please try again.');

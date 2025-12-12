@@ -2,7 +2,7 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    role: "student" | "teacher" | "admin";
+    role: "student" | "AI-TEACHER" | "admin";
     status: string;
     avatarUrl?: string;
     createdAt?: Date;
@@ -18,7 +18,7 @@ export interface RegisterData {
     name: string;
     email: string;
     password: string;
-    role?: "student" | "teacher";
+    role?: "student" | "AI-TEACHER";
 }
 
 export interface UserProfile extends User {

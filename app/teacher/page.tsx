@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
-import { teacherNavigation } from "@/data/navigation";
+import { AI-TEACHERNavigation } from "@/data/navigation";
 import {
 	Card,
 	CardContent,
@@ -28,17 +28,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function TeacherDashboard() {
+export default function AI-TEACHERDashboard() {
 	const { user } = useAuth();
 	const router = useRouter();
 
 	useEffect(() => {
-		if (!user || user.role !== "teacher") {
+		if (!user || user.role !== "AI-TEACHER") {
 			router.push("/");
 		}
 	}, [user, router]);
 
-	if (!user || user.role !== "teacher") {
+	if (!user || user.role !== "AI-TEACHER") {
 		return null;
 	}
 
@@ -140,14 +140,14 @@ export default function TeacherDashboard() {
 		<div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
 			{/* Sidebar */}
 			<aside className="hidden md:block border-r border-border/40">
-				<DashboardSidebar navigation={teacherNavigation} />
+				<DashboardSidebar navigation={AI - TEACHERNavigation} />
 			</aside>
 
 			{/* Main Content */}
 			<div className="flex-1 flex flex-col">
 				<DashboardHeader
-					title="Teacher Dashboard"
-					navigation={teacherNavigation}
+					title="AI-TEACHER Dashboard"
+					navigation={AI - TEACHERNavigation}
 				/>
 
 				<main className="flex-1 p-6 space-y-8 max-w-7xl mx-auto w-full">
@@ -198,7 +198,7 @@ export default function TeacherDashboard() {
 									</div>
 								))}
 								<Button className="w-full mt-2" variant="outline" asChild>
-									<Link href="/teacher/courses">View All Courses</Link>
+									<Link href="/AI-TEACHER/courses">View All Courses</Link>
 								</Button>
 							</CardContent>
 						</Card>
@@ -236,7 +236,7 @@ export default function TeacherDashboard() {
 									</div>
 								))}
 								<Button className="w-full mt-2" variant="outline" asChild>
-									<Link href="/teacher/schedule">View Full Schedule</Link>
+									<Link href="/AI-TEACHER/schedule">View Full Schedule</Link>
 								</Button>
 							</CardContent>
 						</Card>
@@ -283,7 +283,7 @@ export default function TeacherDashboard() {
 								))}
 							</div>
 							<Button className="w-full mt-6" variant="outline" asChild>
-								<Link href="/teacher/assignments">View All Submissions</Link>
+								<Link href="/AI-TEACHER/assignments">View All Submissions</Link>
 							</Button>
 						</CardContent>
 					</Card>

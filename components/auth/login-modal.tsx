@@ -42,10 +42,10 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 		}
 	};
 
-	const fillDemoCredentials = (role: "admin" | "teacher" | "student") => {
+	const fillDemoCredentials = (role: "admin" | "AI-TEACHER" | "student") => {
 		const credentials = {
 			admin: { email: "admin@mr5school.com", password: "Admin@123456" },
-			teacher: { email: "teacher@mr5school.com", password: "Teacher@123456" },
+			"AI-TEACHER": { email: "AI-TEACHER@mr5school.com", password: "AI-TEACHER@123456" },
 			student: { email: "student@mr5school.com", password: "Student@123456" },
 		};
 		setEmail(credentials[role].email);
@@ -74,7 +74,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 							</p>
 						</div>
 						<div className="grid grid-cols-3 gap-2">
-							{["Admin", "Teacher", "Student"].map((role) => (
+							{["Admin", "AI-TEACHER", "Student"].map((role) => (
 								<Button
 									key={role}
 									type="button"
