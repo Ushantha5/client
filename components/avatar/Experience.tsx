@@ -1,5 +1,5 @@
 "use client";
-import { Environment, OrbitControls, Stars, Float } from "@react-three/drei";
+import { OrbitControls, Stars, Float } from "@react-three/drei";
 import { Avatar } from "./Avatar";
 import { Suspense } from "react";
 

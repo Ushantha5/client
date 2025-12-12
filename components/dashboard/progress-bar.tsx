@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface ProgressBarProps {
@@ -9,11 +8,6 @@ interface ProgressBarProps {
 }
 
 export function LiquidProgressBar({ progress = 0, className }: ProgressBarProps) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     return (
         <div className={cn("w-full relative h-[60px] flex items-center", className)}>

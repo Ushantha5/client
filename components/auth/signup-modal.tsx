@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -22,11 +22,11 @@ import {
 import { User, Mail, Lock } from "lucide-react";
 
 interface SignupModalProps {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
+	_open: boolean;
+	onOpenChange: (isOpen: boolean) => void;
 }
 
-export function SignupModal({ open, onOpenChange }: SignupModalProps) {
+export function SignupModal({ _open, onOpenChange }: SignupModalProps) {
 	const { register } = useAuth();
 	const [formData, setFormData] = useState({
 		name: "",
@@ -58,14 +58,14 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog open={_open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-[450px] bg-background/80 backdrop-blur-xl border-white/10 shadow-2xl">
 				<DialogHeader className="space-y-3">
 					<DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
 						Join MR5 School
 					</DialogTitle>
 					<DialogDescription className="text-center text-muted-foreground">
-						Create your account to start learning or teaching
+						Create your account to start learning
 					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="space-y-4">
@@ -83,7 +83,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 								<Input
 									id="name"
 									type="text"
-									placeholder="John Doe"
+									placeholder="Mr Ushantha"
 									value={formData.name}
 									onChange={(e) =>
 										setFormData({ ...formData, name: e.target.value })
@@ -100,7 +100,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 								<Input
 									id="email"
 									type="email"
-									placeholder="you@example.com"
+									placeholder="ushanthamr@gmail.com"
 									value={formData.email}
 									onChange={(e) =>
 										setFormData({ ...formData, email: e.target.value })
@@ -117,7 +117,7 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 								<Input
 									id="password"
 									type="password"
-									placeholder="••••••••"
+									placeholder="hgufv^_^1234"
 									value={formData.password}
 									onChange={(e) =>
 										setFormData({ ...formData, password: e.target.value })
@@ -140,7 +140,6 @@ export function SignupModal({ open, onOpenChange }: SignupModalProps) {
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="student">Student</SelectItem>
-									<SelectItem value="AI-TEACHER">AI-TEACHER</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>

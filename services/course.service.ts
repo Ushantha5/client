@@ -9,15 +9,15 @@ export interface Course {
 	price: number;
 	thumbnail?: string;
 	language: string;
-	AI - TEACHER: {
-	_id: string;
-	name: string;
-	email: string;
-	profileImage ?: string;
-};
-isApproved: boolean;
-createdAt: string;
-updatedAt: string;
+	teacher: {
+		_id: string;
+		name: string;
+		email: string;
+		profileImage?: string;
+	};
+	isApproved: boolean;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface CoursesResponse {
@@ -49,5 +49,24 @@ export const courseService = {
 		);
 		return response.data;
 	},
+
+	createCourse: async (courseData: {
+		title: string;
+		description: string;
+		category: string;
+		level: string;
+		price: number;
+		language: string;
+		thumbnail?: string;
+		teacher: string;
+		isApproved?: boolean;
+	}): Promise<{ success: boolean; data: Course }> => {
+		const response = await apiClient.post<{ success: boolean; data: Course }>(
+			"/api/courses",
+			courseData,
+		);
+		return response.data;
+	},
 };
+
 

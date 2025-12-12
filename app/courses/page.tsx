@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -28,13 +29,8 @@ import {
 } from "@/components/ui/popover";
 import {
   BookOpen,
-  Clock,
-  Star,
-  Users,
   Search,
   Filter,
-  TrendingUp,
-  Award,
   Play,
   X,
   Loader2,
@@ -74,7 +70,7 @@ export default function CoursesPage() {
       try {
         setLoading(true);
         const response = await courseService.getAllCourses({
-          isApproved: true,
+          // isApproved: true,
         });
         setCourses(response.data || []);
       } catch (error: any) {
@@ -136,7 +132,7 @@ export default function CoursesPage() {
       filtered = filtered.filter(course =>
         course.title.toLowerCase().includes(query) ||
         course.description?.toLowerCase().includes(query) ||
-        course.AI - TEACHER?.name.toLowerCase().includes(query)
+        course.teacher?.name.toLowerCase().includes(query)
       );
     }
 
@@ -279,8 +275,8 @@ export default function CoursesPage() {
                             </SelectTrigger>
                             <SelectContent>
                               {categories.map(cat => (
-                                <SelectItem key={cat} value={cat}>
-                                  {cat === "all" ? "All Categories" : cat}
+                                <SelectItem key={cat as string} value={cat as string}>
+                                  {cat === "all" ? "All Categories" : (cat as string)}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -295,8 +291,8 @@ export default function CoursesPage() {
                             </SelectTrigger>
                             <SelectContent>
                               {levels.map(lvl => (
-                                <SelectItem key={lvl} value={lvl}>
-                                  {lvl === "all" ? "All Levels" : lvl}
+                                <SelectItem key={lvl as string} value={lvl as string}>
+                                  {lvl === "all" ? "All Levels" : (lvl as string)}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -387,10 +383,11 @@ export default function CoursesPage() {
                     {/* Course Image */}
                     <div className={`h-48 ${gradientColors[index % gradientColors.length]} relative overflow-hidden`}>
                       {course.thumbnail ? (
-                        <img
+                        <Image
                           src={course.thumbnail}
                           alt={course.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       ) : null}
                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
@@ -425,7 +422,7 @@ export default function CoursesPage() {
 
                     <CardContent className="space-y-4">
                       <div className="text-sm text-muted-foreground">
-                        By {course.AI - TEACHER?.name || "Unknown Instructor"}
+                        By {course.teacher?.name || "Unknown Instructor"}
                       </div>
 
                       <div className="flex items-center justify-between text-sm">

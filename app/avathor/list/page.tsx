@@ -3,29 +3,29 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import { Card } from "@/components/ui/card";
-import { AI-TEACHERService } from "@/services/AI-TEACHER.service";
-import { AI-TEACHER } from "@/types/AI-TEACHER";
+import { teacherService } from "@/services/teacher.service";
+import { Teacher } from "@/types/teacher";
 import { handleApiError } from "@/lib/errorHandler";
 
 export default function AvathorListPage() {
-	const [AI-TEACHERs, setAI - TEACHERs] = useState < AI - TEACHER[] > ([]);
+	const [teachers, setTeachers] = useState<Teacher[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		loadAI - TEACHERs();
+		loadTeachers();
 	}, []);
 
-	const loadAI-TEACHERs = async () => {
+	const loadTeachers = async () => {
 		setLoading(true);
 		setError(null);
 		try {
-			const response = await AI - TEACHERService.getAllAI - TEACHERs();
+			const response = await teacherService.getAllTeachers();
 			if (response.success) {
-				setAI - TEACHERs(response.data || []);
+				setTeachers(response.data || []);
 			}
 		} catch (err: unknown) {
-			setError(handleApiError(err, "Fetch AI-TEACHERs"));
+			setError(handleApiError(err, "Fetch Teachers"));
 		} finally {
 			setLoading(false);
 		}
@@ -35,13 +35,13 @@ export default function AvathorListPage() {
 		<div className="min-h-screen flex flex-col">
 			<Navbar />
 			<main className="flex-1 container mx-auto px-4 py-12">
-				<h1 className="text-3xl font-bold mb-6">Avathor AI AI-TEACHERs</h1>
+				<h1 className="text-3xl font-bold mb-6">Avathor AI Teachers</h1>
 
 				{loading && <p>Loading...</p>}
 				{error && <div className="text-destructive">{error}</div>}
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{AI - TEACHERs.map((t) => (
+					{teachers.map((t) => (
 						<Card key={t._id} className="p-4">
 							<h3 className="text-xl font-semibold">
 								{t.user?.name || "Avathor AI"}
@@ -52,9 +52,9 @@ export default function AvathorListPage() {
 						</Card>
 					))}
 
-					{!loading && AI - TEACHERs.length === 0 && !error && (
+					{!loading && teachers.length === 0 && !error && (
 						<div className="text-muted-foreground">
-							No Avathor AI AI-TEACHERs found.
+							No Avathor AI Teachers found.
 						</div>
 					)}
 				</div>

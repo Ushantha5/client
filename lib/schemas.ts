@@ -20,7 +20,7 @@ export const loginSchema = z.object({
 	password: z.string().min(1, "Password is required"),
 });
 
-export const AI-TEACHERRegistrationSchema = z.object({
+export const AITeacherRegistrationSchema = z.object({
 	bio: z.string().min(10, "Bio must be at least 10 characters"),
 	qualifications: z.string().min(5, "Qualifications are required"),
 	experience: z.string().optional(),

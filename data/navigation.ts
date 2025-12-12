@@ -110,74 +110,8 @@ export const adminNavigation: NavigationSection[] = [
     },
 ];
 
-// AI-TEACHER Navigation
-export const teacherNavigation: NavigationSection[] = [
-    {
-        title: "Overview",
-        items: [
-            {
-                title: "Dashboard",
-                href: "/AI-TEACHER",
-                icon: LayoutDashboard,
-            },
-        ],
-    },
-    {
-        title: "Teaching",
-        items: [
-            {
-                title: "My Courses",
-                href: "/AI-TEACHER/courses",
-                icon: BookOpen,
-            },
-            {
-                title: "Students",
-                href: "/AI-TEACHER/students",
-                icon: Users,
-            },
-            {
-                title: "Assignments",
-                href: "/AI-TEACHER/assignments",
-                icon: FileText,
-            },
-            {
-                title: "Schedule",
-                href: "/AI-TEACHER/schedule",
-                icon: Calendar,
-            },
-        ],
-    },
-    {
-        title: "Communication",
-        items: [
-            {
-                title: "Messages",
-                href: "/AI-TEACHER/messages",
-                icon: MessageSquare,
-            },
-        ],
-    },
-    {
-        title: "Account",
-        items: [
-            {
-                title: "Settings",
-                href: "/AI-TEACHER/settings",
-                icon: Settings,
-            },
-        ],
-    },
-    {
-        title: "Tools",
-        items: [
-            {
-                title: "MMS Solver",
-                href: "/solver",
-                icon: Bot,
-            },
-        ],
-    },
-];
+
+// AI-TEACHER navigation removed
 
 // Student Navigation
 export const studentNavigation: NavigationSection[] = [

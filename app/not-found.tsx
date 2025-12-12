@@ -30,10 +30,10 @@ export default function NotFound() {
 								Oops!
 							</h1>
 							<p className="text-3xl md:text-4xl font-bold text-white/90">
-								You're off the learning path.
+								You&apos;re off the learning path.
 							</p>
 							<p className="text-lg text-blue-200/60 max-w-lg mx-auto lg:mx-0 font-medium">
-								This page doesn't exist — let's get you back on track to your space odyssey.
+								This page doesn&apos;t exist — let&apos;s get you back on track to your space odyssey.
 							</p>
 						</div>
 

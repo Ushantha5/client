@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+// import Image from "next/image";
 import { Footer } from "@/components/layout/footer";
 import { LiquidProgressBar } from "@/components/dashboard/progress-bar";
 import { Trophy, Star, Zap, Clock, BookOpen, Activity } from "lucide-react";

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Smile, Frown, Meh, Video, VideoOff, Activity } from "lucide-react";
+import { Smile, Meh, Video, VideoOff, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function MoodDetector() {

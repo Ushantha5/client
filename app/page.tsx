@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getTimeBasedGreeting } from "@/lib/time-utils";
 import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -21,12 +22,19 @@ export default function HomePage() {
 	const [loading, setLoading] = useState(true);
 	const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 	const [aiProvider] = useState<"openai" | "gemini" | "mock">("openai");
+	const [greeting, setGreeting] = useState("");
 
 	const voiceInteraction = useVoiceInteraction(aiProvider);
 	const { isSpeaking } = voiceInteraction;
 
 	useEffect(() => {
 		setMounted(true);
+		setGreeting(getTimeBasedGreeting());
+		// Update greeting every minute
+		const interval = setInterval(() => {
+			setGreeting(getTimeBasedGreeting());
+		}, 60000);
+		return () => clearInterval(interval);
 	}, []);
 
 	if (!mounted) {
@@ -61,7 +69,7 @@ export default function HomePage() {
 							</div>
 
 							<h1 className="text-5xl lg:text-7xl font-bold leading-tight">
-								Master Any Subject with <br />
+								{greeting}! Master Any Subject with <br />
 								<span className="bg-gradient-to-r from-primary via-purple-500 to-pink-600 bg-clip-text text-transparent">
 									AI Intelligence
 								</span>

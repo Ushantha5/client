@@ -71,12 +71,6 @@ export function Navbar() {
 						>
 							Contact
 						</Link>
-						<Link
-							href="/solver"
-							className="text-foreground/80 hover:text-foreground transition-colors hover:underline underline-offset-4"
-						>
-							Solver
-						</Link>
 					</div>
 
 					{/* Auth Buttons */}
@@ -131,8 +125,8 @@ export function Navbar() {
 				</div>
 			</nav >
 
-			<LoginModal open={showLogin} onOpenChange={setShowLogin} />
-			<SignupModal open={showSignup} onOpenChange={setShowSignup} />
+			<LoginModal _open={showLogin} onOpenChange={setShowLogin} />
+			<SignupModal _open={showSignup} onOpenChange={setShowSignup} />
 		</>
 	);
 }

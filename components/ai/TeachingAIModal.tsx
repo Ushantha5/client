@@ -8,7 +8,6 @@ import {
     X,
     Sparkles,
     Send,
-    Loader2,
     Bot,
     User
 } from 'lucide-react';
@@ -16,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { MoodDetector } from '@/components/classroom/MoodDetector';
-import { cn } from '@/lib/utils';
+// import { cn } from '@/lib/utils';
 
 interface TeachingAIModalProps {
     isOpen: boolean;

@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -137,10 +136,10 @@ export default function AboutPage() {
             <CardContent className="p-12">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 {[
-                  { label: "Students", value: "10,000+" },
-                  { label: "Courses", value: "150+" },
-                  { label: "Instructors", value: "50+" },
-                  { label: "Countries", value: "25+" }
+                  { label: "Students", value: "0+" },
+                  { label: "Courses", value: "0+" },
+                  { label: "Instructors", value: "1+" },
+                  { label: "Countries", value: "1+" }
                 ].map((stat, index) => (
                   <div key={index} className="text-center">
                     <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>

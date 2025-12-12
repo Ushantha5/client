@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
@@ -22,14 +22,19 @@ import {
 	DollarSign,
 	UserPlus,
 	Award,
+	Plus,
 } from "lucide-react";
 import AdminApprovalsTable from "@/components/admin/approvals-table";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CreateCourseModal } from "@/components/admin/create-course-modal";
+import { Button } from "@/components/ui/button";
+
 
 export default function AdminDashboard() {
 	const { user } = useAuth();
 	const router = useRouter();
+	const [showCreateCourse, setShowCreateCourse] = useState(false);
 
 	useEffect(() => {
 		if (!user || user.role !== "admin") {
@@ -40,6 +45,12 @@ export default function AdminDashboard() {
 	if (!user || user.role !== "admin") {
 		return null;
 	}
+
+	const handleCourseCreated = () => {
+		// Optionally refresh course data or show success message
+		// For now, the modal handles the success toast
+	};
+
 
 	const stats = [
 		{
@@ -120,6 +131,24 @@ export default function AdminDashboard() {
 				<DashboardHeader title="Admin Dashboard" navigation={adminNavigation} />
 
 				<main className="flex-1 p-6 space-y-8 max-w-7xl mx-auto w-full">
+					{/* Header with Create Course Button */}
+					<div className="flex items-center justify-between">
+						<div>
+							<h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
+							<p className="text-muted-foreground">
+								Manage your platform and monitor key metrics
+							</p>
+						</div>
+						<Button
+							onClick={() => setShowCreateCourse(true)}
+							className="gap-2"
+							size="lg"
+						>
+							<Plus className="h-5 w-5" />
+							Create Course
+						</Button>
+					</div>
+
 					{/* Stats Grid */}
 					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 						{stats.map((stat, index) => (
@@ -272,6 +301,13 @@ export default function AdminDashboard() {
 					</Tabs>
 				</main>
 			</div>
+
+			{/* Create Course Modal */}
+			<CreateCourseModal
+				open={showCreateCourse}
+				onOpenChange={setShowCreateCourse}
+				onSuccess={handleCourseCreated}
+			/>
 		</div>
 	);
 }

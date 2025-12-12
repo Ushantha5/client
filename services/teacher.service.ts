@@ -1,21 +1,21 @@
 import apiClient from "@/lib/apiClient";
-import { AI-TEACHER } from "@/types/AI-TEACHER";
+import { Teacher } from "@/types/teacher"; // Assuming type file will be renamed or exports Teacher
 import { ApiResponse } from "@/types/api";
 
-export const AI-TEACHERService = {
+export const teacherService = {
     /**
      * Get all AI-TEACHERs
      */
-    getAllAI - TEACHERs: async (): Promise<ApiResponse<AI-TEACHER[] >> => {
-        const response = await apiClient.get("/avathor/AI-TEACHERs");
+    getAllTeachers: async (): Promise<ApiResponse<Teacher[]>> => {
+        const response = await apiClient.get("/avathor/teachers");
         return response.data;
     },
 
     /**
      * Get AI-TEACHER by ID
      */
-    getAI - TEACHERById: async (id: string): Promise<ApiResponse<AI-TEACHER >> => {
-        const response = await apiClient.get(`/avathor/AI-TEACHERs/${id}`);
+    getTeacherById: async (id: string): Promise<ApiResponse<Teacher>> => {
+        const response = await apiClient.get(`/avathor/teachers/${id}`);
         return response.data;
     },
 };
