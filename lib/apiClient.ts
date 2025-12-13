@@ -1,8 +1,15 @@
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 
+// Use the baseURL as-is from environment variable
+// The environment variable should include /api if the backend routes are under /api
+// Components should call paths without /api prefix (e.g., /courses not /api/courses)
+const getBaseURL = () => {
+	return process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+};
+
 const apiClient = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: getBaseURL(),
     timeout: 10000,
     withCredentials: true, // Important for cookies
 });

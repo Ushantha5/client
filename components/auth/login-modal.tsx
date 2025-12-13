@@ -17,7 +17,7 @@ import { Lock, Mail } from "lucide-react";
 
 interface LoginModalProps {
 	_open: boolean;
-	onOpenChange: (isOpen: boolean) => void;
+	onOpenChange: (_val: boolean) => void;
 }
 
 export function LoginModal({ _open, onOpenChange }: LoginModalProps) {

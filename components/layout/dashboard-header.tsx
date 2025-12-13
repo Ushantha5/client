@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getTimeBasedGreeting } from "@/lib/time-utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -29,20 +27,6 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ title, navigation }: DashboardHeaderProps) {
     const { user, logout } = useAuth();
-    const [greeting, setGreeting] = useState("");
-
-    useEffect(() => {
-        if (user) {
-            setGreeting(getTimeBasedGreeting());
-        }
-        // Update greeting every minute
-        const interval = setInterval(() => {
-            if (user) {
-                setGreeting(getTimeBasedGreeting());
-            }
-        }, 60000);
-        return () => clearInterval(interval);
-    }, [user]);
 
     const getInitials = (name: string) => {
         return name
@@ -79,7 +63,7 @@ export function DashboardHeader({ title, navigation }: DashboardHeaderProps) {
                     <h1 className="text-xl font-bold truncate">{title}</h1>
                     {user && (
                         <p className="text-sm text-muted-foreground truncate">
-                            {greeting}, {user.name}
+                            Welcome back, {user.name}
                         </p>
                     )}
                 </div>

@@ -23,7 +23,7 @@ import { User, Mail, Lock } from "lucide-react";
 
 interface SignupModalProps {
 	_open: boolean;
-	onOpenChange: (isOpen: boolean) => void;
+	onOpenChange: (_val: boolean) => void;
 }
 
 export function SignupModal({ _open, onOpenChange }: SignupModalProps) {

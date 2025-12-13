@@ -1,0 +1,6 @@
+**/*.test.ts
+**/*.test.js
+tests/
+coverage/
+playwright.config.ts
+e2e/

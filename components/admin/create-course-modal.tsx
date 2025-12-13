@@ -28,7 +28,7 @@ import Image from "next/image";
 
 interface CreateCourseModalProps {
     open: boolean;
-    onOpenChange: (isOpen: boolean) => void;
+    onOpenChange: (_val: boolean) => void;
     onSuccess?: () => void;
 }
 
@@ -137,7 +137,7 @@ export function CreateCourseModal({
                 isApproved: true, // Auto-approve admin-created courses
             };
 
-            await apiClient.post("/api/courses", courseData);
+            await apiClient.post("/courses", courseData);
 
             toast.success("Course created successfully!");
 

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+// Initialize lazily to avoid build-time errors if env var is missing
+const getGenAI = () => {
+	const key = process.env.GEMINI_API_KEY || "";
+	return new GoogleGenerativeAI(key);
+};
 
 export async function POST(request: NextRequest) {
 	try {
@@ -14,6 +18,7 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
+		const genAI = getGenAI();
 		const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 		const result = await model.generateContent([

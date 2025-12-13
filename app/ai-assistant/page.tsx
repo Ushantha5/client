@@ -153,7 +153,7 @@ export default function AIAssistantPage() {
             // Get AI response from API
             try {
                 let aiResponseText = '';
-
+                
                 // Try OpenAI first, fallback to Gemini
                 try {
                     const openaiResponse = await fetch('/api/ai/openai', {
@@ -161,7 +161,7 @@ export default function AIAssistantPage() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: inputMessage }),
                     });
-
+                    
                     if (openaiResponse.ok) {
                         const data = await openaiResponse.json();
                         aiResponseText = data.response || generateAIResponse(inputMessage);
@@ -176,7 +176,7 @@ export default function AIAssistantPage() {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ message: inputMessage }),
                         });
-
+                        
                         if (geminiResponse.ok) {
                             const data = await geminiResponse.json();
                             aiResponseText = data.response || generateAIResponse(inputMessage);
@@ -213,7 +213,7 @@ export default function AIAssistantPage() {
             } catch (aiError) {
                 console.error('AI response error:', aiError);
                 const fallbackResponse = generateAIResponse(inputMessage);
-
+                
                 if (interaction.data._id) {
                     await aiAssistantService.updateInteraction(interaction.data._id, {
                         response: fallbackResponse
@@ -386,7 +386,7 @@ export default function AIAssistantPage() {
                             </div>
 
                             <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <span>You are viewing <span className="text-cyan-400 font-medium">AI Assistant&apos;s</span> screen</span>
+                                <span>You are viewing <span className="text-cyan-400 font-medium">AI Assistant's</span> screen</span>
                                 <button className="p-1 hover:bg-white/10 rounded">
                                     <MoreVertical className="w-4 h-4" />
                                 </button>

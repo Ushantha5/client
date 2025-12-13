@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -29,8 +28,13 @@ import {
 } from "@/components/ui/popover";
 import {
   BookOpen,
+  Clock,
+  Star,
+  Users,
   Search,
   Filter,
+  TrendingUp,
+  Award,
   Play,
   X,
   Loader2,
@@ -70,7 +74,7 @@ export default function CoursesPage() {
       try {
         setLoading(true);
         const response = await courseService.getAllCourses({
-          // isApproved: true,
+          isApproved: true,
         });
         setCourses(response.data || []);
       } catch (error: any) {
@@ -156,7 +160,7 @@ export default function CoursesPage() {
         break;
       default:
         // Default: sort by creation date (newest first)
-        filtered = [...filtered].sort((a, b) =>
+        filtered = [...filtered].sort((a, b) => 
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         break;
@@ -198,8 +202,16 @@ export default function CoursesPage() {
     }
   };
 
+  const breadcrumbData = generateStructuredData("BreadcrumbList", {
+    items: [
+      { name: "Home", url: process.env.NEXT_PUBLIC_SITE_URL || "https://mr5school.com" },
+      { name: "Courses", url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://mr5school.com"}/courses` },
+    ],
+  });
+
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+      <StructuredData data={breadcrumbData} />
       <Navbar />
 
       {/* Hero Section */}
@@ -275,8 +287,8 @@ export default function CoursesPage() {
                             </SelectTrigger>
                             <SelectContent>
                               {categories.map(cat => (
-                                <SelectItem key={cat as string} value={cat as string}>
-                                  {cat === "all" ? "All Categories" : (cat as string)}
+                                <SelectItem key={cat} value={cat}>
+                                  {cat === "all" ? "All Categories" : cat}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -291,8 +303,8 @@ export default function CoursesPage() {
                             </SelectTrigger>
                             <SelectContent>
                               {levels.map(lvl => (
-                                <SelectItem key={lvl as string} value={lvl as string}>
-                                  {lvl === "all" ? "All Levels" : (lvl as string)}
+                                <SelectItem key={lvl} value={lvl}>
+                                  {lvl === "all" ? "All Levels" : lvl}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -383,11 +395,10 @@ export default function CoursesPage() {
                     {/* Course Image */}
                     <div className={`h-48 ${gradientColors[index % gradientColors.length]} relative overflow-hidden`}>
                       {course.thumbnail ? (
-                        <Image
-                          src={course.thumbnail}
+                        <img 
+                          src={course.thumbnail} 
                           alt={course.title}
-                          fill
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       ) : null}
                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
@@ -438,7 +449,7 @@ export default function CoursesPage() {
                         <span className="text-2xl font-bold text-primary">
                           ${course.price.toFixed(2)}
                         </span>
-                        <Button
+                        <Button 
                           onClick={() => handleEnroll(course._id)}
                           disabled={enrollingCourseId === course._id}
                           className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"

@@ -13,8 +13,8 @@ import {
     Calendar,
     Award,
     TrendingUp,
-    ShoppingCart,
-    Mail,
+    // ShoppingCart,
+    // Mail,
     Bot,
 } from "lucide-react";
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { AICoach } from "@/components/dashboard/ai-coach";
 import { CourseCard } from "@/components/dashboard/course-card";
 import { FeedbackPanel } from "@/components/dashboard/feedback-panel";
