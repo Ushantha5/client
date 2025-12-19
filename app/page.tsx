@@ -19,6 +19,7 @@ import LoadingScreen from "@/components/loading/LoadingScreen";
 import TeachingAIModal from "@/components/ai/TeachingAIModal";
 import { useVoiceInteraction } from "@/hooks/useVoiceInteraction";
 import { getTamilGreeting } from "@/lib/tamil-greetings";
+import { useCommonTracking } from "@/hooks/useAnalytics";
 
 // Dynamically import 3D Avatar
 const WelcomeAvatar = dynamic(() => import("@/components/3d/WelcomeAvatar").then(m => ({ default: m.WelcomeAvatar })), { ssr: false });
@@ -32,6 +33,7 @@ export default function HomePage() {
   const [greeting, setGreeting] = useState<any>(null);
 
   const voiceInteraction = useVoiceInteraction("gemini");
+  const { trackButtonClick, trackNavigation } = useCommonTracking();
 
   useEffect(() => {
     setMounted(true);
@@ -99,14 +101,22 @@ export default function HomePage() {
 
                 <div className="flex gap-4 pt-4">
                   <Button
-                    onClick={() => setIsAIModalOpen(true)}
+                    onClick={() => {
+                      trackButtonClick("Open Workspace", "Homepage Hero");
+                      setIsAIModalOpen(true);
+                    }}
                     className="bg-primary hover:bg-primary/90 text-white rounded-lg shadow-[0_0_20px_rgba(120,110,255,0.3)] border border-white/10"
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
                     Open Workspace
                   </Button>
                   <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10" asChild>
-                    <Link href="/courses">Browse Library</Link>
+                    <Link 
+                      href="/courses" 
+                      onClick={() => trackNavigation("Homepage", "/courses")}
+                    >
+                      Browse Library
+                    </Link>
                   </Button>
                 </div>
               </div>

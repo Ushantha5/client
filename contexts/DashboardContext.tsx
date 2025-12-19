@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ContextService, { LocationContextData } from '@/services/context.service';
 import LocationService from '@/services/location.service';
+import { useAuth } from './AuthContext';
 
 interface ContextState {
     context: LocationContextData | null;
@@ -15,10 +16,17 @@ const DashboardContext = createContext<ContextState | undefined>(undefined);
 
 export const DashboardContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [context, setContext] = useState<LocationContextData | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { isAuthenticated, loading: authLoading } = useAuth();
 
     const refreshContext = useCallback(async () => {
+        // Only sync context if user is authenticated
+        if (!isAuthenticated) {
+            setLoading(false);
+            return;
+        }
+
         setLoading(true);
         try {
             // 1. Detect location
@@ -29,30 +37,42 @@ export const DashboardContextProvider: React.FC<{ children: React.ReactNode }> =
 
             if (result.success) {
                 setContext(result.data);
+                setError(null);
             }
         } catch (err: any) {
-            console.error("Dashboard context error:", err);
-            setError(err.message);
+            // Only log errors if we're authenticated (expected to fail if not)
+            if (isAuthenticated) {
+                console.error("Dashboard context error:", err);
+                setError(err.message);
 
-            // Fallback: try to get existing context if sync fails
-            try {
-                const existing = await ContextService.getMyContext();
-                if (existing.success) setContext(existing.data);
-            } catch (e) {
-                console.warn("Failed to retrieve cached context:", e);
+                // Fallback: try to get existing context if sync fails
+                try {
+                    const existing = await ContextService.getMyContext();
+                    if (existing.success) {
+                        setContext(existing.data);
+                        setError(null);
+                    }
+                } catch (e) {
+                    console.warn("Failed to retrieve cached context:", e);
+                }
             }
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [isAuthenticated]);
 
     useEffect(() => {
+        // Wait for auth to finish loading before attempting to sync
+        if (authLoading) return;
+
         refreshContext();
 
-        // Refresh weather every 15 minutes
-        const interval = setInterval(refreshContext, 15 * 60 * 1000);
-        return () => clearInterval(interval);
-    }, [refreshContext]);
+        // Refresh weather every 15 minutes (only if authenticated)
+        if (isAuthenticated) {
+            const interval = setInterval(refreshContext, 15 * 60 * 1000);
+            return () => clearInterval(interval);
+        }
+    }, [refreshContext, authLoading, isAuthenticated]);
 
     return (
         <DashboardContext.Provider value={{ context, loading, error, refreshContext }}>

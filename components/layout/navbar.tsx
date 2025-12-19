@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { LoginModal } from "@/components/auth/login-modal";
 import { SignupModal } from "@/components/auth/signup-modal";
 import Image from "next/image";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
+import { RealTimeNotifications } from "@/components/notifications/RealTimeNotifications";
 import { LogOut } from "lucide-react";
 import {
 	DropdownMenu,
@@ -19,7 +20,7 @@ import {
 import { ThemeCustomizer } from "@/components/theme-customizer";
 
 export function Navbar() {
-	const { user, logout } = useAuth();
+	const { user, logout } = useEnhancedUser();
 	const [showLogin, setShowLogin] = useState(false);
 	const [showSignup, setShowSignup] = useState(false);
 
@@ -75,6 +76,7 @@ export function Navbar() {
 					{/* Auth Buttons */}
 					<div className="flex items-center gap-3">
 						<ThemeCustomizer />
+						<RealTimeNotifications />
 						{user ? (
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>

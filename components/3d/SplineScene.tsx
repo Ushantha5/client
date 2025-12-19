@@ -56,14 +56,17 @@ export function SplineScene({
     }, [onLoad]);
 
     const handleError = useCallback((err: any) => {
-        console.error("Spline Load Error:", err);
+        // Suppress console logging in production - we handle errors gracefully with UI
+        if (process.env.NODE_ENV === "development") {
+            console.warn("Spline Load Error:", err?.message || err);
+        }
         setIsLoading(false);
 
         // Detailed error messages
         if (err?.message?.includes("end of buffer")) {
-            setError("3D Model format error. Trying to recover...");
+            setError("3D Model temporarily unavailable");
         } else if (err?.status === 403) {
-            setError("Access to 3D scene was denied (CORS/Permissions)");
+            setError("Access to 3D scene was denied");
         } else {
             setError("Failed to load 3D scene");
         }

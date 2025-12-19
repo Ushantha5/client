@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { EnhancedUserProvider } from "@/contexts/EnhancedUserContext";
 import "@/lib/suppress-auth-errors";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeColorProvider } from "@/contexts/ThemeColorContext";
@@ -10,6 +10,8 @@ import { DashboardContextProvider } from "@/contexts/DashboardContext";
 import { Toaster } from "@/components/ui/sonner";
 import { generateMetadata as genMeta, generateStructuredData } from "@/lib/seo";
 import { StructuredData } from "@/components/seo/StructuredData";
+import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = genMeta({
@@ -49,6 +51,13 @@ export default function RootLayout({
 				<meta name="theme-color" content="#18181b" />
 				<meta name="mobile-web-app-capable" content="yes" />
 				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+				<link rel="manifest" href="/manifest.webmanifest" />
+				<link rel="apple-touch-icon" href="/icon.png" />
+				<meta name="apple-mobile-web-app-title" content="MR5 School" />
+				<meta name="application-name" content="MR5 School" />
+				<meta name="msapplication-TileColor" content="#18181b" />
+				<meta name="msapplication-config" content="/browserconfig.xml" />
+				<meta name="format-detection" content="telephone=no" />
 			</head>
 			<body className="bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary" suppressHydrationWarning>
 				{/* Global Noise Texture */}
@@ -63,16 +72,36 @@ export default function RootLayout({
 					<ThemeColorProvider>
 						<UIPreferencesProvider>
 							<RegionalSettingsProvider>
-								<AuthProvider>
-									<DashboardContextProvider>
-										{children}
-										<Toaster />
-									</DashboardContextProvider>
-								</AuthProvider>
+								<ErrorBoundary>
+									<EnhancedUserProvider>
+										<DashboardContextProvider>
+											{children}
+											<Toaster />
+											<PerformanceMonitor />
+										</DashboardContextProvider>
+									</EnhancedUserProvider>
+								</ErrorBoundary>
 							</RegionalSettingsProvider>
 						</UIPreferencesProvider>
 					</ThemeColorProvider>
 				</ThemeProvider>
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
+							if ('serviceWorker' in navigator) {
+								window.addEventListener('load', function() {
+									navigator.serviceWorker.register('/sw.js')
+										.then(function(registration) {
+											console.log('SW registered: ', registration);
+										})
+										.catch(function(registrationError) {
+											console.log('SW registration failed: ', registrationError);
+										});
+								});
+							}
+						`,
+					}}
+				/>
 			</body>
 		</html>
 	);

@@ -21,7 +21,8 @@ import {
 } from "lucide-react";
 import { courseService, Course } from "@/services/course.service";
 import { paymentService } from "@/services/payment.service";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
+import { useAPICache } from "@/hooks/useAdvancedCache";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { generateStructuredData } from "@/lib/seo";
 import Image from "next/image";
@@ -39,7 +40,24 @@ const gradientColors = [
 ];
 
 export default function CoursesPage() {
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
+    const { data: coursesData, loading: coursesLoading } = useAPICache(
+      "allCourses",
+      () => courseService.getAllCourses(),
+      { ttl: 5 * 60 * 1000 } // 5 minutes cache
+    );
+  
+    // Update courses state when data changes
+    useEffect(() => {
+      if (coursesData) {
+        setCourses(coursesData.data || []);
+      }
+    }, [coursesData]);
+  
+    // Update loading state
+    useEffect(() => {
+      setLoading(coursesLoading);
+    }, [coursesLoading]);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -50,22 +68,7 @@ export default function CoursesPage() {
   const [enrollingCourseId, setEnrollingCourseId] = useState<string | null>(null);
 
   // Fetch courses from API
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setLoading(true);
-        const response = await courseService.getAllCourses();
-        setCourses(response.data || []);
-      } catch (error: any) {
-        console.error("Failed to fetch courses:", error);
-        toast.error("Failed to load courses");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourses();
-  }, []);
+  // Removed old useEffect since we're using useAPICache now
 
   // Extract unique categories and levels
   const categories = useMemo(() => {

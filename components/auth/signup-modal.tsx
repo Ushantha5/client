@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import {
 	Select,
 	SelectContent,
@@ -29,7 +29,7 @@ interface SignupModalProps {
 }
 
 export function SignupModal({ _open: isOpen, onOpenChange }: SignupModalProps) {
-	const { register } = useAuth();
+	const { register } = useEnhancedUser();
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",

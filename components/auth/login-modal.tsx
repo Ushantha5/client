@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { loginSchema } from "@/lib/schemas";
 import { Lock, Mail } from "lucide-react";
 
@@ -22,7 +22,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
-	const { login } = useAuth();
+	const { login } = useEnhancedUser();
 	const [formData, setFormData] = useState({ email: "", password: "" });
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [loading, setLoading] = useState(false);

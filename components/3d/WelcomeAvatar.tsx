@@ -14,12 +14,11 @@ import { Button } from "@/components/ui/button";
 import { LocationData } from "@/services/location.service";
 
 // Default Spline scene URL - replace with actual avatar scene
-// Default Spline scene URL - Using a reliable public Spline scene for the avatar
-const DEFAULT_AVATAR_SCENE = "https://prod.spline.design/iK-7pS1lS6-V3-N3/scene.splinecode";
+// Using a known working public Spline scene
+const DEFAULT_AVATAR_SCENE = "https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode";
 
 // Fallback scene URL in case the default is unavailable
-// Fallback scene URL - also using a valid public URL
-const FALLBACK_AVATAR_SCENE = "https://prod.spline.design/iK-7pS1lS6-V3-N3/scene.splinecode";
+const FALLBACK_AVATAR_SCENE = "https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode";
 
 interface WelcomeAvatarProps {
   /** Override the Spline scene URL */

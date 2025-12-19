@@ -7,8 +7,10 @@ export default function manifest(): MetadataRoute.Manifest {
 		description: "Advanced online learning platform with AI-powered avatars and interactive courses",
 		start_url: "/",
 		display: "standalone",
-		background_color: "#ffffff",
-		theme_color: "#3b82f6",
+		background_color: "#18181b",
+		theme_color: "#786eff",
+		orientation: "portrait-primary",
+		display_override: ["window-controls-overlay"],
 		icons: [
 			{
 				src: "/icon.png",
@@ -17,6 +19,42 @@ export default function manifest(): MetadataRoute.Manifest {
 			},
 		],
 		categories: ["education", "learning", "courses"],
+		screenshots: [
+			{
+				src: "/images/screenshots/dashboard.png",
+				sizes: "1280x800",
+				type: "image/png"
+			},
+			{
+				src: "/images/screenshots/course.png",
+				sizes: "1280x800",
+				type: "image/png"
+			}
+		],
+		shortcuts: [
+			{
+				name: "Dashboard",
+				url: "/dashboard",
+				icons: [
+					{
+						src: "/icon.png",
+						sizes: "96x96",
+						type: "image/png"
+					}
+				]
+			},
+			{
+				name: "Courses",
+				url: "/courses",
+				icons: [
+					{
+						src: "/icon.png",
+						sizes: "96x96",
+						type: "image/png"
+					}
+				]
+			}
+		]
 	};
 }
 

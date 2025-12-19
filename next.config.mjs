@@ -30,11 +30,11 @@ const nextConfig = {
 	reactStrictMode: true,
 	swcMinify: true,
 	experimental: {
-		optimizeCss: false,
+		optimizeCss: true,
+		serverComponentsExternalPackages: ["@splinetool/runtime", "@splinetool/react-spline"],
 	},
-	transpilePackages: ["@splinetool/react-spline", "@splinetool/runtime"],
 	// Increase chunk loading timeout to prevent ChunkLoadError
-	webpack: (config, { isServer }) => {
+	webpack: (config, { isServer, dev }) => {
 		// Adjust chunk request timeout (in milliseconds)
 		config.output.chunkLoadingGlobal = 'webpackJsonpCallback';
 
@@ -59,7 +59,26 @@ const nextConfig = {
 					enforce: true,
 					maxSize: 244000, // 244 KB
 				},
+				// Split framework chunks
+				framework: {
+					test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+					name: 'framework',
+					chunks: 'all',
+					enforce: true,
+				},
 			};
+		}
+
+		// Enable top level await for server components
+		config.experiments = {
+			...config.experiments,
+			topLevelAwait: true,
+		};
+
+		// Optimize for production
+		if (!dev) {
+			config.optimization.minimize = true;
+			config.optimization.concatenateModules = true;
 		}
 
 		return config;
@@ -84,6 +103,27 @@ const nextConfig = {
 					{
 						key: "Referrer-Policy",
 						value: "origin-when-cross-origin",
+					},
+					{
+						key: "Permissions-Policy",
+						value: "camera=*, microphone=*, geolocation=*",
+					},
+					{
+						key: "Strict-Transport-Security",
+						value: "max-age=63072000; includeSubDomains; preload",
+					},
+				],
+			},
+			{
+				source: "/sw.js",
+				headers: [
+					{
+						key: "Cache-Control",
+						value: "no-cache, no-store, must-revalidate",
+					},
+					{
+						key: "Content-Type",
+						value: "application/javascript; charset=utf-8",
 					},
 				],
 			},

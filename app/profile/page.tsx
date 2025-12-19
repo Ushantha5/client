@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
+import { PermissionsManager } from "@/components/permissions-manager";
 import { Footer } from "@/components/layout/footer";
 import { LiquidProgressBar } from "@/components/dashboard/progress-bar";
 import { Trophy, Star, Zap, Clock, BookOpen, Activity, Upload } from "lucide-react";
@@ -36,7 +37,7 @@ interface EditingUser {
 }
 
 export default function ProfilePage() {
-  const { user, loading: authLoading, refreshUser } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useEnhancedUser();
   const router = useRouter();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -577,6 +578,12 @@ export default function ProfilePage() {
 
           {/* Right Col: Progress & Courses */}
           <div className="space-y-8 lg:col-span-2">
+            {/* Permissions Manager */}
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[30px] shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+              <h3 className="text-white/80 font-bold mb-4">Permissions & Settings</h3>
+              <PermissionsManager />
+            </div>
+            
             {/* Liquid Progress Card */}
             <div className="bg-gradient-to-br from-blue-900/40 to-[#0b1226]/80 backdrop-blur-xl border border-cyan-500/20 p-8 rounded-[40px] relative overflow-hidden group">
               <div className="absolute -right-20 -top-20 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl group-hover:bg-cyan-500/30 transition-colors" />
