@@ -112,19 +112,19 @@ export default function HomePage() {
               </div>
 
               <div className="flex-1 relative min-h-[300px] md:min-h-auto">
-                {/* <WelcomeAvatar
+                <WelcomeAvatar
                   showGreetingText={false}
                   enableVoice={true}
                   className="w-full h-full absolute inset-0"
                   onAvatarClick={() => setIsAIModalOpen(true)}
-                /> */}
+                />
                 {/* Status Badge floating */}
-                {/* <div className="absolute bottom-6 right-6 bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl flex items-center gap-3">
+                <div className="absolute bottom-6 right-6 bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${voiceInteraction.isSpeaking ? 'bg-green-500 animate-ping' : 'bg-red-500'}`} />
                   <span className="text-xs font-mono text-muted-foreground uppercase">
                     {voiceInteraction.isSpeaking ? "Voice Active" : "Standby"}
                   </span>
-                </div> */}
+                </div>
               </div>
             </div>
           </BentoItem>
