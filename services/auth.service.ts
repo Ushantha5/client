@@ -8,8 +8,8 @@ export const authService = {
      */
     login: async (
         credentials: LoginCredentials,
-    ): Promise<ApiResponse<{ token: string; user: User }>> => {
-        const response = await apiClient.post("/auth/login", credentials);
+    ): Promise<ApiResponse<{ accessToken: string; user: User }>> => {
+        const response = await apiClient.post("/api/auth/login", credentials);
         return response.data;
     },
 
@@ -17,7 +17,7 @@ export const authService = {
      * Register a new user
      */
     register: async (data: RegisterData): Promise<ApiResponse<User>> => {
-        const response = await apiClient.post("/auth/register", data);
+        const response = await apiClient.post("/api/auth/register", data);
         return response.data;
     },
 
@@ -25,7 +25,15 @@ export const authService = {
      * Get current authenticated user
      */
     getCurrentUser: async (): Promise<ApiResponse<User>> => {
-        const response = await apiClient.get("/auth/me");
+        const response = await apiClient.get("/api/auth/me");
+        return response.data;
+    },
+
+    /**
+     * Update user profile
+     */
+    updateProfile: async (data: any): Promise<ApiResponse<User>> => {
+        const response = await apiClient.put("/api/auth/updatedetails", data);
         return response.data;
     },
 
@@ -33,7 +41,7 @@ export const authService = {
      * Logout (if backend has logout endpoint)
      */
     logout: async (): Promise<ApiResponse<{ message: string }>> => {
-        const response = await apiClient.post("/auth/logout");
+        const response = await apiClient.post("/api/auth/logout");
         return response.data;
     },
 };

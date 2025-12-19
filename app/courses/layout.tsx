@@ -1,5 +1,6 @@
 import { generateMetadata } from "@/lib/seo";
 import { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = generateMetadata({
 	title: "Online Courses - Programming, Web Development, Data Science",
@@ -22,7 +23,7 @@ export const metadata: Metadata = generateMetadata({
 export default function CoursesLayout({
 	children,
 }: {
-	children: React.ReactNode;
+	children: ReactNode;
 }) {
 	return <>{children}</>;
 }

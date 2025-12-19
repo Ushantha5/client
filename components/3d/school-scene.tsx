@@ -1,9 +1,8 @@
 "use client";
 
 import React, { Suspense, useEffect, useState } from "react";
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, Html, useProgress, PerspectiveCamera } from "@react-three/drei";
-import { FBXLoader } from "three-stdlib";
 
 function Loader() {
     const { progress } = useProgress();
@@ -25,7 +24,28 @@ function Loader() {
 }
 
 function FBXModel({ url }: { url: string }) {
-    const fbx = useLoader(FBXLoader, url);
+    const [fbx, setFbx] = useState<any>(null);
+
+    useEffect(() => {
+        const loadModel = async () => {
+            try {
+                const { FBXLoader } = await import("three-stdlib");
+                const loader = new FBXLoader();
+                loader.load(
+                    url,
+                    (loadedFbx: any) => setFbx(loadedFbx),
+                    undefined,
+                    (error) => console.error("Error loading FBX:", error)
+                );
+            } catch (err) {
+                console.error("Failed to initialize FBX loader:", err);
+            }
+        };
+        loadModel();
+    }, [url]);
+
+    if (!fbx) return null;
+
     return <primitive object={fbx} scale={0.01} position={[0, -5, 0]} />;
 }
 

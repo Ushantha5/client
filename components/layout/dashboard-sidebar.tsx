@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { NavigationSection } from "@/data/navigation";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import {
@@ -13,9 +12,10 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { NavigationItem } from "@/data/navigation";
 
 interface DashboardSidebarProps {
-    navigation: NavigationSection[];
+    navigation: NavigationItem[];
     className?: string;
 }
 
@@ -44,79 +44,95 @@ export function DashboardSidebar({
                                 {section.title}
                             </h2>
                             <div className="space-y-1">
-                                {section.items.map((item) => {
-                                    const isActive = pathname === item.href;
-                                    const Icon = item.icon;
+                                {section.items && Array.isArray(section.items) ? (
+                                    // Handle section groups with items
+                                    section.items.map((item: NavigationItem) => {
+                                        const isActive = pathname === item.href;
+                                        const Icon = item.icon;
 
-                                    if (item.items && item.items.length > 0) {
-                                        const isOpen = openSections.includes(item.title);
-                                        return (
-                                            <Collapsible
-                                                key={item.title}
-                                                open={isOpen}
-                                                onOpenChange={() => toggleSection(item.title)}
-                                            >
-                                                <CollapsibleTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        className="w-full justify-between"
-                                                    >
-                                                        <div className="flex items-center">
-                                                            {Icon && <Icon className="mr-2 h-4 w-4" />}
-                                                            <span>{item.title}</span>
-                                                        </div>
-                                                        <ChevronDown
-                                                            className={cn(
-                                                                "h-4 w-4 transition-transform",
-                                                                isOpen && "rotate-180"
-                                                            )}
-                                                        />
-                                                    </Button>
-                                                </CollapsibleTrigger>
-                                                <CollapsibleContent className="pl-6 space-y-1">
-                                                    {item.items.map((subItem) => (
+                                        if (item.items && item.items.length > 0) {
+                                            const isOpen = openSections.includes(item.title);
+                                            return (
+                                                <Collapsible
+                                                    key={item.title}
+                                                    open={isOpen}
+                                                    onOpenChange={() => toggleSection(item.title)}
+                                                >
+                                                    <CollapsibleTrigger asChild>
                                                         <Button
-                                                            key={subItem.href}
-                                                            variant={
-                                                                pathname === subItem.href ? "secondary" : "ghost"
-                                                            }
-                                                            className="w-full justify-start"
-                                                            asChild
+                                                            variant="ghost"
+                                                            className="w-full justify-between"
                                                         >
-                                                            <Link href={subItem.href || "#"}>
-                                                                {subItem.title}
-                                                                {subItem.label && (
-                                                                    <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                                                                        {subItem.label}
-                                                                    </span>
+                                                            <div className="flex items-center">
+                                                                {Icon && <Icon className="mr-2 h-4 w-4" />}
+                                                                <span>{item.title}</span>
+                                                            </div>
+                                                            <ChevronDown
+                                                                className={cn(
+                                                                    "h-4 w-4 transition-transform",
+                                                                    isOpen && "rotate-180"
                                                                 )}
-                                                            </Link>
+                                                            />
                                                         </Button>
-                                                    ))}
-                                                </CollapsibleContent>
-                                            </Collapsible>
-                                        );
-                                    }
+                                                    </CollapsibleTrigger>
+                                                    <CollapsibleContent className="pl-6 space-y-1">
+                                                        {item.items && Array.isArray(item.items) && item.items.map((subItem: NavigationItem) => (
+                                                            <Button
+                                                                key={subItem.href}
+                                                                variant={
+                                                                    pathname === subItem.href ? "secondary" : "ghost"
+                                                                }
+                                                                className="w-full justify-start"
+                                                                asChild
+                                                            >
+                                                                <Link href={subItem.href || "#"}>
+                                                                    {subItem.title}
+                                                                    {subItem.label && (
+                                                                        <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                                                            {subItem.label}
+                                                                        </span>
+                                                                    )}
+                                                                </Link>
+                                                            </Button>
+                                                        ))}
+                                                    </CollapsibleContent>
+                                                </Collapsible>
+                                            );
+                                        }
 
-                                    return (
-                                        <Button
-                                            key={item.href}
-                                            variant={isActive ? "secondary" : "ghost"}
-                                            className="w-full justify-start"
-                                            asChild
-                                        >
-                                            <Link href={item.href || "#"}>
-                                                {Icon && <Icon className="mr-2 h-4 w-4" />}
-                                                <span>{item.title}</span>
-                                                {item.label && (
-                                                    <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                                                        {item.label}
-                                                    </span>
-                                                )}
-                                            </Link>
-                                        </Button>
-                                    );
-                                })}
+                                        return (
+                                            <Button
+                                                key={item.href}
+                                                variant={isActive ? "secondary" : "ghost"}
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <Link href={item.href || "#"}>
+                                                    {Icon && <Icon className="mr-2 h-4 w-4" />}
+                                                    <span>{item.title}</span>
+                                                    {item.label && (
+                                                        <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                                            {item.label}
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                            </Button>
+                                        );
+                                    })
+                                ) : (
+                                    // Handle direct links without items
+                                    <Button
+                                        key={section.href}
+                                        variant={pathname === section.href ? "secondary" : "ghost"}
+                                        className="w-full justify-start"
+                                        asChild
+                                    >
+                                        <Link href={section.href || "#"}>
+                                            {section.icon && <section.icon className="mr-2 h-4 w-4" />}
+                                            <span>{section.title}</span>
+                                        </Link>
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     ))}

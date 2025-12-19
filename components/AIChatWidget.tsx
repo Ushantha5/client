@@ -88,7 +88,8 @@ export default function AIChatWidget({
                     } else {
                         throw new Error('OpenAI failed');
                     }
-                } catch (openaiError) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (_openaiError) {
                     // Fallback to Gemini
                     try {
                         const geminiResponse = await fetch('/api/ai/gemini', {
@@ -103,7 +104,8 @@ export default function AIChatWidget({
                         } else {
                             aiResponseText = generateAIResponse(inputMessage);
                         }
-                    } catch (geminiError) {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    } catch (_geminiError) {
                         aiResponseText = generateAIResponse(inputMessage);
                     }
                 }

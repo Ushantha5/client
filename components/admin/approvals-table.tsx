@@ -29,6 +29,7 @@ export default function AdminApprovalsTable() {
   const [selected, setSelected] = useState<PendingItem | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -37,14 +38,26 @@ export default function AdminApprovalsTable() {
 
   async function fetchPending() {
     setLoading(true);
+    setError(null);
     try {
       const res = await apiClient.get<{ success: boolean; data: PendingItem[] }>(
-        "/admin/registrations/pending"
+        "/api/admin/registrations/pending"
       );
       setItems(res.data.data || []);
     } catch (err: any) {
-      const errorMessage = handleApiError(err, "Fetch Pending Registrations");
-      toast.error(errorMessage);
+      // Handle 404 specifically - it means no pending items
+      if (err.response?.status === 404) {
+        setItems([]); // Set empty array for no pending items
+      } else if (err.response?.status === 401 || err.response?.status === 403) {
+        // Handle authentication errors
+        const errorMessage = "Unauthorized access to admin features. Please ensure you are logged in as an administrator.";
+        toast.error(errorMessage);
+        setError(errorMessage);
+      } else {
+        const errorMessage = handleApiError(err, "Fetch Pending Registrations");
+        toast.error(errorMessage);
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -53,7 +66,7 @@ export default function AdminApprovalsTable() {
   async function handleApprove(item: PendingItem) {
     if (!confirm(`Approve ${item.name} (${item.email})?`)) return;
     try {
-      await apiClient.post("/admin/registrations/" + item.id + "/approve", {
+      await apiClient.post("/api/admin/registrations/" + item.id + "/approve", {
         note: `Approved by ${user?.name || "admin"}`,
       });
       toast.success("Approved");
@@ -79,7 +92,7 @@ export default function AdminApprovalsTable() {
 
     if (!selected) return;
     try {
-      await apiClient.post("/admin/registrations/" + selected.id + "/reject", {
+      await apiClient.post("/api/admin/registrations/" + selected.id + "/reject", {
         reason: rejectReason,
       });
       toast.success("Rejected");
@@ -99,15 +112,28 @@ export default function AdminApprovalsTable() {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div>Loading...</div>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="ml-2">Loading pending registrations...</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-destructive">
+            <p>Error loading pending registrations: {error}</p>
+            <Button variant="outline" className="mt-4" onClick={fetchPending}>
+              Retry
+            </Button>
+          </div>
         ) : items.length === 0 ? (
-          <div>No pending registrations</div>
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No pending registrations at this time.</p>
+            <p className="text-sm mt-2">All registration requests have been processed.</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between border rounded-md p-3"
+                className="flex items-center justify-between border rounded-md p-3 hover:bg-accent transition-colors"
               >
                 <div>
                   <div className="font-medium">{item.name}</div>
@@ -142,8 +168,8 @@ export default function AdminApprovalsTable() {
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                className="w-full rounded-md border p-2"
-                rows={4}
+                className="w-full rounded-md border p-2 min-h-[100px]"
+                placeholder="Enter rejection reason..."
               />
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setShowRejectDialog(false)}>

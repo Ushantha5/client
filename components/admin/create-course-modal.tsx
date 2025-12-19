@@ -23,12 +23,13 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, Plus, Tag } from "lucide-react";
 import Image from "next/image";
+import { uploadToCloudinary } from "@/services/cloudinary.service";
 
 interface CreateCourseModalProps {
     open: boolean;
-    onOpenChange: (_val: boolean) => void;
+    onOpenChange: (_open: boolean) => void;
     onSuccess?: () => void;
 }
 
@@ -40,13 +41,11 @@ interface CourseFormData {
     price: string;
     language: "English" | "Tamil" | "Sinhala";
     thumbnail: string;
+    prerequisites: string[];
+    tags: string[];
 }
 
-export function CreateCourseModal({
-    open,
-    onOpenChange,
-    onSuccess,
-}: CreateCourseModalProps) {
+export function CreateCourseModal({ open: isOpen, onOpenChange, onSuccess }: CreateCourseModalProps) {
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [imagePreview, setImagePreview] = useState<string>("");
@@ -58,39 +57,54 @@ export function CreateCourseModal({
         price: "",
         language: "English",
         thumbnail: "",
+        prerequisites: [],
+        tags: [],
     });
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [newPrerequisite, setNewPrerequisite] = useState("");
+    const [newTag, setNewTag] = useState("");
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev: CourseFormData) => ({ ...prev, [name]: value }));
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validate file type
-        if (!file.type.startsWith("image/")) {
-            toast.error("Please upload an image file");
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error("Image size should be less than 10MB");
             return;
         }
 
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            toast.error("Image size should be less than 5MB");
-            return;
-        }
+        setLoading(true);
+        try {
+            // Use the cloudinary service for direct upload
+            const result = await uploadToCloudinary(file, {
+                folder: "course-thumbnails",
+                tags: ["course-thumbnail", "mr5-lms"]
+            });
 
-        // Create preview
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const result = reader.result as string;
-            setImagePreview(result);
-            setFormData((prev) => ({ ...prev, thumbnail: result }));
-        };
-        reader.readAsDataURL(file);
+            if (result) {
+                const imageUrl = result.secure_url;
+                setImagePreview(imageUrl);
+                setFormData((prev: CourseFormData) => ({
+                    ...prev,
+                    thumbnail: imageUrl,
+                }));
+                toast.success("Image uploaded to Cloudinary");
+            } else {
+                toast.error("Failed to upload image");
+            }
+        } catch (err: any) {
+            const errorMessage = handleApiError(err, "Upload");
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const removeImage = () => {
@@ -98,24 +112,51 @@ export function CreateCourseModal({
         setFormData((prev) => ({ ...prev, thumbnail: "" }));
     };
 
-    const validateForm = (): boolean => {
-        if (!formData.title.trim()) {
-            toast.error("Please enter a course title");
-            return false;
+    const addPrerequisite = () => {
+        if (newPrerequisite.trim() && !formData.prerequisites.includes(newPrerequisite.trim())) {
+            setFormData(prev => ({
+                ...prev,
+                prerequisites: [...prev.prerequisites, newPrerequisite.trim()]
+            }));
+            setNewPrerequisite("");
         }
-        if (!formData.description.trim()) {
-            toast.error("Please enter a course description");
-            return false;
+    };
+
+    const removePrerequisite = (prereq: string) => {
+        setFormData(prev => ({
+            ...prev,
+            prerequisites: prev.prerequisites.filter(p => p !== prereq)
+        }));
+    };
+
+    const addTag = () => {
+        if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
+            setFormData(prev => ({
+                ...prev,
+                tags: [...prev.tags, newTag.trim()]
+            }));
+            setNewTag("");
         }
-        if (!formData.category.trim()) {
-            toast.error("Please enter a course category");
-            return false;
-        }
-        if (!formData.price || parseFloat(formData.price) < 0) {
-            toast.error("Please enter a valid price");
-            return false;
-        }
-        return true;
+    };
+
+    const removeTag = (tag: string) => {
+        setFormData(prev => ({
+            ...prev,
+            tags: prev.tags.filter(t => t !== tag)
+        }));
+    };
+
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+
+        if (!formData.title.trim()) newErrors.title = "Title is required";
+        if (!formData.description.trim()) newErrors.description = "Description is required";
+        if (!formData.category) newErrors.category = "Category is required";
+        if (!formData.level) newErrors.level = "Level is required";
+        if (!formData.price || parseFloat(formData.price) < 0) newErrors.price = "Valid price is required";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -133,11 +174,13 @@ export function CreateCourseModal({
                 price: parseFloat(formData.price),
                 language: formData.language,
                 thumbnail: formData.thumbnail,
+                prerequisites: formData.prerequisites,
+                tags: formData.tags,
                 teacher: user?.id, // Assign current admin as teacher
                 isApproved: true, // Auto-approve admin-created courses
             };
 
-            await apiClient.post("/courses", courseData);
+            await apiClient.post("/api/courses", courseData);
 
             toast.success("Course created successfully!");
 
@@ -150,8 +193,12 @@ export function CreateCourseModal({
                 price: "",
                 language: "English",
                 thumbnail: "",
+                prerequisites: [],
+                tags: [],
             });
             setImagePreview("");
+            setNewPrerequisite("");
+            setNewTag("");
 
             onOpenChange(false);
             onSuccess?.();
@@ -164,8 +211,8 @@ export function CreateCourseModal({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold">
                         Create New Course
@@ -180,7 +227,7 @@ export function CreateCourseModal({
                     {/* Title */}
                     <div className="space-y-2">
                         <Label htmlFor="title">
-                            Course Title <span className="text-red-500">*</span>
+                            Course Title <span className="text-destructive">*</span>
                         </Label>
                         <Input
                             id="title"
@@ -190,12 +237,13 @@ export function CreateCourseModal({
                             placeholder="e.g., Introduction to Web Development"
                             required
                         />
+                        {errors.title && <p className="text-destructive text-sm">{errors.title}</p>}
                     </div>
 
                     {/* Description */}
                     <div className="space-y-2">
                         <Label htmlFor="description">
-                            Description <span className="text-red-500">*</span>
+                            Description <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
                             id="description"
@@ -206,13 +254,14 @@ export function CreateCourseModal({
                             rows={4}
                             required
                         />
+                        {errors.description && <p className="text-destructive text-sm">{errors.description}</p>}
                     </div>
 
                     {/* Category and Level */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="category">
-                                Category <span className="text-red-500">*</span>
+                                Category <span className="text-destructive">*</span>
                             </Label>
                             <Input
                                 id="category"
@@ -222,11 +271,12 @@ export function CreateCourseModal({
                                 placeholder="e.g., Programming, Design, Business"
                                 required
                             />
+                            {errors.category && <p className="text-destructive text-sm">{errors.category}</p>}
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="level">
-                                Level <span className="text-red-500">*</span>
+                                Level <span className="text-destructive">*</span>
                             </Label>
                             <Select
                                 value={formData.level}
@@ -243,6 +293,67 @@ export function CreateCourseModal({
                                     <SelectItem value="Advanced">Advanced</SelectItem>
                                 </SelectContent>
                             </Select>
+                            {errors.level && <p className="text-destructive text-sm">{errors.level}</p>}
+                        </div>
+                    </div>
+
+                    {/* Prerequisites */}
+                    <div className="space-y-2">
+                        <Label>Prerequisites</Label>
+                        <div className="flex gap-2">
+                            <Input
+                                value={newPrerequisite}
+                                onChange={(e) => setNewPrerequisite(e.target.value)}
+                                placeholder="Add a prerequisite (e.g., Basic HTML knowledge)"
+                                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addPrerequisite())}
+                            />
+                            <Button type="button" onClick={addPrerequisite} variant="outline" size="icon">
+                                <Plus className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {formData.prerequisites.map((prereq, index) => (
+                                <div key={index} className="flex items-center bg-secondary rounded-full px-3 py-1 text-sm">
+                                    <span>{prereq}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removePrerequisite(prereq)}
+                                        className="ml-2 text-muted-foreground hover:text-foreground"
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="space-y-2">
+                        <Label>Tags</Label>
+                        <div className="flex gap-2">
+                            <Input
+                                value={newTag}
+                                onChange={(e) => setNewTag(e.target.value)}
+                                placeholder="Add a tag (e.g., javascript, frontend)"
+                                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                            />
+                            <Button type="button" onClick={addTag} variant="outline" size="icon">
+                                <Tag className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {formData.tags.map((tag, index) => (
+                                <div key={index} className="flex items-center bg-primary/10 rounded-full px-3 py-1 text-sm">
+                                    <span>{tag}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeTag(tag)}
+                                        className="ml-2 text-muted-foreground hover:text-foreground"
+                                    >
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
@@ -250,7 +361,7 @@ export function CreateCourseModal({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="price">
-                                Price ($) <span className="text-red-500">*</span>
+                                Price ($) <span className="text-destructive">*</span>
                             </Label>
                             <Input
                                 id="price"
@@ -263,11 +374,12 @@ export function CreateCourseModal({
                                 placeholder="0.00"
                                 required
                             />
+                            {errors.price && <p className="text-destructive text-sm">{errors.price}</p>}
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="language">
-                                Language <span className="text-red-500">*</span>
+                                Language <span className="text-destructive">*</span>
                             </Label>
                             <Select
                                 value={formData.language}
@@ -296,15 +408,18 @@ export function CreateCourseModal({
                                     src={imagePreview}
                                     alt="Course thumbnail preview"
                                     fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     className="object-cover"
                                 />
-                                <button
+                                <Button
                                     type="button"
                                     onClick={removeImage}
-                                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                     <X className="h-4 w-4" />
-                                </button>
+                                </Button>
                             </div>
                         ) : (
                             <label
@@ -318,7 +433,7 @@ export function CreateCourseModal({
                                         drag and drop
                                     </p>
                                     <p className="text-xs text-muted-foreground">
-                                        PNG, JPG or WEBP (MAX. 5MB)
+                                        PNG, JPG or WEBP (MAX. 10MB)
                                     </p>
                                 </div>
                                 <input
@@ -327,6 +442,7 @@ export function CreateCourseModal({
                                     className="hidden"
                                     accept="image/*"
                                     onChange={handleImageUpload}
+                                    disabled={loading}
                                 />
                             </label>
                         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ZodError } from "zod";
 import {
 	Dialog,
 	DialogContent,
@@ -19,46 +20,70 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { registerSchema } from "@/lib/schemas";
 import { User, Mail, Lock } from "lucide-react";
 
 interface SignupModalProps {
 	_open: boolean;
-	onOpenChange: (_val: boolean) => void;
+	onOpenChange: (_open: boolean) => void;
 }
 
-export function SignupModal({ _open, onOpenChange }: SignupModalProps) {
+export function SignupModal({ _open: isOpen, onOpenChange }: SignupModalProps) {
 	const { register } = useAuth();
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",
 		password: "",
+		confirmPassword: "",
 		role: "student",
 	});
-	const [error, setError] = useState("");
+	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [loading, setLoading] = useState(false);
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setFormData({ ...formData, [e.target.name]: e.target.value });
+	};
+
+	const handleRoleChange = (value: string) => {
+		setFormData({ ...formData, role: value });
+	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setError("");
+		setErrors({});
 		setLoading(true);
 
 		try {
+			registerSchema.parse(formData);
+
 			await register(
 				formData.name,
 				formData.email,
 				formData.password,
-				formData.role as "student" | "AI-TEACHER"
+				formData.role as "student" | "AI-TEACHER",
 			);
 			onOpenChange(false);
 		} catch (err: any) {
-			setError(err.message || "Registration failed. Please try again.");
+			if (err instanceof ZodError) {
+				const fieldErrors: Record<string, string> = {};
+				err.errors.forEach((e) => {
+					if (e.path[0]) {
+						fieldErrors[e.path[0]] = e.message;
+					}
+				});
+				setErrors(fieldErrors);
+			} else {
+				setErrors({
+					general: err.message || "Registration failed. Please try again.",
+				});
+			}
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	return (
-		<Dialog open={_open} onOpenChange={onOpenChange}>
+		<Dialog open={isOpen} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-[450px] bg-background/80 backdrop-blur-xl border-white/10 shadow-2xl">
 				<DialogHeader className="space-y-3">
 					<DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
@@ -69,10 +94,10 @@ export function SignupModal({ _open, onOpenChange }: SignupModalProps) {
 					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className="space-y-4">
-					{error && (
+					{errors.general && (
 						<div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg text-sm flex items-center gap-2">
 							<div className="h-1.5 w-1.5 rounded-full bg-destructive" />
-							{error}
+							{errors.general}
 						</div>
 					)}
 					<div className="space-y-4">
@@ -82,16 +107,18 @@ export function SignupModal({ _open, onOpenChange }: SignupModalProps) {
 								<User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
 								<Input
 									id="name"
+									name="name"
 									type="text"
 									placeholder="Mr Ushantha"
 									value={formData.name}
-									onChange={(e) =>
-										setFormData({ ...formData, name: e.target.value })
-									}
+									onChange={handleChange}
 									required
 									className="pl-9 bg-background/50"
 								/>
 							</div>
+							{errors.name && (
+								<p className="text-destructive text-sm">{errors.name}</p>
+							)}
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="email">Email Address</Label>
@@ -99,16 +126,18 @@ export function SignupModal({ _open, onOpenChange }: SignupModalProps) {
 								<Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
 								<Input
 									id="email"
+									name="email"
 									type="email"
 									placeholder="ushanthamr@gmail.com"
 									value={formData.email}
-									onChange={(e) =>
-										setFormData({ ...formData, email: e.target.value })
-									}
+									onChange={handleChange}
 									required
 									className="pl-9 bg-background/50"
 								/>
 							</div>
+							{errors.email && (
+								<p className="text-destructive text-sm">{errors.email}</p>
+							)}
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="password">Password</Label>
@@ -116,25 +145,45 @@ export function SignupModal({ _open, onOpenChange }: SignupModalProps) {
 								<Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
 								<Input
 									id="password"
+									name="password"
 									type="password"
 									placeholder="hgufv^_^1234"
 									value={formData.password}
-									onChange={(e) =>
-										setFormData({ ...formData, password: e.target.value })
-									}
+									onChange={handleChange}
 									required
 									className="pl-9 bg-background/50"
 								/>
 							</div>
+							{errors.password && (
+								<p className="text-destructive text-sm">
+									{errors.password}
+								</p>
+							)}
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="confirmPassword">Confirm Password</Label>
+							<div className="relative">
+								<Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+								<Input
+									id="confirmPassword"
+									name="confirmPassword"
+									type="password"
+									placeholder="hgufv^_^1234"
+									value={formData.confirmPassword}
+									onChange={handleChange}
+									required
+									className="pl-9 bg-background/50"
+								/>
+							</div>
+							{errors.confirmPassword && (
+								<p className="text-destructive text-sm">
+									{errors.confirmPassword}
+								</p>
+							)}
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor="role">I want to join as a</Label>
-							<Select
-								value={formData.role}
-								onValueChange={(value) =>
-									setFormData({ ...formData, role: value })
-								}
-							>
+							<Select value={formData.role} onValueChange={handleRoleChange}>
 								<SelectTrigger className="bg-background/50">
 									<SelectValue placeholder="Select role" />
 								</SelectTrigger>

@@ -1,5 +1,6 @@
 import { generateMetadata } from "@/lib/seo";
 import { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = generateMetadata({
 	title: "Contact Us - Get in Touch with MR5 School",
@@ -19,7 +20,7 @@ export const metadata: Metadata = generateMetadata({
 export default function ContactLayout({
 	children,
 }: {
-	children: React.ReactNode;
+	children: ReactNode;
 }) {
 	return <>{children}</>;
 }

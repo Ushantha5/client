@@ -1,21 +1,19 @@
 import apiClient from "@/lib/apiClient";
-import { Teacher } from "@/types/teacher"; // Assuming type file will be renamed or exports Teacher
-import { ApiResponse } from "@/types/api";
 
 export const teacherService = {
     /**
-     * Get all AI-TEACHERs
+     * Get all teachers
      */
-    getAllTeachers: async (): Promise<ApiResponse<Teacher[]>> => {
-        const response = await apiClient.get("/avathor/teachers");
+    getAllTeachers: async () => {
+        const response = await apiClient.get("/api/avathor/teachers");
         return response.data;
     },
 
     /**
-     * Get AI-TEACHER by ID
+     * Get teacher by ID
      */
-    getTeacherById: async (id: string): Promise<ApiResponse<Teacher>> => {
-        const response = await apiClient.get(`/avathor/teachers/${id}`);
+    getTeacherById: async (id: string) => {
+        const response = await apiClient.get(`/api/avathor/teachers/${id}`);
         return response.data;
     },
 };

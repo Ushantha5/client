@@ -4,13 +4,6 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,27 +15,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  BookOpen,
-  Clock,
-  Star,
-  Users,
   Search,
-  Filter,
-  TrendingUp,
-  Award,
-  Play,
-  X,
   Loader2,
   ShoppingCart,
 } from "lucide-react";
 import { courseService, Course } from "@/services/course.service";
 import { paymentService } from "@/services/payment.service";
 import { useAuth } from "@/contexts/AuthContext";
+import { StructuredData } from "@/components/seo/StructuredData";
+import { generateStructuredData } from "@/lib/seo";
+import Image from "next/image";
 import { toast } from "sonner";
 
 const gradientColors = [
@@ -63,7 +45,6 @@ export default function CoursesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("popular");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrollingCourseId, setEnrollingCourseId] = useState<string | null>(null);
@@ -73,9 +54,7 @@ export default function CoursesPage() {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await courseService.getAllCourses({
-          isApproved: true,
-        });
+        const response = await courseService.getAllCourses();
         setCourses(response.data || []);
       } catch (error: any) {
         console.error("Failed to fetch courses:", error);
@@ -160,7 +139,7 @@ export default function CoursesPage() {
         break;
       default:
         // Default: sort by creation date (newest first)
-        filtered = [...filtered].sort((a, b) => 
+        filtered = [...filtered].sort((a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         break;
@@ -211,174 +190,120 @@ export default function CoursesPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      <StructuredData data={breadcrumbData} />
+      {breadcrumbData && <StructuredData data={breadcrumbData} />}
       <Navbar />
 
-      {/* Hero Section */}
-      <div className="relative h-64 w-full overflow-hidden bg-gradient-to-r from-primary/20 via-purple-600/20 to-blue-600/20">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background"></div>
+      {/* Hero Section - Deep Space aesthetic */}
+      <div className="relative h-72 w-full overflow-hidden">
+        {/* Background Huly Gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+
         <div className="container mx-auto px-4 h-full flex flex-col justify-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="max-w-2xl"
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Explore Our Courses</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
-              Discover world-class courses taught by industry experts. Start learning today and advance your career.
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
+              Explore The Library
+            </h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Master new skills with our AI-enhanced curriculum. <br className="hidden md:block" />
+              Designed for the next generation of creators.
             </p>
           </motion.div>
         </div>
       </div>
 
-      <main className="container max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <main className="container max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
         {/* Search and Filter Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-12"
+          className="mb-12 sticky top-20 z-40"
         >
-          <Card className="border-border/50 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex flex-col gap-4">
-                {/* Search and Filter Button Row */}
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search courses, instructors..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-background"
-                    />
-                  </div>
-                  <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="gap-2 relative">
-                        <Filter className="h-4 w-4" />
-                        Filters
-                        {hasActiveFilters && (
-                          <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full"></span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80" align="end">
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-semibold">Filters</h4>
-                          {hasActiveFilters && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={clearFilters}
-                              className="h-8 text-xs"
-                            >
-                              Clear All
-                            </Button>
-                          )}
-                        </div>
+          <div className="bg-surface/80 backdrop-blur-xl border border-white/5 shadow-2xl rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center">
+            {/* Search */}
+            <div className="flex-1 relative w-full md:w-auto">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search courses, instructors..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-primary h-11 rounded-xl"
+              />
+            </div>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Category</label>
-                          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="All Categories" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {categories.map(cat => (
-                                <SelectItem key={cat} value={cat}>
-                                  {cat === "all" ? "All Categories" : cat}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+            {/* Filters Row */}
+            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-[160px] bg-white/5 border-white/10 h-11 rounded-xl">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.filter((cat): cat is string => Boolean(cat)).map(cat => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat === "all" ? "All Categories" : cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Level</label>
-                          <Select value={selectedLevel} onValueChange={setSelectedLevel}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="All Levels" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {levels.map(lvl => (
-                                <SelectItem key={lvl} value={lvl}>
-                                  {lvl === "all" ? "All Levels" : lvl}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+              <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                <SelectTrigger className="w-[140px] bg-white/5 border-white/10 h-11 rounded-xl">
+                  <SelectValue placeholder="Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {levels.map(lvl => (
+                    <SelectItem key={lvl} value={lvl}>
+                      {lvl === "all" ? "All Levels" : lvl}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Sort By</label>
-                          <Select value={sortBy} onValueChange={setSortBy}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="popular">Newest First</SelectItem>
-                              <SelectItem value="price-low">Price: Low to High</SelectItem>
-                              <SelectItem value="price-high">Price: High to Low</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[160px] bg-white/5 border-white/10 h-11 rounded-xl">
+                  <SelectValue placeholder="Sort By" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="popular">Newest First</SelectItem>
+                  <SelectItem value="price-low">Price: Low to High</SelectItem>
+                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
 
-                {/* Active Filters Display */}
-                {hasActiveFilters && (
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <span className="text-sm text-muted-foreground">Active filters:</span>
-                    {searchQuery && (
-                      <Badge variant="secondary" className="gap-1">
-                        Search: {searchQuery}
-                        <X
-                          className="h-3 w-3 cursor-pointer"
-                          onClick={() => setSearchQuery("")}
-                        />
-                      </Badge>
-                    )}
-                    {selectedCategory !== "all" && (
-                      <Badge variant="secondary" className="gap-1">
-                        {selectedCategory}
-                        <X
-                          className="h-3 w-3 cursor-pointer"
-                          onClick={() => setSelectedCategory("all")}
-                        />
-                      </Badge>
-                    )}
-                    {selectedLevel !== "all" && (
-                      <Badge variant="secondary" className="gap-1">
-                        {selectedLevel}
-                        <X
-                          className="h-3 w-3 cursor-pointer"
-                          onClick={() => setSelectedLevel("all")}
-                        />
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  onClick={clearFilters}
+                  className="h-11 px-4 text-muted-foreground hover:text-foreground"
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
+          </div>
         </motion.div>
 
         {/* Results Count */}
-        <div className="mb-6 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{filteredCourses.length}</span> {filteredCourses.length === 1 ? 'course' : 'courses'}
+        <div className="mb-6 flex items-center justify-between px-2">
+          <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider">
+            Library Index <span className="text-primary mx-2">{'//'}</span> {filteredCourses.length} Items Found
           </p>
         </div>
 
         {/* Courses Grid */}
         <AnimatePresence mode="wait">
           {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="flex items-center justify-center py-32">
+              <div className="flex flex-col items-center gap-4">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground animate-pulse">Syncing Library Data...</p>
+              </div>
             </div>
           ) : filteredCourses.length > 0 ? (
             <motion.div
@@ -387,88 +312,70 @@ export default function CoursesPage() {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
             >
               {filteredCourses.map((course, index) => (
-                <motion.div key={course._id} variants={itemVariants} layout>
-                  <Card className="group border-border/50 overflow-hidden hover:shadow-xl transition-all h-full flex flex-col">
-                    {/* Course Image */}
-                    <div className={`h-48 ${gradientColors[index % gradientColors.length]} relative overflow-hidden`}>
+                <motion.div key={course._id} variants={itemVariants} layout className="h-full">
+                  <div className="group relative h-full border border-white/5 bg-surface overflow-hidden rounded-2xl hover:border-primary/50 transition-colors duration-500">
+                    {/* Image Area */}
+                    <div className="relative aspect-[4/3] overflow-hidden">
                       {course.thumbnail ? (
-                        <img 
-                          src={course.thumbnail} 
+                        <Image
+                          src={course.thumbnail}
                           alt={course.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover transform transition-transform duration-700 group-hover:scale-105"
                         />
-                      ) : null}
-                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
-                      {course.category && (
-                        <div className="absolute top-4 left-4">
-                          <Badge className="bg-white/90 text-black hover:bg-white">
-                            {course.category}
-                          </Badge>
-                        </div>
+                      ) : (
+                        <div className={`w-full h-full ${gradientColors[index % gradientColors.length]} opacity-50`} />
                       )}
-                      <div className="absolute top-4 right-4">
-                        <Badge variant="secondary" className="bg-black/60 text-white border-0">
-                          {course.level}
+
+                      {/* Overlay Gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent opacity-80" />
+
+                      <div className="absolute top-4 left-4">
+                        <Badge className="bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 text-white">
+                          {course.category}
                         </Badge>
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-                          <Play className="h-8 w-8 text-primary ml-1" />
-                        </div>
                       </div>
                     </div>
 
-                    {/* Course Content */}
-                    <CardHeader className="flex-1">
-                      <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
-                        {course.title}
-                      </CardTitle>
-                      <CardDescription className="line-clamp-2">
-                        {course.description || "No description available"}
-                      </CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="space-y-4">
-                      <div className="text-sm text-muted-foreground">
-                        By {course.teacher?.name || "Unknown Instructor"}
+                    {/* Content */}
+                    <div className="p-5 flex flex-col h-[calc(100%-aspect-[4/3])] relative mt-[-20%] z-10">
+                      <div className="flex-1 space-y-3">
+                        <h3 className="text-xl font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                          {course.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                          {course.description}
+                        </p>
                       </div>
 
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-4">
-                          <span className="flex items-center gap-1 text-muted-foreground">
-                            <BookOpen className="h-4 w-4" />
-                            {course.language}
-                          </span>
+                      <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground uppercase tracking-wider">Price</span>
+                          <span className="text-lg font-bold text-foreground">${course.price}</span>
                         </div>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                        <span className="text-2xl font-bold text-primary">
-                          ${course.price.toFixed(2)}
-                        </span>
-                        <Button 
+                        <Button
                           onClick={() => handleEnroll(course._id)}
                           disabled={enrollingCourseId === course._id}
-                          className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                          size="sm"
+                          className="bg-white/5 hover:bg-primary hover:text-white text-foreground border border-white/10 transition-all duration-300"
                         >
                           {enrollingCourseId === course._id ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Processing...
-                            </>
+                            <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
-                            <>
-                              <ShoppingCart className="mr-2 h-4 w-4" />
-                              Enroll Now
-                            </>
+                            <ShoppingCart className="h-4 w-4 mr-2" />
                           )}
+                          Enroll
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+
+                    {/* Hover Glow */}
+                    <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-t from-primary/10 to-transparent" />
+                  </div>
                 </motion.div>
               ))}
             </motion.div>
@@ -478,17 +385,17 @@ export default function CoursesPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="text-center py-16"
+              className="text-center py-24"
             >
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                <Search className="h-8 w-8 text-muted-foreground" />
+              <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6 border border-white/10">
+                <Search className="h-10 w-10 text-muted-foreground" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">No courses found</h3>
-              <p className="text-muted-foreground mb-6">
-                Try adjusting your filters or search query
+              <h3 className="text-2xl font-bold mb-3">No matching courses</h3>
+              <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                We couldn&apos;t find any courses matching your criteria. Try adjusting your filters or search terms.
               </p>
-              <Button onClick={clearFilters} variant="outline">
-                Clear All Filters
+              <Button onClick={clearFilters} variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10">
+                Clear Filters
               </Button>
             </motion.div>
           )}

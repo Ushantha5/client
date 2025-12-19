@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY || "",
-});
+const getGenAI = () => {
+	const key = process.env.GEMINI_API_KEY || "";
+	return new GoogleGenerativeAI(key);
+};
 
 export async function POST(request: NextRequest) {
 	try {
@@ -16,30 +17,22 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const completion = await openai.chat.completions.create({
-			model: "gpt-4",
-			messages: [
-				{
-					role: "system",
-					content:
-						"You are a helpful AI tutor for MR5 School. Provide concise, educational responses.",
-				},
-				{
-					role: "user",
-					content: message,
-				},
-			],
-			max_tokens: 150,
-		});
+		const genAI = getGenAI();
+		// Using gemini-1.5-flash as the replacement for GPT-4 for speed/efficiency in this context
+		const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-		const response =
-			completion.choices[0]?.message?.content || "No response generated.";
+		const systemPrompt = "You are a helpful AI tutor for MR5 School. Provide concise, educational responses.";
+		// Prepend system prompt to message for simple chat turn
+		const fullMessage = `${systemPrompt}\n\nUser: ${message}`;
+
+		const result = await model.generateContent(fullMessage);
+		const response = result.response.text();
 
 		return NextResponse.json({ response });
 	} catch (error) {
-		console.error("OpenAI API error:", error);
+		console.error("Gemini (via OpenAI route) API error:", error);
 		return NextResponse.json(
-			{ error: "Failed to get response from OpenAI" },
+			{ error: "Failed to get response from AI service" },
 			{ status: 500 },
 		);
 	}

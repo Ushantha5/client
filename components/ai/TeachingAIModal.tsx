@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Mic,
@@ -9,18 +9,30 @@ import {
     Sparkles,
     Send,
     Bot,
-    User
+    User,
+    Image as ImageIcon,
+    Heart,
+    Volume2,
+    VolumeX,
+    Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { MoodDetector } from '@/components/classroom/MoodDetector';
+import { toast } from 'sonner';
 // import { cn } from '@/lib/utils';
+
+interface Message {
+    role: 'user' | 'ai';
+    content: string;
+    type?: 'text' | 'image';
+}
 
 interface TeachingAIModalProps {
     isOpen: boolean;
     onClose: () => void;
-    voiceInteraction: {
+    voiceInteraction?: {
         transcript: string;
         listening: boolean;
         startListening: () => void;
@@ -33,20 +45,31 @@ interface TeachingAIModalProps {
 }
 
 export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingAIModalProps) {
-    const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [inputMessage, setInputMessage] = useState('');
+    const [isMuted, setIsMuted] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isSending, setIsSending] = useState(false);
+    const [emotionalState, setEmotionalState] = useState({
+        engagement: 'High',
+        confidence: 'Medium',
+        curiosity: 'Strong'
+    });
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     const {
-        transcript,
-        listening,
-        startListening,
-        stopListening,
-        response,
-        isSpeaking,
-        isProcessing,
-        browserSupportsSpeechRecognition,
-    } = voiceInteraction;
+        transcript = '',
+        listening = false,
+        startListening = () => { },
+        stopListening = () => { },
+        response = '',
+        isSpeaking = false,
+        isProcessing = false,
+        browserSupportsSpeechRecognition = false,
+    } = voiceInteraction || {};
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -62,14 +85,194 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
         }
     }, [response]);
 
-    const handleSendMessage = (text?: string) => {
-        const messageToSend = text || inputMessage;
-        if (!messageToSend.trim()) return;
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+        };
+    }, []);
 
-        setMessages(prev => [...prev, { role: 'user', content: messageToSend }]);
+    // Send message to Gemini API
+    const sendToGeminiAPI = async (messageContent: string, imageData?: string) => {
+        try {
+            setIsSending(true);
+
+            // Create abort controller for cancellation
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+            abortControllerRef.current = new AbortController();
+
+            // Prepare the message content
+            let content: string | { text: string; images?: string[] } = messageContent;
+            if (imageData) {
+                content = {
+                    text: messageContent,
+                    images: [imageData]
+                };
+            }
+
+            // Prepare messages array for the API
+            const apiMessages = [
+                {
+                    role: "system",
+                    content: "You are an expert AI tutor specializing in personalized education. Provide detailed, accurate, and engaging explanations tailored to the student's level. Adapt your teaching style based on emotional cues and learning progress. Always be encouraging and supportive."
+                },
+                ...messages.map(msg => ({
+                    role: msg.role === 'user' ? 'user' : 'assistant',
+                    content: msg.content
+                })),
+                {
+                    role: "user",
+                    content
+                }
+            ];
+
+            // Call Gemini API through backend
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai/gemini`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    messages: apiMessages,
+                    multimodal: !!imageData,
+                    options: {
+                        temperature: 0.7,
+                        max_tokens: 1000
+                    }
+                }),
+                signal: abortControllerRef.current.signal
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`API request failed with status ${response.status}: ${errorData.error || 'Unknown error'}`);
+            }
+
+            const data = await response.json();
+
+            // Add AI response to messages
+            setMessages(prev => [...prev, { role: 'ai', content: data.response }]);
+
+            // Simulate emotional analysis (in a real implementation, this would call the analyzeEmotions API)
+            const emotions = ['High', 'Medium', 'Strong'];
+            setEmotionalState({
+                engagement: emotions[Math.floor(Math.random() * emotions.length)],
+                confidence: emotions[Math.floor(Math.random() * emotions.length)],
+                curiosity: emotions[Math.floor(Math.random() * emotions.length)]
+            });
+
+        } catch (error: any) {
+            if (error.name === 'AbortError') {
+                console.log('Request was cancelled');
+                return;
+            }
+
+            console.error("Gemini API Error:", error);
+            toast.error("AI Tutor Error", {
+                description: error.message || "Failed to get response from AI tutor. Please try again."
+            });
+
+            // Add error message to chat
+            setMessages(prev => [...prev, {
+                role: 'ai',
+                content: "Sorry, I encountered an error processing your request. Please try again."
+            }]);
+        } finally {
+            setIsSending(false);
+        }
+    };
+
+    const handleSendMessage = async (text?: string) => {
+        const messageToSend = text || inputMessage;
+        if (!messageToSend.trim() && !imagePreview) return;
+
+        // Add user message to chat
+        const newUserMessage: Message = {
+            role: 'user',
+            content: messageToSend,
+            type: imagePreview ? 'image' : 'text'
+        };
+
+        setMessages(prev => [...prev, newUserMessage]);
         setInputMessage('');
 
-        // TODO: Integrate text-based AI call
+        // Send to Gemini API
+        await sendToGeminiAPI(messageToSend, imagePreview || undefined);
+        setImagePreview(null);
+    };
+
+    // Handle image upload
+    const handleImageUpload = (file: File) => {
+        if (!file.type.startsWith('image/')) {
+            toast.error("Invalid file type", {
+                description: "Please upload an image file (JPEG, PNG, etc.)"
+            });
+            return;
+        }
+
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("File too large", {
+                description: "Please upload an image smaller than 5MB"
+            });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // Handle drag and drop events
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = () => {
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleImageUpload(e.dataTransfer.files[0]);
+        }
+    };
+
+    // Handle file input change
+    const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            handleImageUpload(e.target.files[0]);
+        }
+    };
+
+    // Trigger file input click
+    const triggerFileInput = () => {
+        fileInputRef.current?.click();
+    };
+
+    // Toggle mute
+    const toggleMute = () => {
+        setIsMuted(!isMuted);
+        // In a real implementation, this would integrate with the TTS service
+    };
+
+    // Cancel current request
+    const cancelRequest = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            setIsSending(false);
+            toast.info("Request cancelled");
+        }
     };
 
     return (
@@ -102,15 +305,61 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                 {/* <ClassroomRoom roomName="math-101" participantName="Student" /> */}
 
                                 <div className="mt-auto p-4 rounded-xl bg-white/5 border border-white/5">
-                                    <h4 className="text-sm font-medium text-white mb-2">Session Stats</h4>
-                                    <div className="space-y-2 text-xs text-gray-400">
-                                        <div className="flex justify-between">
-                                            <span>Duration</span>
-                                            <span className="text-white">00:12:45</span>
+                                    <h4 className="text-sm font-medium text-white mb-2">Emotional Insights</h4>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <Heart className="w-4 h-4 text-red-400" />
+                                            <div className="flex-1">
+                                                <div className="flex justify-between text-xs">
+                                                    <span className="text-gray-300">Engagement</span>
+                                                    <span className="text-white font-medium">{emotionalState.engagement}</span>
+                                                </div>
+                                                <div className="w-full bg-gray-700 rounded-full h-1.5 mt-1">
+                                                    <div
+                                                        className="bg-red-500 h-1.5 rounded-full"
+                                                        style={{
+                                                            width: emotionalState.engagement === 'High' ? '90%' :
+                                                                emotionalState.engagement === 'Medium' ? '60%' : '30%'
+                                                        }}
+                                                    ></div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Topics</span>
-                                            <span className="text-white">3 Covered</span>
+                                        <div className="flex items-center gap-2">
+                                            <Sparkles className="w-4 h-4 text-yellow-400" />
+                                            <div className="flex-1">
+                                                <div className="flex justify-between text-xs">
+                                                    <span className="text-gray-300">Confidence</span>
+                                                    <span className="text-white font-medium">{emotionalState.confidence}</span>
+                                                </div>
+                                                <div className="w-full bg-gray-700 rounded-full h-1.5 mt-1">
+                                                    <div
+                                                        className="bg-yellow-500 h-1.5 rounded-full"
+                                                        style={{
+                                                            width: emotionalState.confidence === 'High' ? '90%' :
+                                                                emotionalState.confidence === 'Medium' ? '60%' : '30%'
+                                                        }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Bot className="w-4 h-4 text-cyan-400" />
+                                            <div className="flex-1">
+                                                <div className="flex justify-between text-xs">
+                                                    <span className="text-gray-300">Curiosity</span>
+                                                    <span className="text-white font-medium">{emotionalState.curiosity}</span>
+                                                </div>
+                                                <div className="w-full bg-gray-700 rounded-full h-1.5 mt-1">
+                                                    <div
+                                                        className="bg-cyan-500 h-1.5 rounded-full"
+                                                        style={{
+                                                            width: emotionalState.curiosity === 'High' ? '90%' :
+                                                                emotionalState.curiosity === 'Medium' ? '60%' : '30%'
+                                                        }}
+                                                    ></div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -132,14 +381,24 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                             </div>
                                         </div>
                                     </div>
-                                    <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-400 hover:text-white hover:bg-white/10">
-                                        <X className="w-5 h-5" />
-                                    </Button>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={toggleMute}
+                                            className="text-gray-400 hover:text-white hover:bg-white/10"
+                                        >
+                                            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                                        </Button>
+                                        <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-400 hover:text-white hover:bg-white/10">
+                                            <X className="w-5 h-5" />
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 {/* Chat Area */}
                                 <div className="flex-1 overflow-hidden relative flex flex-col">
-                                    <ScrollArea className="flex-1 px-6 py-6" ref={scrollRef}>
+                                    <ScrollArea className="flex-1 px-6 py-6">
                                         <div className="space-y-6">
                                             {messages.length === 0 && (
                                                 <div className="text-center py-12">
@@ -170,6 +429,16 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                                         ? 'bg-purple-600/20 border border-purple-500/30 text-white'
                                                         : 'bg-white/10 border border-white/10 text-gray-100'
                                                         }`}>
+                                                        {msg.type === 'image' && msg.content ? (
+                                                            <div className="mb-2">
+                                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                <img
+                                                                    src={msg.content}
+                                                                    alt="Uploaded content"
+                                                                    className="rounded-lg max-w-xs max-h-40 object-contain"
+                                                                />
+                                                            </div>
+                                                        ) : null}
                                                         <p className="leading-relaxed">{msg.content}</p>
                                                     </div>
                                                 </motion.div>
@@ -192,7 +461,7 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                             )}
 
                                             {/* AI Processing/Speaking Indicator */}
-                                            {(isProcessing || isSpeaking) && (
+                                            {(isProcessing || isSpeaking || isSending) && (
                                                 <motion.div
                                                     initial={{ opacity: 0 }}
                                                     animate={{ opacity: 1 }}
@@ -213,18 +482,81 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                         </div>
                                     </ScrollArea>
 
+                                    {/* Image Preview */}
+                                    {imagePreview && (
+                                        <div className="px-6 pb-4">
+                                            <div className="relative inline-block">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    src={imagePreview}
+                                                    alt="User uploaded preview"
+                                                    className="rounded-lg max-h-32 object-contain border border-white/20"
+                                                />
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => setImagePreview(null)}
+                                                    className="absolute -top-2 -right-2 h-6 w-6 bg-red-500 hover:bg-red-600 text-white rounded-full"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Input Area */}
-                                    <div className="p-6 bg-black/20 border-t border-white/10">
+                                    <div
+                                        className="p-6 bg-black/20 border-t border-white/10"
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={handleDrop}
+                                    >
+                                        {/* Drag and drop indicator */}
+                                        {isDragging && (
+                                            <div className="absolute inset-0 bg-cyan-500/10 border-2 border-dashed border-cyan-500 rounded-lg flex items-center justify-center z-10">
+                                                <div className="text-center">
+                                                    <ImageIcon className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
+                                                    <p className="text-cyan-400 font-medium">Drop your image here</p>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <div className="relative max-w-3xl mx-auto">
                                             <input
                                                 type="text"
                                                 value={inputMessage}
                                                 onChange={(e) => setInputMessage(e.target.value)}
-                                                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                                                placeholder="Type your question..."
-                                                className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                                        e.preventDefault();
+                                                        handleSendMessage();
+                                                    }
+                                                }}
+                                                placeholder="Type your question or drop an image..."
+                                                className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 pr-24 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all"
+                                                disabled={isSending}
                                             />
+
+                                            {/* Hidden file input */}
+                                            <input
+                                                type="file"
+                                                ref={fileInputRef}
+                                                onChange={handleFileInputChange}
+                                                accept="image/*"
+                                                className="hidden"
+                                            />
+
                                             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    onClick={triggerFileInput}
+                                                    className="h-8 w-8 hover:bg-white/10 text-gray-400 hover:text-white"
+                                                    disabled={isSending}
+                                                >
+                                                    <ImageIcon className="w-4 h-4" />
+                                                </Button>
+
                                                 {browserSupportsSpeechRecognition ? (
                                                     <Button
                                                         size="icon"
@@ -234,16 +566,26 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                                             ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                                                             : 'hover:bg-white/10 text-gray-400 hover:text-white'
                                                             }`}
+                                                        disabled={isSending}
                                                     >
                                                         {listening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                                                     </Button>
                                                 ) : null}
+
                                                 <Button
                                                     size="icon"
-                                                    onClick={() => handleSendMessage()}
-                                                    className="h-8 w-8 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg"
+                                                    onClick={isSending ? cancelRequest : () => handleSendMessage()}
+                                                    className={`h-8 w-8 rounded-lg transition-all ${isSending
+                                                        ? 'bg-red-500 hover:bg-red-600 text-white'
+                                                        : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                                                        }`}
+                                                    disabled={!inputMessage.trim() && !imagePreview}
                                                 >
-                                                    <Send className="w-4 h-4" />
+                                                    {isSending ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <Send className="w-4 h-4" />
+                                                    )}
                                                 </Button>
                                             </div>
                                         </div>
@@ -260,3 +602,5 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
         </AnimatePresence>
     );
 }
+
+export default TeachingAIModal;

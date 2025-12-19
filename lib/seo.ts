@@ -37,14 +37,6 @@ export function generateMetadata(config: SEOConfig): Metadata {
 	const canonicalUrl = url ? `${siteUrl}${url}` : siteUrl;
 	const ogImage = image.startsWith("http") ? image : `${siteUrl}${image}`;
 
-	const robots = [
-		noIndex ? "noindex" : "index",
-		noFollow ? "nofollow" : "follow",
-		"max-image-preview:large",
-		"max-snippet:-1",
-		"max-video-preview:-1",
-	].join(", ");
-
 	return {
 		title: {
 			default: fullTitle,
@@ -71,7 +63,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
 			},
 		},
 		openGraph: {
-			type,
+			type: type === "product" ? "website" : type,
 			locale: "en_US",
 			url: canonicalUrl,
 			siteName,
@@ -103,6 +95,28 @@ export function generateMetadata(config: SEOConfig): Metadata {
 			yahoo: process.env.NEXT_PUBLIC_YAHOO_VERIFICATION,
 		},
 	};
+}
+
+export function generateCourseStructuredData(course: any) {
+    const courseData = {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        "name": course.title,
+        "description": course.description,
+        "provider": {
+            "@type": "Organization",
+            "name": "MR5 School",
+            "sameAs": process.env.NEXT_PUBLIC_SITE_URL || "https://mr5school.com"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": course.price,
+            "priceCurrency": "USD",
+            "category": course.category
+        }
+    };
+
+    return courseData;
 }
 
 export function generateStructuredData(type: "Organization" | "WebSite" | "Course" | "BreadcrumbList", data?: any) {

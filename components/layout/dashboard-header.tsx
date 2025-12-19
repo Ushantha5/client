@@ -14,15 +14,15 @@ import {
 import { LogOut, User, Settings, Menu, ShoppingCart, BookOpen, Bell, Search } from "lucide-react";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { NavigationSection } from "@/data/navigation";
 import { DashboardSidebar } from "./dashboard-sidebar";
 import { ThemeCustomizer } from "@/components/theme-customizer";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { NavigationItem } from "@/data/navigation";
 
 interface DashboardHeaderProps {
     title: string;
-    navigation?: NavigationSection[];
+    navigation?: NavigationItem[];
 }
 
 export function DashboardHeader({ title, navigation }: DashboardHeaderProps) {

@@ -20,7 +20,7 @@ export const aiAssistantService = {
     getAllInteractions: async (
         params?: AIInteractionFilters,
     ): Promise<PaginatedResponse<AIInteraction>> => {
-        const response = await apiClient.get("/aI_Assistant_Interctions", {
+        const response = await apiClient.get("/api/ai-assistant-interactions", {
             params,
         });
         return response.data;
@@ -32,7 +32,7 @@ export const aiAssistantService = {
     getInteractionById: async (
         id: string,
     ): Promise<{ success: boolean; data: AIInteraction }> => {
-        const response = await apiClient.get(`/aI_Assistant_Interctions/${id}`);
+        const response = await apiClient.get(`/api/ai-assistant-interactions/${id}`);
         return response.data;
     },
 
@@ -42,7 +42,7 @@ export const aiAssistantService = {
     createInteraction: async (
         data: CreateAIInteractionData,
     ): Promise<{ success: boolean; data: AIInteraction }> => {
-        const response = await apiClient.post("/aI_Assistant_Interctions", data);
+        const response = await apiClient.post("/api/ai-assistant-interactions", data);
         return response.data;
     },
 
@@ -54,7 +54,7 @@ export const aiAssistantService = {
         data: UpdateAIInteractionData,
     ): Promise<{ success: boolean; data: AIInteraction }> => {
         const response = await apiClient.put(
-            `/aI_Assistant_Interctions/${id}`,
+            `/api/ai-assistant-interactions/${id}`,
             data,
         );
         return response.data;
@@ -66,7 +66,7 @@ export const aiAssistantService = {
     deleteInteraction: async (
         id: string,
     ): Promise<{ success: boolean; message: string }> => {
-        const response = await apiClient.delete(`/aI_Assistant_Interctions/${id}`);
+        const response = await apiClient.delete(`/api/ai-assistant-interactions/${id}`);
         return response.data;
     },
 

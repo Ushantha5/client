@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import apiClient from "@/lib/apiClient";
 import { SchoolScene } from "@/components/3d/school-scene";
 import { Button } from "@/components/ui/button";
-import { Loader2, Lock, CreditCard, LogIn, ChevronRight } from "lucide-react";
+import { Loader2, Lock, CreditCard, LogIn, ChevronRight, PlayCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function CoursePage() {
@@ -30,7 +30,8 @@ export default function CoursePage() {
                 try {
                     const cRes = await apiClient.get(`/courses/${courseId}`);
                     setCourseData(cRes.data.data);
-                } catch (e) {
+                } catch (error) {
+                    console.error('Course loading error:', error);
                     setCourseData({ title: "Course Details", price: 99.99, description: "Loading failed or course not found." });
                 }
 
@@ -44,7 +45,8 @@ export default function CoursePage() {
                             if (accessRes.data.access) {
                                 setHasAccess(true);
                             }
-                        } catch (e) {
+                        } catch (error) {
+                            console.error('Enrollment check error:', error);
                             console.log("Not enrolled");
                         }
                     }
@@ -142,6 +144,11 @@ export default function CoursePage() {
                             <div className="p-6 rounded-2xl bg-green-500/10 border border-green-500/30">
                                 <h3 className="text-xl font-bold mb-2 text-green-400">Ready to Learn!</h3>
                                 <p className="text-slate-300 mb-4">You have full access to the campus.</p>
+                                <Link href={`/course/${courseId}/lesson/start`} className="block mb-4">
+                                    <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-12">
+                                        <PlayCircle className="mr-2 h-5 w-5" /> Start Lessons
+                                    </Button>
+                                </Link>
                                 <div className="grid grid-cols-2 gap-4">
                                     <Link href={`/course/${courseId}/room/mensa`}>
                                         <Button variant="outline" className="w-full justify-between">

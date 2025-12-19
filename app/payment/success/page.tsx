@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { paymentService } from "@/services/payment.service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const sessionId = searchParams.get("session_id");
@@ -118,3 +118,10 @@ export default function PaymentSuccessPage() {
 	return null;
 }
 
+export default function PaymentSuccessPage() {
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<PaymentSuccessContent />
+		</Suspense>
+	);
+}

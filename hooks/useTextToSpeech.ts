@@ -4,13 +4,16 @@ export const useTextToSpeech = () => {
 	const [isSpeaking, setIsSpeaking] = useState(false);
 
 	const speak = useCallback(
-		(text: string, voice: "web" | "elevenlabs" = "web") => {
+		(text: string, voice: "web" | "elevenlabs" = "web", lang?: string) => {
 			if (typeof window === "undefined") return;
 
 			if (voice === "web" && window.speechSynthesis) {
 				// Web Speech API
 				setIsSpeaking(true);
 				const utterance = new SpeechSynthesisUtterance(text);
+				if (lang) {
+					utterance.lang = lang;
+				}
 				utterance.onend = () => setIsSpeaking(false);
 				utterance.onerror = () => setIsSpeaking(false);
 				window.speechSynthesis.speak(utterance);
@@ -21,6 +24,9 @@ export const useTextToSpeech = () => {
 				if (window.speechSynthesis) {
 					setIsSpeaking(true);
 					const utterance = new SpeechSynthesisUtterance(text);
+					if (lang) {
+						utterance.lang = lang;
+					}
 					utterance.onend = () => setIsSpeaking(false);
 					utterance.onerror = () => setIsSpeaking(false);
 					window.speechSynthesis.speak(utterance);

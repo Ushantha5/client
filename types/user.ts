@@ -5,6 +5,15 @@ export interface User {
     role: "student" | "AI-TEACHER" | "admin";
     status: string;
     avatarUrl?: string;
+    language?: string;
+    timezone?: string;
+    gradingSystem?: string;
+    regionalPreferences?: {
+        schoolHours: string;
+        academicCalendar: string;
+        holidays: string;
+        additionalInfo: string;
+    };
     createdAt?: Date;
     updatedAt?: Date;
 }

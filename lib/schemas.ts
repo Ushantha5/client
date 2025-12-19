@@ -25,3 +25,13 @@ export const AITeacherRegistrationSchema = z.object({
 	qualifications: z.string().min(5, "Qualifications are required"),
 	experience: z.string().optional(),
 });
+
+export const avathorSkillSchema = z.object({
+	name: z.string().min(2, "Name must be at least 2 characters"),
+	email: z.string().email("Invalid email address"),
+	skillName: z.string().min(3, "Skill name must be at least 3 characters"),
+	description: z
+		.string()
+		.min(10, "Description must be at least 10 characters"),
+	category: z.string().min(3, "Category must be at least 3 characters"),
+});

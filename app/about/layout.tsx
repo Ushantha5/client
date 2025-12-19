@@ -1,5 +1,6 @@
 import { generateMetadata } from "@/lib/seo";
 import { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = generateMetadata({
 	title: "About MR5 School - AI-Powered Learning Platform",
@@ -19,7 +20,7 @@ export const metadata: Metadata = generateMetadata({
 export default function AboutLayout({
 	children,
 }: {
-	children: React.ReactNode;
+	children: ReactNode;
 }) {
 	return <>{children}</>;
 }

@@ -65,6 +65,7 @@ export default function NotFound() {
 								src="/assets/404-robot.png"
 								alt="Lost AI Robot 404"
 								fill
+								sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
 								className="object-contain"
 								priority
 							/>

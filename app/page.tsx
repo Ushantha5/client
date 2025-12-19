@@ -1,230 +1,211 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getTimeBasedGreeting } from "@/lib/time-utils";
+import { BentoGrid, BentoItem } from "@/components/ui/bento-grid";
 import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useVoiceInteraction } from "@/hooks/useVoiceInteraction";
-import { Mic, Sparkles, ArrowRight, BookOpen, Users, Trophy, Play } from "lucide-react";
+import {
+  Sparkles,
+  BookOpen,
+  Users,
+  Zap,
+  Brain,
+  Calendar,
+  Search
+} from "lucide-react";
 import LoadingScreen from "@/components/loading/LoadingScreen";
-import { TeachingAIModal } from "@/components/ai/TeachingAIModal";
-import { motion } from "framer-motion";
+import TeachingAIModal from "@/components/ai/TeachingAIModal";
+import { useVoiceInteraction } from "@/hooks/useVoiceInteraction";
+import { getTamilGreeting } from "@/lib/tamil-greetings";
 
-// Dynamically import Scene to avoid SSR issues with Three.js
-const Scene = dynamic(() => import("@/components/avatar/Scene"), {
-	ssr: false,
-});
+// Dynamically import 3D Avatar
+const WelcomeAvatar = dynamic(() => import("@/components/3d/WelcomeAvatar").then(m => ({ default: m.WelcomeAvatar })), { ssr: false });
 
 export default function HomePage() {
-	const [mounted, setMounted] = useState(false);
-	const [loading, setLoading] = useState(true);
-	const [isAIModalOpen, setIsAIModalOpen] = useState(false);
-	const [aiProvider] = useState<"openai" | "gemini" | "mock">("openai");
-	const [greeting, setGreeting] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+  // We use 'any' here to bypass the strict type mismatch if the type definitions are outdated
+  // in a real scenario we should update the Greeting type definition
+  const [greeting, setGreeting] = useState<any>(null);
 
-	const voiceInteraction = useVoiceInteraction(aiProvider);
-	const { isSpeaking } = voiceInteraction;
+  const voiceInteraction = useVoiceInteraction("gemini");
 
-	useEffect(() => {
-		setMounted(true);
-		setGreeting(getTimeBasedGreeting());
-		// Update greeting every minute
-		const interval = setInterval(() => {
-			setGreeting(getTimeBasedGreeting());
-		}, 60000);
-		return () => clearInterval(interval);
-	}, []);
+  useEffect(() => {
+    setMounted(true);
+    setGreeting(getTamilGreeting());
+    const interval = setInterval(() => setGreeting(getTamilGreeting()), 60000);
+    return () => clearInterval(interval);
+  }, []);
 
-	if (!mounted) {
-		return null; // Prevent hydration mismatch
-	}
+  if (!mounted) return null;
 
-	return (
-		<div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden transition-colors duration-300">
-			{loading && <LoadingScreen onComplete={() => setLoading(false)} />}
-			<Navbar />
+  return (
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
+      <Navbar />
 
-			<main className="flex-1 relative">
-				{/* Background Elements */}
-				<div className="absolute inset-0 overflow-hidden pointer-events-none">
-					<div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]" />
-					<div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px]" />
-				</div>
+      <main className="flex-1 container mx-auto px-4 py-8 pb-20">
 
-				{/* Hero Section */}
-				<section className="container mx-auto px-4 pt-20 pb-32 relative z-10">
-					<div className="flex flex-col lg:flex-row items-center gap-12">
-						{/* Text Content */}
-						<motion.div
-							initial={{ opacity: 0, x: -50 }}
-							animate={{ opacity: 1, x: 0 }}
-							transition={{ duration: 0.8 }}
-							className="lg:w-1/2 text-left space-y-8"
-						>
-							<div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 backdrop-blur-sm">
-								<span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-								<span className="text-sm font-medium text-foreground/80">AI Tutor Online</span>
-							</div>
+        {/* Header / Command Bar Area */}
+        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+              Dashboard
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
 
-							<h1 className="text-5xl lg:text-7xl font-bold leading-tight">
-								{greeting}! Master Any Subject with <br />
-								<span className="bg-gradient-to-r from-primary via-purple-500 to-pink-600 bg-clip-text text-transparent">
-									AI Intelligence
-								</span>
-							</h1>
+          {/* Huly-style Search Bar */}
+          <div className="relative group w-full md:w-96">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-500" />
+            <div className="relative flex items-center bg-surface border border-white/10 rounded-lg px-4 py-2 text-sm text-foreground/50 shadow-inner">
+              <Search className="w-4 h-4 mr-3" />
+              <span>Search courses, students, or ask AI...</span>
+              <span className="ml-auto text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-muted-foreground">⌘K</span>
+            </div>
+          </div>
+        </div>
 
-							<p className="text-xl text-muted-foreground max-w-xl leading-relaxed">
-								Experience the future of education with our advanced AI avatars.
-								Personalized tutoring, real-time feedback, and interactive learning
-								sessions available 24/7.
-							</p>
+        <BentoGrid>
+          {/* [Row 1] Hero Module: Avatar & Greeting */}
+          <BentoItem colSpan={8} rowSpan={2} className="relative overflow-hidden min-h-[400px]">
+            <div className="absolute inset-0 z-0">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+            </div>
 
-							<div className="flex flex-wrap gap-4">
-								<Button
-									size="lg"
-									onClick={() => setIsAIModalOpen(true)}
-									className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 h-14 text-lg shadow-lg shadow-primary/25 transition-all hover:scale-105"
-								>
-									<Sparkles className="mr-2 h-5 w-5" />
-									Start AI Session
-								</Button>
-								<Button
-									size="lg"
-									variant="outline"
-									asChild
-									className="border-primary/20 hover:bg-primary/5 text-foreground rounded-full px-8 h-14 text-lg backdrop-blur-sm"
-								>
-									<Link href="/courses">
-										Explore Courses
-										<ArrowRight className="ml-2 h-5 w-5" />
-									</Link>
-								</Button>
-							</div>
+            <div className="relative z-10 flex flex-col md:flex-row h-full">
+              <div className="flex-1 p-8 flex flex-col justify-center space-y-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 self-start">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-xs font-medium text-primary-foreground">System Online</span>
+                </div>
 
-							<div className="flex items-center gap-6 pt-4 text-sm text-muted-foreground">
-								<div className="flex items-center gap-2">
-									<Users className="w-4 h-4 text-primary" />
-									<span>10k+ Students</span>
-								</div>
-								<div className="flex items-center gap-2">
-									<Trophy className="w-4 h-4 text-primary" />
-									<span>#1 AI Platform</span>
-								</div>
-								<div className="flex items-center gap-2">
-									<Play className="w-4 h-4 text-primary" />
-									<span>Live Demo</span>
-								</div>
-							</div>
-						</motion.div>
+                <div>
+                  <h2 className="text-5xl font-bold leading-tight mb-2">
+                    {greeting?.transliteration || greeting?.english || "Vanakkam"}
+                  </h2>
+                  <p className="text-2xl text-muted-foreground font-light mb-4 text-glow">
+                    {greeting?.primary || "Welcome"}
+                  </p>
+                  <p className="text-foreground/80 max-w-md leading-relaxed">
+                    Welcome to your AI-powered learning OS. Your personal tutor is ready to assist you with real-time feedback.
+                  </p>
+                </div>
 
-						{/* Avatar Section */}
-						<motion.div
-							initial={{ opacity: 0, scale: 0.8 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ duration: 0.8, delay: 0.2 }}
-							className="lg:w-1/2 w-full relative"
-						>
-							<div className="relative z-10 bg-gradient-to-b from-card/50 to-background/50 rounded-3xl border border-primary/10 backdrop-blur-xl shadow-2xl overflow-hidden">
-								<div className="absolute inset-0 bg-grid-primary/5 bg-[size:30px_30px]" />
-								<Scene isSpeaking={isSpeaking} />
+                <div className="flex gap-4 pt-4">
+                  <Button
+                    onClick={() => setIsAIModalOpen(true)}
+                    className="bg-primary hover:bg-primary/90 text-white rounded-lg shadow-[0_0_20px_rgba(120,110,255,0.3)] border border-white/10"
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Open Workspace
+                  </Button>
+                  <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10" asChild>
+                    <Link href="/courses">Browse Library</Link>
+                  </Button>
+                </div>
+              </div>
 
-								{/* Floating Badge */}
-								<motion.div
-									animate={{ y: [0, -10, 0] }}
-									transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-									className="absolute bottom-8 right-8 bg-background/60 backdrop-blur-md border border-primary/10 p-4 rounded-2xl flex items-center gap-3"
-								>
-									<div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-										<Mic className="w-5 h-5 text-primary-foreground" />
-									</div>
-									<div>
-										<p className="text-xs text-muted-foreground">Status</p>
-										<p className="text-sm font-bold text-foreground">
-											{isSpeaking ? "Speaking..." : "Listening..."}
-										</p>
-									</div>
-								</motion.div>
-							</div>
+              <div className="flex-1 relative min-h-[300px] md:min-h-auto">
+                {/* <WelcomeAvatar
+                  showGreetingText={false}
+                  enableVoice={true}
+                  className="w-full h-full absolute inset-0"
+                  onAvatarClick={() => setIsAIModalOpen(true)}
+                /> */}
+                {/* Status Badge floating */}
+                {/* <div className="absolute bottom-6 right-6 bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${voiceInteraction.isSpeaking ? 'bg-green-500 animate-ping' : 'bg-red-500'}`} />
+                  <span className="text-xs font-mono text-muted-foreground uppercase">
+                    {voiceInteraction.isSpeaking ? "Voice Active" : "Standby"}
+                  </span>
+                </div> */}
+              </div>
+            </div>
+          </BentoItem>
 
-							{/* Decorative Elements behind avatar */}
-							<div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/30 rounded-full blur-3xl opacity-50" />
-							<div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-500/30 rounded-full blur-3xl opacity-50" />
-						</motion.div>
-					</div>
-				</section>
+          {/* [Row 1] Right Column Stats */}
+          <BentoItem colSpan={4} title="Study Streak" subtitle="Constructive flow state maintained." icon={<Zap className="w-5 h-5" />}>
+            <div className="mt-4 flex items-end gap-2">
+              <span className="text-6xl font-bold text-foreground">12</span>
+              <span className="text-xl text-muted-foreground mb-2">days</span>
+            </div>
+            <div className="w-full bg-white/5 h-2 rounded-full mt-4 overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-primary to-purple-500 w-[65%]" />
+            </div>
+          </BentoItem>
 
-				{/* Features Section */}
-				<section className="py-24 bg-card/30 border-t border-border/50">
-					<div className="container mx-auto px-4">
-						<div className="text-center mb-16">
-							<h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-								Why Choose MR5 School?
-							</h2>
-							<p className="text-muted-foreground max-w-2xl mx-auto">
-								Unlock your potential with our cutting-edge learning platform designed for the modern era.
-							</p>
-						</div>
+          <BentoItem colSpan={4} title="Knowledge Graph" subtitle="72 concepts mastered this week." icon={<Brain className="w-5 h-5" />}>
+            <div className="mt-4 grid grid-cols-5 gap-1 h-16 items-end">
+              {[40, 70, 45, 90, 60].map((h, i) => (
+                <div key={i} className="bg-white/10 hover:bg-primary/50 transition-colors rounded-sm" style={{ height: `${h}%` }} />
+              ))}
+            </div>
+          </BentoItem>
 
-						<div className="grid md:grid-cols-3 gap-8">
-							{[
-								{
-									icon: Sparkles,
-									title: "AI-Powered Learning",
-									desc: "Interact with intelligent AI avatars that adapt to your learning style and pace.",
-									color: "bg-primary/10 text-primary"
-								},
-								{
-									icon: BookOpen,
-									title: "Expert Curriculum",
-									desc: "Access world-class content curated by industry professionals and certified AI-TEACHERs.",
-									color: "bg-purple-500/10 text-purple-500"
-								},
-								{
-									icon: Trophy,
-									title: "Personalized Path",
-									desc: "Get a customized learning journey tailored to your specific goals and achievements.",
-									color: "bg-orange-500/10 text-orange-500"
-								}
-							].map((feature, idx) => (
-								<motion.div
-									key={idx}
-									initial={{ opacity: 0, y: 20 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									viewport={{ once: true }}
-									transition={{ delay: idx * 0.1 }}
-									className="group p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/20 transition-all hover:bg-card/80 hover:shadow-lg"
-								>
-									<div className={`w-14 h-14 rounded-2xl ${feature.color} flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform`}>
-										<feature.icon className="w-7 h-7" />
-									</div>
-									<h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
-										{feature.title}
-									</h3>
-									<p className="text-muted-foreground leading-relaxed">
-										{feature.desc}
-									</p>
-								</motion.div>
-							))}
-						</div>
-					</div>
-				</section>
-			</main>
+          {/* [Row 2] Modules */}
+          <BentoItem colSpan={4} title="Recent Courses" icon={<BookOpen className="w-5 h-5" />}>
+            <div className="space-y-3 mt-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer group/item">
+                  <div className="w-10 h-10 rounded-md bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center">
+                    <span className="text-xs font-mono text-muted-foreground">0{i}</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground group-hover/item:text-primary transition-colors">Advanced React Patterns</p>
+                    <p className="text-xs text-muted-foreground">Module {i} • 15m remaining</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </BentoItem>
 
-			{/* Footer */}
-			<footer className="border-t border-border/50 py-12 bg-card/50">
-				<div className="container mx-auto px-4 text-center">
-					<p className="text-muted-foreground">&copy; 2025 MR5 School. All rights reserved.</p>
-				</div>
-			</footer>
+          <BentoItem colSpan={4} title="Community" icon={<Users className="w-5 h-5" />}>
+            <div className="space-y-4 text-sm mt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Active Learners</span>
+                <span className="font-mono text-foreground">1,248</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Global Rank</span>
+                <span className="font-mono text-green-400">#42</span>
+              </div>
+              <div className="p-3 bg-white/5 rounded-lg border border-white/5">
+                <p className="text-xs text-muted-foreground">&quot;The AI tutor helped me solve the recursion problem in minutes!&quot;</p>
+                <p className="text-xs text-foreground mt-2 font-medium">- Sarah J.</p>
+              </div>
+            </div>
+          </BentoItem>
 
-			{/* AI Modal */}
-			<TeachingAIModal
-				isOpen={isAIModalOpen}
-				onClose={() => setIsAIModalOpen(false)}
-				voiceInteraction={voiceInteraction}
-			/>
-		</div>
-	);
+          <BentoItem colSpan={4} title="Upcoming" icon={<Calendar className="w-5 h-5" />}>
+            <div className="relative pl-4 border-l border-white/10 space-y-6 mt-2">
+              {[
+                { time: "10:00 AM", event: "Live Session: Next.js 14" },
+                { time: "02:00 PM", event: "Code Review with AI" },
+              ].map((item, i) => (
+                <div key={i} className="relative">
+                  <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-surface border border-primary/50 ring-4 ring-background" />
+                  <p className="text-xs text-primary font-mono">{item.time}</p>
+                  <p className="text-sm text-foreground">{item.event}</p>
+                </div>
+              ))}
+            </div>
+          </BentoItem>
+
+        </BentoGrid>
+      </main>
+
+      {/* AI Modal Integration */}
+      <TeachingAIModal
+        isOpen={isAIModalOpen}
+        onClose={() => setIsAIModalOpen(false)}
+        voiceInteraction={voiceInteraction}
+      />
+    </div>
+  );
 }

@@ -1,178 +1,159 @@
-import type { LucideIcon } from "lucide-react";
+import React from 'react';
 import {
-    LayoutDashboard,
-    Users,
-    GraduationCap,
-    BookOpen,
-    Settings,
-    BarChart3,
-    FileText,
-    CreditCard,
-    UserCog,
-    MessageSquare,
-    Calendar,
-    Award,
-    TrendingUp,
-    // ShoppingCart,
-    // Mail,
-    Bot,
+  LayoutDashboard,
+  Users,
+  GraduationCap,
+  BookOpen,
+  BarChart,
+  Settings,
+  CreditCard,
+  FileText,
+  Calendar,
+  UserCheck,
+  DollarSign,
+  Globe,
+  Trophy,
 } from "lucide-react";
 
+// Define the navigation item type
 export interface NavigationItem {
-    title: string;
-    href?: string;
-    icon?: LucideIcon;
-    label?: string;
-    items?: NavigationItem[];
+  title: string;
+  href?: string;
+  icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, "ref"> & React.RefAttributes<SVGSVGElement>>;
+  items?: NavigationItem[];
+  label?: string;
 }
 
-export interface NavigationSection {
-    title: string;
-    items: NavigationItem[];
-}
-
-// Admin Navigation
-export const adminNavigation: NavigationSection[] = [
-    {
-        title: "Overview",
-        items: [
-            {
-                title: "Dashboard",
-                href: "/admin",
-                icon: LayoutDashboard,
-            },
-            {
-                title: "Analytics",
-                href: "/admin/analytics",
-                icon: BarChart3,
-            },
-        ],
-    },
-    {
-        title: "Management",
-        items: [
-            {
-                title: "Users",
-                href: "/admin/users",
-                icon: Users,
-            },
-            {
-                title: "AI-TEACHERs",
-                href: "/admin/AI-TEACHERs",
-                icon: GraduationCap,
-            },
-            {
-                title: "Students",
-                href: "/admin/students",
-                icon: UserCog,
-            },
-            {
-                title: "Courses",
-                href: "/admin/courses",
-                icon: BookOpen,
-            },
-            {
-                title: "Enrollments",
-                href: "/admin/enrollments",
-                icon: Award,
-            },
-        ],
-    },
-    {
-        title: "Finance",
-        items: [
-            {
-                title: "Payments",
-                href: "/admin/payments",
-                icon: CreditCard,
-            },
-            {
-                title: "Revenue",
-                href: "/admin/revenue",
-                icon: TrendingUp,
-            },
-        ],
-    },
-    {
-        title: "System",
-        items: [
-            {
-                title: "Settings",
-                href: "/admin/settings",
-                icon: Settings,
-            },
-            {
-                title: "Reports",
-                href: "/admin/reports",
-                icon: FileText,
-            },
-        ],
-    },
+export const adminNavigation: NavigationItem[] = [
+  {
+    title: "Overview",
+    href: "/admin",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Analytics",
+    href: "/admin/analytics",
+    icon: BarChart,
+  },
+  {
+    title: "Management",
+    items: [
+      {
+        title: "Users",
+        href: "/admin/users",
+        icon: Users,
+      },
+      {
+        title: "AI-TEACHERs",
+        href: "/admin/ai-teachers",
+        icon: GraduationCap,
+      },
+      {
+        title: "Students",
+        href: "/admin/students",
+        icon: UserCheck,
+      },
+      {
+        title: "Courses",
+        href: "/admin/courses",
+        icon: BookOpen,
+      },
+      {
+        title: "Enrollments",
+        href: "/admin/enrollments",
+        icon: Calendar,
+      },
+    ],
+  },
+  {
+    title: "Finance",
+    items: [
+      {
+        title: "Payments",
+        href: "/admin/payments",
+        icon: CreditCard,
+      },
+      {
+        title: "Revenue",
+        href: "/admin/revenue",
+        icon: DollarSign,
+      },
+      {
+        title: "Regional Pricing",
+        href: "/admin/pricing",
+        icon: Globe,
+      },
+    ],
+  },
+  {
+    title: "System",
+    items: [
+      {
+        title: "Settings",
+        href: "/admin/settings",
+        icon: Settings,
+      },
+      {
+        title: "Reports",
+        href: "/admin/reports",
+        icon: FileText,
+      },
+    ],
+  },
 ];
 
+export const studentNavigation: NavigationItem[] = [
+  {
+    title: "Dashboard",
+    href: "/student/portal",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "My Courses",
+    href: "/student/courses",
+    icon: BookOpen,
+  },
+  {
+    title: "Assignments",
+    href: "/student/assignments",
+    icon: FileText,
+  },
+  {
+    title: "Grades",
+    href: "/student/grades",
+    icon: Trophy,
+  },
+  {
+    title: "Schedule",
+    href: "/student/schedule",
+    icon: Calendar,
+  },
+];
 
-// AI-TEACHER navigation removed
-
-// Student Navigation
-export const studentNavigation: NavigationSection[] = [
-    {
-        title: "Overview",
-        items: [
-            {
-                title: "Dashboard",
-                href: "/student",
-                icon: LayoutDashboard,
-            },
-        ],
-    },
-    {
-        title: "Learning",
-        items: [
-            {
-                title: "My Courses",
-                href: "/student/courses",
-                icon: BookOpen,
-            },
-            {
-                title: "Assignments",
-                href: "/student/assignments",
-                icon: FileText,
-            },
-            {
-                title: "Grades",
-                href: "/student/grades",
-                icon: Award,
-            },
-            {
-                title: "Schedule",
-                href: "/student/schedule",
-                icon: Calendar,
-            },
-        ],
-    },
-    {
-        title: "Resources",
-        items: [
-            {
-                title: "Messages",
-                href: "/student/messages",
-                icon: MessageSquare,
-            },
-            {
-                title: "MMS Solver",
-                href: "/solver",
-                icon: Bot,
-            },
-        ],
-    },
-    {
-        title: "Account",
-        items: [
-            {
-                title: "Settings",
-                href: "/student/settings",
-                icon: Settings,
-            },
-        ],
-    },
+export const teacherNavigation: NavigationItem[] = [
+  {
+    title: "Dashboard",
+    href: "/teacher",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "My Classes",
+    href: "/teacher/classes",
+    icon: GraduationCap,
+  },
+  {
+    title: "Course Builder",
+    href: "/teacher/builder",
+    icon: BookOpen,
+  },
+  {
+    title: "Students",
+    href: "/teacher/students",
+    icon: Users,
+  },
+  {
+    title: "Analytics",
+    href: "/teacher/analytics",
+    icon: BarChart,
+  },
 ];

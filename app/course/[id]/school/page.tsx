@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import apiClient from "@/lib/apiClient";
-import { SchoolScene } from "@/components/3d/school-scene";
 import { Button } from "@/components/ui/button";
 import { Loader2, Lock } from "lucide-react";
 
@@ -17,6 +16,7 @@ export default function SchoolPage() {
     const [accessGranted, setAccessGranted] = useState(false);
     const [checkingAccess, setCheckingAccess] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [SchoolScene, setSchoolScene] = useState<any>(null);
 
     useEffect(() => {
         // 1. Wait for Auth to initialize
@@ -34,6 +34,9 @@ export default function SchoolPage() {
                 const response = await apiClient.get(`/enrollments/check/${courseId}`);
                 if (response.data.access) {
                     setAccessGranted(true);
+                    // Dynamically import the 3D component only when access is granted
+                    const { SchoolScene } = await import("@/components/3d/school-scene");
+                    setSchoolScene(() => SchoolScene);
                 } else {
                     setError("Enrollment required");
                 }
@@ -96,5 +99,5 @@ export default function SchoolPage() {
     }
 
     // Success State - Render 3D Scene
-    return <SchoolScene />;
+    return SchoolScene ? <SchoolScene /> : <div>Loading 3D environment...</div>;
 }

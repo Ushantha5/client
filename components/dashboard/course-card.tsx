@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { SpotlightCard } from "@/components/ui/bento-grid";
+import { Button } from "@/components/ui/button";
+import { Play } from "lucide-react";
 
 interface CourseCardProps {
     title: string;
@@ -11,50 +13,54 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ title, progress, iconPath = "/assets/dashboard/course-icon-1.png", className }: CourseCardProps) {
+    // Determine button text based on progress
+    const getButtonText = () => {
+        if (progress > 0) {
+            return "Continue Learning";
+        }
+        return "Start Learning";
+    };
+
     return (
-        <div className={cn(
-            "relative w-full aspect-[4/5] rounded-[40px] bg-gradient-to-br from-[#e0e5ec] to-[#ffffff] p-6 flex flex-col items-center justify-between transition-all duration-300 hover:-translate-y-2",
-            "shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff]", // Neumorphism shadow
-            "hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]", // Blue glow on hover
-            className
-        )}>
-            {/* Inner inset shadow container for depth feeling */}
-            <div className="absolute inset-0 rounded-[40px] opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none ring-2 ring-blue-400/20" />
+        <SpotlightCard className={`group/card h-full ${className}`} spotlightColor="rgba(var(--primary-channel), 0.15)">
+            <div className="flex flex-col h-full bg-surface/50 p-4 relative z-10 transition-colors hover:bg-surface/80">
+                <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 border border-white/5">
+                    <Image
+                        src={iconPath}
+                        alt={title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transform transition-transform duration-500 group-hover/card:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                </div>
 
-            {/* 3D Icon Container */}
-            <div className="relative w-32 h-32 mt-4 transform hover:scale-105 transition-transform duration-500">
-                <Image
-                    src={iconPath}
-                    alt={title}
-                    fill
-                    className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.2)]"
-                />
-            </div>
+                <div className="flex-1 space-y-3">
+                    <h3 className="text-lg font-bold text-foreground leading-tight line-clamp-2 group-hover/card:text-primary transition-colors">
+                        {title}
+                    </h3>
 
-            {/* Content */}
-            <div className="w-full space-y-4 z-10">
-                <h3 className="text-xl font-bold text-slate-800 text-center leading-tight">
-                    {title}
-                </h3>
-
-                {/* Custom Neumorphic Progress Bar */}
-                <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-semibold text-slate-500">
-                        <span>Progress</span>
-                        <span>{progress}%</span>
-                    </div>
-                    <div className="h-4 w-full bg-[#e0e5ec] rounded-full shadow-[inset_3px_3px_6px_#bebebe,inset_-3px_-3px_6px_#ffffff] overflow-hidden p-[2px]">
-                        <div
-                            className="h-full rounded-full bg-gradient-to-r from-blue-400 to-cyan-300 shadow-[2px_2px_4px_rgba(0,0,0,0.1)] transition-all duration-1000 ease-out"
-                            style={{ width: `${progress}%` }}
-                        />
+                    <div className="space-y-2">
+                        <div className="flex justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                            <span>Progress</span>
+                            <span className={progress === 100 ? "text-green-400" : "text-primary"}>{progress}%</span>
+                        </div>
+                        <div className="relative h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                            <div
+                                className="absolute top-0 left-0 h-full bg-primary transition-all duration-500 ease-out shadow-[0_0_10px_rgba(var(--primary-channel),0.5)]"
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                <button className="w-full py-3 rounded-2xl bg-[#e0e5ec] text-blue-600 font-bold shadow-[6px_6px_12px_#bebebe,-6px_-6px_12px_#ffffff] active:shadow-[inset_4px_4px_8px_#bebebe,inset_-4px_-4px_8px_#ffffff] transition-all duration-200 hover:text-blue-500">
-                    Continue
-                </button>
+                <div className="mt-6">
+                    <Button className="w-full bg-primary/10 hover:bg-primary hover:text-white text-primary border border-primary/20 hover:border-primary transition-all duration-300" size="sm">
+                        <Play className="h-4 w-4 mr-2" />
+                        {getButtonText()}
+                    </Button>
+                </div>
             </div>
-        </div>
+        </SpotlightCard>
     );
 }

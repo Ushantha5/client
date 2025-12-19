@@ -18,7 +18,8 @@ export default function Scene({ isSpeaking }: { isSpeaking: boolean }) {
 			if (!gl) {
 				setHasWebGL(false);
 			}
-		} catch (e) {
+		} catch (error) {
+			console.error('WebGL detection error:', error);
 			setHasWebGL(false);
 		}
 	}, []);
@@ -47,31 +48,10 @@ export default function Scene({ isSpeaking }: { isSpeaking: boolean }) {
 	}
 
 	return (
-		<div className="h-[500px] w-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl overflow-hidden shadow-2xl">
-			<Suspense
-				fallback={
-					<div className="h-full w-full flex items-center justify-center text-white">
-						Loading Avatar...
-					</div>
-				}
-			>
-				<Canvas
-					shadows
-					camera={{ position: [0, 0, 5], fov: 30 }}
-					gl={{
-						alpha: true,
-						antialias: true,
-						powerPreference: "high-performance",
-						failIfMajorPerformanceCaveat: false,
-					}}
-					dpr={[1, 2]}
-					onCreated={(state) => {
-						state.gl.setClearColor("#0a0e27", 1);
-					}}
-				>
-					<Experience isSpeaking={isSpeaking} />
-				</Canvas>
+		<Canvas shadows camera={{ position: [0, 0, 5], fov: 50 }}>
+			<Suspense fallback={null}>
+				<Experience isSpeaking={isSpeaking} />
 			</Suspense>
-		</div>
+		</Canvas>
 	);
 }

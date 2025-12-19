@@ -1,9 +1,8 @@
 "use client";
 
-import React, { Suspense } from "react";
-import { Canvas, useLoader } from "@react-three/fiber";
+import React, { Suspense, useState, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, Html, useProgress } from "@react-three/drei";
-import { OBJLoader } from "three-stdlib";
 
 function Loader() {
     const { progress } = useProgress();
@@ -15,14 +14,27 @@ function Loader() {
 }
 
 function OBJModel({ url }: { url: string }) {
-    const obj = useLoader(OBJLoader, url);
+    const [obj, setObj] = useState<any>(null);
 
-    // Basic material override if textures aren't effectively mapped by default
-    // obj.traverse((child: any) => {
-    //   if (child.isMesh) {
-    //     child.material.color.setHex(0xcccccc);
-    //   }
-    // });
+    useEffect(() => {
+        const loadModel = async () => {
+            try {
+                const { OBJLoader } = await import("three-stdlib");
+                const loader = new OBJLoader();
+                loader.load(
+                    url,
+                    (loadedObj: any) => setObj(loadedObj),
+                    undefined,
+                    (error) => console.error("Error loading OBJ model:", error)
+                );
+            } catch (err) {
+                console.error("Failed to initialize OBJ loader:", err);
+            }
+        };
+        loadModel();
+    }, [url]);
+
+    if (!obj) return null;
 
     return <primitive object={obj} scale={1} position={[0, -2, 0]} />;
 }

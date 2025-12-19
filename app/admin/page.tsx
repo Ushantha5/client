@@ -20,27 +20,85 @@ import {
 	BarChart,
 	TrendingUp,
 	DollarSign,
-	UserPlus,
-	Award,
 	Plus,
+	Search,
+	Filter,
+	Download,
+	RefreshCw,
 } from "lucide-react";
 import AdminApprovalsTable from "@/components/admin/approvals-table";
-import { Progress } from "@/components/ui/progress";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateCourseModal } from "@/components/admin/create-course-modal";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import { adminService } from "@/services/admin.service";
 
 
 export default function AdminDashboard() {
 	const { user } = useAuth();
 	const router = useRouter();
 	const [showCreateCourse, setShowCreateCourse] = useState(false);
+	const [stats, setStats] = useState({
+		totalStudents: 0,
+		totalAITeachers: 0,
+		activeCourses: 0,
+		revenue: 0,
+	});
+	const [loading, setLoading] = useState(true);
+	const [users, setUsers] = useState<any[]>([]);
+	const [courses, setCourses] = useState<any[]>([]);
+	const [payments, setPayments] = useState<any[]>([]);
 
 	useEffect(() => {
 		if (!user || user.role !== "admin") {
 			router.push("/");
+		} else {
+			fetchDashboardData();
 		}
 	}, [user, router]);
+
+	const fetchDashboardData = async () => {
+		try {
+			setLoading(true);
+
+			// Fetch stats
+			const statsData = await adminService.getPlatformStats();
+
+			setStats({
+				totalStudents: statsData.totalStudents,
+				totalAITeachers: statsData.totalAITeachers || 0,
+				activeCourses: statsData.totalCourses,
+				revenue: statsData.revenue || 0,
+			});
+
+			// Fetch users
+			const usersData = await adminService.getUsers({ limit: 5 });
+			setUsers(Array.isArray(usersData.data) ? usersData.data : []);
+
+			// Fetch courses
+			const coursesData = await adminService.getCourses({ limit: 5 });
+			setCourses(Array.isArray(coursesData.data) ? coursesData.data : []);
+
+			// Fetch payments
+			const paymentsData = await adminService.getPayments({ limit: 5 });
+			setPayments(Array.isArray(paymentsData.data) ? paymentsData.data : []);
+
+		} catch (error: any) {
+			console.error("Error fetching dashboard data:", error);
+			toast.error("Failed to load dashboard data");
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	if (!user || user.role !== "admin") {
 		return null;
@@ -49,13 +107,13 @@ export default function AdminDashboard() {
 	const handleCourseCreated = () => {
 		// Optionally refresh course data or show success message
 		// For now, the modal handles the success toast
+		fetchDashboardData(); // Refresh stats after creating a course
 	};
 
-
-	const stats = [
+	const statCards = [
 		{
 			title: "Total Students",
-			value: "1,234",
+			value: stats.totalStudents.toString(),
 			change: "+12.5%",
 			trend: "up",
 			icon: Users,
@@ -64,7 +122,7 @@ export default function AdminDashboard() {
 		},
 		{
 			title: "Total AI-TEACHERs",
-			value: "56",
+			value: stats.totalAITeachers.toString(),
 			change: "+4.2%",
 			trend: "up",
 			icon: GraduationCap,
@@ -73,7 +131,7 @@ export default function AdminDashboard() {
 		},
 		{
 			title: "Active Courses",
-			value: "89",
+			value: stats.activeCourses.toString(),
 			change: "+8.1%",
 			trend: "up",
 			icon: BookOpen,
@@ -82,41 +140,13 @@ export default function AdminDashboard() {
 		},
 		{
 			title: "Revenue",
-			value: "$45,678",
+			value: `$${stats.revenue.toLocaleString()}`,
 			change: "+23.5%",
 			trend: "up",
 			icon: DollarSign,
 			color: "text-orange-600",
 			bgColor: "bg-orange-500/10",
 		},
-	];
-
-	const recentActivity = [
-		{
-			action: "New student registered",
-			user: "John Doe",
-			time: "2 minutes ago",
-			icon: UserPlus,
-		},
-		{
-			action: "Course published",
-			user: "Jane Smith",
-			time: "1 hour ago",
-			icon: BookOpen,
-		},
-		{
-			action: "AI-TEACHER approved",
-			user: "Mike Johnson",
-			time: "3 hours ago",
-			icon: Award,
-		},
-	];
-
-	const courseStats = [
-		{ name: "Web Development", enrolled: 450, progress: 85 },
-		{ name: "Data Science", enrolled: 320, progress: 72 },
-		{ name: "Mobile Development", enrolled: 280, progress: 68 },
-		{ name: "AI & Machine Learning", enrolled: 184, progress: 45 },
 	];
 
 	return (
@@ -151,7 +181,7 @@ export default function AdminDashboard() {
 
 					{/* Stats Grid */}
 					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-						{stats.map((stat, index) => (
+						{statCards.map((stat, index) => (
 							<Card key={index} className="border-border/50 shadow-sm hover:shadow-md transition-all hover:bg-accent/5">
 								<CardHeader className="flex flex-row items-center justify-between pb-2">
 									<CardTitle className="text-sm font-medium text-muted-foreground">
@@ -194,8 +224,9 @@ export default function AdminDashboard() {
 					<Tabs defaultValue="overview" className="space-y-6">
 						<TabsList className="bg-muted/50 p-1 border border-border/40">
 							<TabsTrigger value="overview">Overview</TabsTrigger>
+							<TabsTrigger value="users">Users</TabsTrigger>
 							<TabsTrigger value="courses">Courses</TabsTrigger>
-							<TabsTrigger value="activity">Recent Activity</TabsTrigger>
+							<TabsTrigger value="payments">Payments</TabsTrigger>
 						</TabsList>
 
 						<TabsContent value="overview" className="space-y-6">
@@ -236,65 +267,229 @@ export default function AdminDashboard() {
 							</div>
 						</TabsContent>
 
-						<TabsContent value="courses" className="space-y-6">
+						<TabsContent value="users" className="space-y-6">
 							<Card className="border-border/50 shadow-sm">
 								<CardHeader>
-									<CardTitle>Top Courses</CardTitle>
-									<CardDescription>
-										Most popular courses by enrollment
-									</CardDescription>
-								</CardHeader>
-								<CardContent className="space-y-6">
-									{courseStats.map((course, index) => (
-										<div key={index} className="space-y-2">
-											<div className="flex items-center justify-between">
-												<div className="space-y-1">
-													<p className="text-sm font-medium">{course.name}</p>
-													<p className="text-xs text-muted-foreground">
-														{course.enrolled} students enrolled
-													</p>
-												</div>
-												<span className="text-sm font-medium">
-													{course.progress}%
-												</span>
-											</div>
-											<Progress value={course.progress} className="h-2" />
+									<div className="flex items-center justify-between">
+										<div>
+											<CardTitle>User Management</CardTitle>
+											<CardDescription>
+												View and manage all platform users
+											</CardDescription>
 										</div>
-									))}
+										<div className="flex gap-2">
+											<Button variant="outline" size="sm">
+												<Search className="h-4 w-4 mr-2" />
+												Search
+											</Button>
+											<Button variant="outline" size="sm">
+												<Filter className="h-4 w-4 mr-2" />
+												Filter
+											</Button>
+											<Button variant="outline" size="sm">
+												<Download className="h-4 w-4 mr-2" />
+												Export
+											</Button>
+											<Button variant="outline" size="sm" onClick={fetchDashboardData}>
+												<RefreshCw className="h-4 w-4 mr-2" />
+												Refresh
+											</Button>
+										</div>
+									</div>
+								</CardHeader>
+								<CardContent>
+									{loading ? (
+										<div className="flex items-center justify-center py-8">
+											<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+											<span className="ml-2">Loading users...</span>
+										</div>
+									) : (
+										<Table>
+											<TableHeader>
+												<TableRow>
+													<TableHead>Name</TableHead>
+													<TableHead>Email</TableHead>
+													<TableHead>Role</TableHead>
+													<TableHead>Status</TableHead>
+													<TableHead>Joined</TableHead>
+													<TableHead>Actions</TableHead>
+												</TableRow>
+											</TableHeader>
+											<TableBody>
+												{Array.isArray(users) && users.map((user: any) => (
+													<TableRow key={user.id}>
+														<TableCell className="font-medium">{user.name}</TableCell>
+														<TableCell>{user.email}</TableCell>
+														<TableCell>
+															<span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+																{user.role}
+															</span>
+														</TableCell>
+														<TableCell>
+															<span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${user.status === "approved"
+																? "bg-green-100 text-green-800"
+																: user.status === "pending"
+																	? "bg-yellow-100 text-yellow-800"
+																	: "bg-red-100 text-red-800"
+																}`}>
+																{user.status}
+															</span>
+														</TableCell>
+														<TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+														<TableCell>
+															<Button variant="ghost" size="sm">Edit</Button>
+														</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</Table>
+									)}
 								</CardContent>
 							</Card>
 						</TabsContent>
 
-						<TabsContent value="activity" className="space-y-6">
+						<TabsContent value="courses" className="space-y-6">
 							<Card className="border-border/50 shadow-sm">
 								<CardHeader>
-									<CardTitle>Recent Activity</CardTitle>
-									<CardDescription>
-										Latest updates from your platform
-									</CardDescription>
+									<div className="flex items-center justify-between">
+										<div>
+											<CardTitle>Course Management</CardTitle>
+											<CardDescription>
+												View and manage all courses on the platform
+											</CardDescription>
+										</div>
+										<div className="flex gap-2">
+											<Button variant="outline" size="sm">
+												<Search className="h-4 w-4 mr-2" />
+												Search
+											</Button>
+											<Button variant="outline" size="sm">
+												<Filter className="h-4 w-4 mr-2" />
+												Filter
+											</Button>
+											<Button variant="outline" size="sm">
+												<Download className="h-4 w-4 mr-2" />
+												Export
+											</Button>
+											<Button variant="outline" size="sm" onClick={fetchDashboardData}>
+												<RefreshCw className="h-4 w-4 mr-2" />
+												Refresh
+											</Button>
+										</div>
+									</div>
 								</CardHeader>
 								<CardContent>
-									<div className="space-y-4">
-										{recentActivity.map((activity, index) => (
-											<div
-												key={index}
-												className="flex items-center gap-4 border-b border-border/40 pb-4 last:border-0 last:pb-0"
-											>
-												<div className="p-2.5 rounded-lg bg-primary/10">
-													<activity.icon className="h-5 w-5 text-primary" />
-												</div>
-												<div className="flex-1">
-													<p className="font-medium text-sm text-foreground">{activity.action}</p>
-													<p className="text-sm text-muted-foreground">
-														{activity.user}
-													</p>
-												</div>
-												<span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-													{activity.time}
-												</span>
-											</div>
-										))}
+									{loading ? (
+										<div className="flex items-center justify-center py-8">
+											<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+											<span className="ml-2">Loading courses...</span>
+										</div>
+									) : (
+										<Table>
+											<TableHeader>
+												<TableRow>
+													<TableHead>Title</TableHead>
+													<TableHead>Instructor</TableHead>
+													<TableHead>Students</TableHead>
+													<TableHead>Status</TableHead>
+													<TableHead>Actions</TableHead>
+												</TableRow>
+											</TableHeader>
+											<TableBody>
+												{Array.isArray(courses) && courses.map((course: any) => (
+													<TableRow key={course.id}>
+														<TableCell className="font-medium">{course.title}</TableCell>
+														<TableCell>{course.instructorName || "Unknown"}</TableCell>
+														<TableCell>{course.enrollmentCount || 0}</TableCell>
+														<TableCell>
+															<span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${course.isApproved
+																? "bg-green-100 text-green-800"
+																: "bg-yellow-100 text-yellow-800"
+																}`}>
+																{course.isApproved ? "Published" : "Draft"}
+															</span>
+														</TableCell>
+														<TableCell>
+															<Button variant="ghost" size="sm">Edit</Button>
+														</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</Table>
+									)}
+								</CardContent>
+							</Card>
+						</TabsContent>
+
+						<TabsContent value="payments" className="space-y-6">
+							<Card className="border-border/50 shadow-sm">
+								<CardHeader>
+									<div className="flex items-center justify-between">
+										<div>
+											<CardTitle>Payment Records</CardTitle>
+											<CardDescription>
+												View recent payment transactions
+											</CardDescription>
+										</div>
+										<div className="flex gap-2">
+											<Button variant="outline" size="sm">
+												<Search className="h-4 w-4 mr-2" />
+												Search
+											</Button>
+											<Button variant="outline" size="sm">
+												<Filter className="h-4 w-4 mr-2" />
+												Filter
+											</Button>
+											<Button variant="outline" size="sm">
+												<Download className="h-4 w-4 mr-2" />
+												Export
+											</Button>
+											<Button variant="outline" size="sm" onClick={fetchDashboardData}>
+												<RefreshCw className="h-4 w-4 mr-2" />
+												Refresh
+											</Button>
+										</div>
 									</div>
+								</CardHeader>
+								<CardContent>
+									{loading ? (
+										<div className="flex items-center justify-center py-8">
+											<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+											<span className="ml-2">Loading payments...</span>
+										</div>
+									) : (
+										<Table>
+											<TableHeader>
+												<TableRow>
+													<TableHead>User</TableHead>
+													<TableHead>Amount</TableHead>
+													<TableHead>Date</TableHead>
+													<TableHead>Status</TableHead>
+													<TableHead>Actions</TableHead>
+												</TableRow>
+											</TableHeader>
+											<TableBody>
+												{Array.isArray(payments) && payments.map((payment: any) => (
+													<TableRow key={payment.id}>
+														<TableCell className="font-medium">{payment.userName || "Unknown User"}</TableCell>
+														<TableCell>${payment.amount.toFixed(2)}</TableCell>
+														<TableCell>{new Date(payment.createdAt).toLocaleDateString()}</TableCell>
+														<TableCell>
+															<span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${payment.status === "completed"
+																? "bg-green-100 text-green-800"
+																: "bg-yellow-100 text-yellow-800"
+																}`}>
+																{payment.status}
+															</span>
+														</TableCell>
+														<TableCell>
+															<Button variant="ghost" size="sm">View</Button>
+														</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</Table>
+									)}
 								</CardContent>
 							</Card>
 						</TabsContent>

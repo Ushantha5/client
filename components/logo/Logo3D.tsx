@@ -1,5 +1,4 @@
-"use client";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -7,17 +6,21 @@ export function Logo3D() {
 	const groupRef = useRef<THREE.Group>(null);
 	const particlesRef = useRef<THREE.Points>(null);
 
-	// Create particles around logo
-	const particleCount = 100;
-	const positions = new Float32Array(particleCount * 3);
+	// Create particles around logo - Use useMemo to prevent hydration mismatch
+	const positions = useMemo(() => {
+		const count = 100;
+		const pos = new Float32Array(count * 3);
+		for (let i = 0; i < count; i++) {
+			const angle = (i / count) * Math.PI * 2;
+			const radius = 2 + Math.random() * 0.5;
+			pos[i * 3] = Math.cos(angle) * radius;
+			pos[i * 3 + 1] = Math.sin(angle) * radius + (Math.random() - 0.5) * 2;
+			pos[i * 3 + 2] = (Math.random() - 0.5) * 2;
+		}
+		return pos;
+	}, []);
 
-	for (let i = 0; i < particleCount; i++) {
-		const angle = (i / particleCount) * Math.PI * 2;
-		const radius = 2 + Math.random() * 0.5;
-		positions[i * 3] = Math.cos(angle) * radius;
-		positions[i * 3 + 1] = Math.sin(angle) * radius + (Math.random() - 0.5) * 2;
-		positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
-	}
+	const particleCount = 100;
 
 	useFrame((state) => {
 		if (groupRef.current) {

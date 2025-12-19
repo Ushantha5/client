@@ -19,11 +19,18 @@ import {
     MoreVertical,
     Loader2,
     History,
-    Download
+    Download,
+    Brain,
+    Sliders,
+    Clock,
+    Zap,
+    Home,
+    BookOpen
 } from 'lucide-react';
 import { aiAssistantService } from '@/services/aiAssistant.service';
 import { AIInteraction } from '@/types/aiAssistant';
 import { toast } from 'sonner';
+import { ShortcutNavbar } from '@/components/layout/shortcut-navbar';
 
 interface Message {
     id: string;
@@ -56,11 +63,19 @@ export default function AIAssistantPage() {
     const [isVideoOn, setIsVideoOn] = useState(true);
     const [isSoundOn, setIsSoundOn] = useState(true);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [activeView, setActiveView] = useState<'presentation' | 'chat'>('presentation');
+    const [activeView, setActiveView] = useState<'presentation' | 'chat' | 'participants' | 'history' | 'models' | 'voice' | 'video' | 'advanced'>('presentation');
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [interactionHistory, setInteractionHistory] = useState<AIInteraction[]>([]);
     const [showHistory, setShowHistory] = useState(false);
+
+    // Stats for dashboard
+    const [stats] = useState({
+        totalInteractions: 24,
+        avgResponseTime: 1.2,
+        accuracy: 94,
+        activeSessions: 3
+    });
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -100,6 +115,16 @@ export default function AIAssistantPage() {
                 'Develop ethical AI solutions',
                 'Master data preprocessing',
                 'Build and deploy models'
+            ]
+        },
+        {
+            title: 'Performance Metrics',
+            content: [
+                'Response time: < 2 seconds',
+                'Accuracy: > 90%',
+                'Availability: 99.9%',
+                'Scalability: 1000+ concurrent users',
+                'Security: End-to-end encryption'
             ]
         }
     ];
@@ -153,39 +178,25 @@ export default function AIAssistantPage() {
             // Get AI response from API
             try {
                 let aiResponseText = '';
-                
-                // Try OpenAI first, fallback to Gemini
+
+                // Use Gemini directly
                 try {
-                    const openaiResponse = await fetch('/api/ai/openai', {
+                    const geminiResponse = await fetch('/api/ai/gemini', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: inputMessage }),
                     });
-                    
-                    if (openaiResponse.ok) {
-                        const data = await openaiResponse.json();
+
+                    if (geminiResponse.ok) {
+                        const data = await geminiResponse.json();
                         aiResponseText = data.response || generateAIResponse(inputMessage);
                     } else {
-                        throw new Error('OpenAI failed');
-                    }
-                } catch (openaiError) {
-                    // Fallback to Gemini
-                    try {
-                        const geminiResponse = await fetch('/api/ai/gemini', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ message: inputMessage }),
-                        });
-                        
-                        if (geminiResponse.ok) {
-                            const data = await geminiResponse.json();
-                            aiResponseText = data.response || generateAIResponse(inputMessage);
-                        } else {
-                            aiResponseText = generateAIResponse(inputMessage);
-                        }
-                    } catch (geminiError) {
+                        console.warn('Gemini API returned error status');
                         aiResponseText = generateAIResponse(inputMessage);
                     }
+                } catch (geminiError) {
+                    console.error('Gemini error:', geminiError);
+                    aiResponseText = generateAIResponse(inputMessage);
                 }
 
                 // Update interaction with response
@@ -213,7 +224,7 @@ export default function AIAssistantPage() {
             } catch (aiError) {
                 console.error('AI response error:', aiError);
                 const fallbackResponse = generateAIResponse(inputMessage);
-                
+
                 if (interaction.data._id) {
                     await aiAssistantService.updateInteraction(interaction.data._id, {
                         response: fallbackResponse
@@ -268,6 +279,16 @@ export default function AIAssistantPage() {
         toast.success('History exported successfully');
     };
 
+    // Handle view change from shortcut navbar
+    const handleViewChange = (view: string) => {
+        setActiveView(view as any);
+        if (view === 'history') {
+            setShowHistory(true);
+        } else {
+            setShowHistory(false);
+        }
+    };
+
     return (
         <div className="h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden flex flex-col">
             {/* Header */}
@@ -307,6 +328,59 @@ export default function AIAssistantPage() {
                     </button>
                 </div>
             </header>
+
+            {/* Stats Dashboard */}
+            <div className="px-6 py-4 border-b border-white/10">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-gradient-to-br from-cyan-900/30 to-cyan-800/30 rounded-xl p-4 border border-cyan-500/30">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-cyan-500/20 rounded-lg">
+                                <MessageSquare className="w-5 h-5 text-cyan-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Interactions</p>
+                                <p className="text-2xl font-bold">{stats.totalInteractions}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/30 rounded-xl p-4 border border-purple-500/30">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-purple-500/20 rounded-lg">
+                                <Clock className="w-5 h-5 text-purple-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Avg. Time</p>
+                                <p className="text-2xl font-bold">{stats.avgResponseTime}s</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-green-900/30 to-green-800/30 rounded-xl p-4 border border-green-500/30">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-green-500/20 rounded-lg">
+                                <Zap className="w-5 h-5 text-green-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Accuracy</p>
+                                <p className="text-2xl font-bold">{stats.accuracy}%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-blue-900/30 to-blue-800/30 rounded-xl p-4 border border-blue-500/30">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-500/20 rounded-lg">
+                                <Users className="w-5 h-5 text-blue-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Active Sessions</p>
+                                <p className="text-2xl font-bold">{stats.activeSessions}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Main Content Area */}
             <div className="flex-1 flex gap-4 p-4 overflow-hidden">
@@ -383,10 +457,30 @@ export default function AIAssistantPage() {
                                     <MessageSquare className="w-4 h-4 inline mr-2" />
                                     Chat
                                 </button>
+                                <button
+                                    onClick={() => setActiveView('models')}
+                                    className={`px-4 py-2 rounded-lg transition-all ${activeView === 'models'
+                                        ? 'bg-purple-500/20 text-purple-400 border border-purple-500/50'
+                                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <Brain className="w-4 h-4 inline mr-2" />
+                                    AI Models
+                                </button>
+                                <button
+                                    onClick={() => setActiveView('advanced')}
+                                    className={`px-4 py-2 rounded-lg transition-all ${activeView === 'advanced'
+                                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <Sliders className="w-4 h-4 inline mr-2" />
+                                    Advanced
+                                </button>
                             </div>
 
                             <div className="flex items-center gap-2 text-sm text-gray-400">
-                                <span>You are viewing <span className="text-cyan-400 font-medium">AI Assistant's</span> screen</span>
+                                <span>You are viewing <span className="text-cyan-400 font-medium">AI Assistant&apos;s</span> screen</span>
                                 <button className="p-1 hover:bg-white/10 rounded">
                                     <MoreVertical className="w-4 h-4" />
                                 </button>
@@ -454,7 +548,7 @@ export default function AIAssistantPage() {
                                             </div>
                                         </div>
                                     </motion.div>
-                                ) : (
+                                ) : activeView === 'chat' ? (
                                     <motion.div
                                         key="chat"
                                         initial={{ opacity: 0, y: 20 }}
@@ -551,6 +645,162 @@ export default function AIAssistantPage() {
                                                     )}
                                                     Send
                                                 </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ) : activeView === 'models' ? (
+                                    <motion.div
+                                        key="models"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        className="h-full flex items-center justify-center"
+                                    >
+                                        <div className="w-full max-w-4xl">
+                                            <h2 className="text-3xl font-bold mb-8 text-center">AI Model Configuration</h2>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/30 rounded-2xl border border-purple-500/30 p-6">
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="p-2 bg-purple-500/20 rounded-lg">
+                                                            <Brain className="w-6 h-6 text-purple-400" />
+                                                        </div>
+                                                        <h3 className="text-xl font-bold">GPT-4 Turbo</h3>
+                                                    </div>
+                                                    <p className="text-gray-300 mb-4">Most capable model for complex tasks</p>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm text-gray-400">Accuracy: 95%</span>
+                                                        <button className="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-all">
+                                                            Select
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gradient-to-br from-blue-900/30 to-blue-800/30 rounded-2xl border border-blue-500/30 p-6">
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="p-2 bg-blue-500/20 rounded-lg">
+                                                            <Brain className="w-6 h-6 text-blue-400" />
+                                                        </div>
+                                                        <h3 className="text-xl font-bold">Claude 3</h3>
+                                                    </div>
+                                                    <p className="text-gray-300 mb-4">Balanced model for general use</p>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm text-gray-400">Accuracy: 92%</span>
+                                                        <button className="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all">
+                                                            Select
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gradient-to-br from-green-900/30 to-green-800/30 rounded-2xl border border-green-500/30 p-6">
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="p-2 bg-green-500/20 rounded-lg">
+                                                            <Brain className="w-6 h-6 text-green-400" />
+                                                        </div>
+                                                        <h3 className="text-xl font-bold">Gemini Pro</h3>
+                                                    </div>
+                                                    <p className="text-gray-300 mb-4">Optimized for educational content</p>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm text-gray-400">Accuracy: 90%</span>
+                                                        <button className="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-all">
+                                                            Select
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gradient-to-br from-orange-900/30 to-orange-800/30 rounded-2xl border border-orange-500/30 p-6">
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="p-2 bg-orange-500/20 rounded-lg">
+                                                            <Brain className="w-6 h-6 text-orange-400" />
+                                                        </div>
+                                                        <h3 className="text-xl font-bold">Custom Model</h3>
+                                                    </div>
+                                                    <p className="text-gray-300 mb-4">Fine-tuned for your domain</p>
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-sm text-gray-400">Accuracy: 97%</span>
+                                                        <button className="px-4 py-2 bg-orange-500/20 text-orange-400 rounded-lg hover:bg-orange-500/30 transition-all">
+                                                            Select
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="advanced"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        className="h-full flex items-center justify-center"
+                                    >
+                                        <div className="w-full max-w-4xl">
+                                            <h2 className="text-3xl font-bold mb-8 text-center">Advanced Settings</h2>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="bg-gradient-to-br from-cyan-900/30 to-cyan-800/30 rounded-2xl border border-cyan-500/30 p-6">
+                                                    <h3 className="text-xl font-bold mb-4">Response Parameters</h3>
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <label className="block text-sm text-gray-400 mb-2">Temperature</label>
+                                                            <input type="range" min="0" max="1" step="0.1" defaultValue="0.7" className="w-full" />
+                                                            <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                                                <span>Precise</span>
+                                                                <span>Balanced</span>
+                                                                <span>Creative</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-sm text-gray-400 mb-2">Max Tokens</label>
+                                                            <input type="number" defaultValue="1024" className="w-full bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-white" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/30 rounded-2xl border border-purple-500/30 p-6">
+                                                    <h3 className="text-xl font-bold mb-4">Model Behavior</h3>
+                                                    <div className="space-y-4">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-gray-300">Enable Reasoning</span>
+                                                            <div className="relative inline-block w-12 h-6">
+                                                                <input type="checkbox" className="sr-only" defaultChecked />
+                                                                <div className="block w-12 h-6 rounded-full bg-cyan-500/30"></div>
+                                                                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-gray-300">Enable Code Execution</span>
+                                                            <div className="relative inline-block w-12 h-6">
+                                                                <input type="checkbox" className="sr-only" />
+                                                                <div className="block w-12 h-6 rounded-full bg-slate-700"></div>
+                                                                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"></div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-gray-300">Enable Web Search</span>
+                                                            <div className="relative inline-block w-12 h-6">
+                                                                <input type="checkbox" className="sr-only" defaultChecked />
+                                                                <div className="block w-12 h-6 rounded-full bg-cyan-500/30"></div>
+                                                                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-6 bg-gradient-to-br from-slate-900/50 to-slate-800/50 rounded-2xl border border-white/10 p-6">
+                                                <h3 className="text-xl font-bold mb-4">Prompt Templates</h3>
+                                                <textarea
+                                                    className="w-full h-32 bg-slate-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                                                    placeholder="Enter your custom prompt template here..."
+                                                    defaultValue="You are an expert AI tutor helping students learn. Provide clear, concise explanations with examples."
+                                                ></textarea>
+                                                <div className="flex justify-end mt-4">
+                                                    <button className="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-all">
+                                                        Save Template
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </motion.div>
@@ -688,6 +938,23 @@ export default function AIAssistantPage() {
                     ))}
                 </div>
             </motion.div>
+
+            {/* Shortcut Navigation Bar */}
+            <ShortcutNavbar
+                shortcuts={[
+                    { id: "home", label: "Home", icon: Home, href: "/" },
+                    { id: "chat", label: "Chat", icon: MessageSquare, onClick: () => handleViewChange('chat') },
+                    { id: "presentation", label: "Presentation", icon: BookOpen, onClick: () => handleViewChange('presentation') },
+                    { id: "participants", label: "Participants", icon: Users, onClick: () => handleViewChange('participants') },
+                    { id: "history", label: "History", icon: History, onClick: () => handleViewChange('history') },
+                    { id: "ai-models", label: "AI Models", icon: Brain, onClick: () => handleViewChange('models') },
+                    { id: "voice", label: "Voice", icon: Mic, onClick: () => handleViewChange('voice') },
+                    { id: "video", label: "Video", icon: Video, onClick: () => handleViewChange('video') },
+                    { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
+                    { id: "advanced", label: "Advanced", icon: Sliders, onClick: () => handleViewChange('advanced') },
+                ]}
+                activeItem={activeView}
+            />
         </div>
     );
 }
