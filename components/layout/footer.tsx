@@ -1,202 +1,98 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Facebook, 
-  Twitter, 
-  Instagram, 
-  Linkedin, 
-  Youtube, 
-  Mail, 
-  Phone, 
-  Send
-} from "lucide-react";
-import { ThemeCustomizer } from "@/components/theme-customizer";
+import { Moon, Sun } from "lucide-react";
+import { useState } from "react";
 
-export function Footer() {
-  const currentYear = new Date().getFullYear();
+export function Footer({ year = 2025 }: { year?: number }) {
+    const [isDark, setIsDark] = useState(true);
 
-  const navigation = {
-    product: [
-      { name: "Features", href: "#" },
-      { name: "Solutions", href: "#" },
-      { name: "Pricing", href: "#" },
-      { name: "Tutorials", href: "#" },
-      { name: "Releases", href: "#" },
-    ],
-    company: [
-      { name: "About", href: "/about" },
-      { name: "Careers", href: "#" },
-      { name: "Press", href: "#" },
-      { name: "News", href: "#" },
-      { name: "Contact", href: "/contact" },
-    ],
-    resources: [
-      { name: "Blog", href: "#" },
-      { name: "Events", href: "#" },
-      { name: "Help Center", href: "#" },
-      { name: "Tutorials", href: "#" },
-      { name: "Support", href: "#" },
-    ],
-    legal: [
-      { name: "Terms", href: "#" },
-      { name: "Privacy", href: "#" },
-      { name: "Cookies", href: "#" },
-      { name: "Licenses", href: "#" },
-      { name: "Settings", href: "#" },
-    ],
-  };
+    return (
+        <footer role="contentinfo" className="w-full py-8 px-6 relative z-50 mt-20">
+            {/* Floating Glass Container */}
+            <div className="mx-auto max-w-7xl rounded-[18px] bg-white/5 border border-white/10 backdrop-blur-[10px] shadow-[0_10px_24px_rgba(2,6,23,0.6),inset_0_6px_16px_rgba(255,255,255,0.02)] p-6 transition-all duration-300 hover:shadow-[0_15px_30px_rgba(0,184,255,0.15),inset_0_6px_16px_rgba(255,255,255,0.05)]">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
 
-  return (
-    <footer className="border-t border-border bg-background">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Brand and Newsletter */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">M</span>
-              </div>
-              <div>
-                <div className="text-xl font-bold">MR5 School</div>
-                <div className="text-xs text-muted-foreground">Productivity OS</div>
-              </div>
+                    {/* Left: Logo & Tagline */}
+                    <div className="flex items-center gap-4">
+                        <div className="relative w-10 h-10">
+                            <Image
+                                src="/assets/mr5-logo-neon.png"
+                                alt="Mr5_LMS logo"
+                                fill
+                                className="object-contain drop-shadow-[0_0_10px_rgba(0,184,255,0.5)]"
+                            />
+                        </div>
+                        <div>
+                            <div className="text-sm font-bold text-white tracking-wide">Mr5_LMS</div>
+                            <div className="text-xs text-blue-200/70 font-medium">Teach smarter, not harder.</div>
+                        </div>
+                    </div>
+
+                    {/* Center: Navigation */}
+                    <nav aria-label="Footer links" className="hidden md:flex gap-8 text-sm font-medium text-blue-100/80">
+                        {['Courses', 'Pricing', 'Instructors', 'Support'].map((item) => (
+                            <Link
+                                key={item}
+                                href={`/${item.toLowerCase()}`}
+                                className="hover:text-[#00b8ff] hover:drop-shadow-[0_0_8px_rgba(0,184,255,0.6)] transition-all duration-300 transform hover:-translate-y-0.5"
+                            >
+                                {item}
+                            </Link>
+                        ))}
+                    </nav>
+
+                    {/* Right: CTA Group */}
+                    <div className="flex items-center gap-4">
+                        <button
+                            aria-label="Request demo"
+                            className="px-5 py-2.5 rounded-full text-white font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95"
+                            style={{
+                                background: 'linear-gradient(90deg, rgba(0,184,255,0.12), rgba(0,184,255,0.06))',
+                                border: '1px solid rgba(0,184,255,0.22)',
+                                boxShadow: '0 6px 28px rgba(0,184,255,0.12), 0 2px 6px rgba(2,6,23,0.5)'
+                            }}
+                        >
+                            Get a demo
+                        </button>
+
+                        <div className="h-8 w-[1px] bg-white/10 mx-1" />
+
+                        <select aria-label="Language" className="bg-transparent text-sm text-blue-200 border-none outline-none cursor-pointer hover:text-white">
+                            <option className="bg-slate-900">EN</option>
+                            <option className="bg-slate-900">TA</option>
+                        </select>
+
+                        <button
+                            aria-label="Toggle theme"
+                            onClick={() => setIsDark(!isDark)}
+                            className="p-2 rounded-full hover:bg-white/10 transition-colors text-blue-200"
+                        >
+                            {isDark ? <Moon size={18} /> : <Sun size={18} />}
+                        </button>
+
+                        <div className="relative w-8 h-8 ml-2 rounded-full ring-2 ring-white/10 p-0.5">
+                            <Image
+                                src="/assets/dashboard/footer-avatar.png"
+                                alt="AI Assistant"
+                                fill
+                                className="object-contain rounded-full"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
-            <p className="text-muted-foreground mb-6 max-w-sm">
-              Empowering learners with AI-driven education and immersive 3D experiences for the future of learning.
-            </p>
-            
-            {/* Newsletter */}
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold mb-3">Subscribe to our newsletter</h3>
-              <form className="flex gap-2">
-                <Input 
-                  type="email" 
-                  placeholder="Enter your email" 
-                  className="flex-1 h-9 text-sm" 
-                />
-                <Button size="sm" className="h-9 w-9 p-0">
-                  <Send className="h-4 w-4" />
-                </Button>
-              </form>
+
+            {/* Bottom Legal Row */}
+            <div className="mx-auto max-w-7xl mt-4 px-4 text-[10px] text-blue-200/40 flex flex-col md:flex-row justify-between items-center gap-2">
+                <div>© {year} Mr5_LMS. All rights reserved.</div>
+                <div className="flex gap-6">
+                    <Link href="/terms" className="hover:text-blue-200 transition-colors">Terms</Link>
+                    <Link href="/privacy" className="hover:text-blue-200 transition-colors">Privacy</Link>
+                    <Link href="/accessibility" className="hover:text-blue-200 transition-colors">Accessibility</Link>
+                </div>
             </div>
-            
-            {/* Social Media */}
-            <div className="flex gap-3">
-              <Button variant="outline" size="icon" className="h-9 w-9">
-                <Facebook className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-9 w-9">
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-9 w-9">
-                <Instagram className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-9 w-9">
-                <Linkedin className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-9 w-9">
-                <Youtube className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <div>
-            <h3 className="text-sm font-semibold mb-4">Product</h3>
-            <ul className="space-y-3">
-              {navigation.product.map((item) => (
-                <li key={item.name}>
-                  <Link 
-                    href={item.href} 
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold mb-4">Company</h3>
-            <ul className="space-y-3">
-              {navigation.company.map((item) => (
-                <li key={item.name}>
-                  <Link 
-                    href={item.href} 
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold mb-4">Resources</h3>
-            <ul className="space-y-3">
-              {navigation.resources.map((item) => (
-                <li key={item.name}>
-                  <Link 
-                    href={item.href} 
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold mb-4">Legal</h3>
-            <ul className="space-y-3">
-              {navigation.legal.map((item) => (
-                <li key={item.name}>
-                  <Link 
-                    href={item.href} 
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-border my-8" />
-
-        {/* Bottom Section */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
-            <div>&copy; {currentYear} MR5 School. All rights reserved.</div>
-            <div className="hidden sm:block">•</div>
-            <div className="flex items-center gap-4">
-              <Link href="#" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-              <Link href="#" className="hover:text-foreground transition-colors">Terms of Service</Link>
-              <Link href="#" className="hover:text-foreground transition-colors">Cookie Policy</Link>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Phone className="h-4 w-4" />
-              <span>+1 (555) 123-4567</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Mail className="h-4 w-4" />
-              <span>support@mr5school.com</span>
-            </div>
-            <ThemeCustomizer />
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
+        </footer>
+    );
 }

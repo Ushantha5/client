@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to avoid prerender issues with auth hooks
+export const dynamic = 'force-dynamic';
+
 import { Button } from "@/components/ui/button";
 import { WifiOff } from "lucide-react";
 import Link from "next/link";

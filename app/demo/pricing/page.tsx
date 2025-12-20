@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to avoid prerender issues with auth hooks
+export const dynamic = 'force-dynamic';
+
 import React, { useState } from "react";
 import { LocationBasedPrice } from "@/components/pricing/location-based-price";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

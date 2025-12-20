@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to avoid prerender issues with auth hooks
+export const dynamic = 'force-dynamic';
+
 import React, { useEffect, useState, useRef } from "react";
 import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { PermissionsManager } from "@/components/permissions-manager";

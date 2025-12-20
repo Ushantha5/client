@@ -83,8 +83,14 @@ export const DashboardContextProvider: React.FC<{ children: React.ReactNode }> =
 
 export const useDashboardContext = () => {
     const context = useContext(DashboardContext);
+    // During SSR/build, return a default value to prevent build failures
     if (!context) {
-        throw new Error('useDashboardContext must be used within a DashboardContextProvider');
+        return {
+            context: null,
+            loading: true,
+            error: null,
+            refreshContext: async () => { console.warn("useDashboardContext called outside of DashboardContextProvider"); }
+        };
     }
     return context;
 };

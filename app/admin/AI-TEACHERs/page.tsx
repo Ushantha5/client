@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to avoid prerender issues with auth hooks
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";

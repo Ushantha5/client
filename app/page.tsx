@@ -1,11 +1,14 @@
 "use client";
 
+// Force dynamic rendering to avoid prerender issues with auth hooks
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { BentoGrid, BentoItem } from "@/components/ui/bento-grid";
 import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import {
   Sparkles,
   BookOpen,
@@ -22,7 +25,7 @@ import { getTamilGreeting } from "@/lib/tamil-greetings";
 import { useCommonTracking } from "@/hooks/useAnalytics";
 
 // Dynamically import 3D Avatar
-const WelcomeAvatar = dynamic(() => import("@/components/3d/WelcomeAvatar").then(m => ({ default: m.WelcomeAvatar })), { ssr: false });
+const WelcomeAvatar = nextDynamic(() => import("@/components/3d/WelcomeAvatar").then(m => ({ default: m.WelcomeAvatar })), { ssr: false });
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
@@ -111,8 +114,8 @@ export default function HomePage() {
                     Open Workspace
                   </Button>
                   <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10" asChild>
-                    <Link 
-                      href="/courses" 
+                    <Link
+                      href="/courses"
                       onClick={() => trackNavigation("Homepage", "/courses")}
                     >
                       Browse Library

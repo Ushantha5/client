@@ -1,4 +1,7 @@
 "use client";
+
+// Force dynamic rendering to avoid prerender issues with auth hooks
+export const dynamic = 'force-dynamic';
 import { CldImage } from 'next-cloudinary';
 
 // By default, the CldImage component applies auto-format and auto-quality to all delivery URLs for optimized delivery.

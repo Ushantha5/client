@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to avoid prerender issues with auth hooks
+export const dynamic = 'force-dynamic';
+
 import { AvatarSupportAgent } from "@/components/ai/avatar-support-agent";
 import { Navbar } from "@/components/layout/navbar";
 

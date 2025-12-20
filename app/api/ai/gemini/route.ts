@@ -3,12 +3,23 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize lazily to avoid build-time errors if env var is missing
 const getGenAI = () => {
-	const key = process.env.GEMINI_API_KEY || "";
+	const key = process.env.GEMINI_API_KEY;
+	if (!key) {
+		throw new Error("GEMINI_API_KEY environment variable is not configured");
+	}
 	return new GoogleGenerativeAI(key);
 };
 
 export async function POST(request: NextRequest) {
 	try {
+		// Check for API key first
+		if (!process.env.GEMINI_API_KEY) {
+			return NextResponse.json(
+				{ error: "AI service is not configured. Please contact support." },
+				{ status: 503 },
+			);
+		}
+
 		const { message, messages, options } = await request.json();
 
 		// Handle both single message and messages array formats
@@ -51,9 +62,11 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ response });
 	} catch (error) {
 		console.error("Gemini API error:", error);
+		const errorMessage = error instanceof Error ? error.message : "Unknown error";
 		return NextResponse.json(
-			{ error: "Failed to get response from Gemini: " + (error as Error).message },
+			{ error: "Failed to get response from AI: " + errorMessage },
 			{ status: 500 },
 		);
 	}
 }
+

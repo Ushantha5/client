@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to avoid prerender issues with auth hooks
+export const dynamic = 'force-dynamic';
+
 import { Footer } from "@/components/layout/footer";
 
 export default function FooterDemoPage() {
