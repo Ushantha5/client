@@ -14,12 +14,16 @@ import {
     Heart,
     Volume2,
     VolumeX,
-    Loader2
+    Loader2,
+    ArrowDown
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { MoodDetector } from '@/components/classroom/MoodDetector';
+import Image from 'next/image';
 import { toast } from 'sonner';
 // import { cn } from '@/lib/utils';
 
@@ -58,8 +62,20 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
     });
     const fileInputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const viewportRef = useRef<HTMLDivElement>(null);
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    const isNearBottom = useRef(true);
     const abortControllerRef = useRef<AbortController | null>(null);
+    const [latency, setLatency] = useState(24);
+    const sessionId = useRef(Math.random().toString(36).substr(2, 6).toUpperCase());
 
+    // Simulate live latency updates
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setLatency(Math.floor(Math.random() * (45 - 15) + 15));
+        }, 2000);
+        return () => clearInterval(interval);
+    }, []);
     const {
         transcript = '',
         listening = false,
@@ -72,9 +88,26 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
     } = voiceInteraction || {};
 
     // Auto-scroll to bottom
+    // Scroll tracking
+    const scrollToBottom = () => {
+        if (viewportRef.current) {
+            viewportRef.current.scrollTo({ top: viewportRef.current.scrollHeight, behavior: 'smooth' });
+        }
+    };
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+        const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+        const isBottom = distanceToBottom < 100;
+
+        isNearBottom.current = isBottom;
+        setShowScrollButton(!isBottom);
+    };
+
+    // Auto-scroll to bottom only if user was already near bottom
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+        if (isNearBottom.current) {
+            scrollToBottom();
         }
     }, [messages, transcript, isProcessing]);
 
@@ -131,7 +164,7 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
             ];
 
             // Call Gemini API through backend
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai/gemini`, {
+            const response = await fetch("/api/ai/gemini", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -279,105 +312,130 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
         <AnimatePresence>
             {isOpen && (
                 <Dialog open={isOpen} onOpenChange={onClose}>
-                    <DialogContent className="sm:max-w-[1100px] p-0 border-0 bg-transparent shadow-none overflow-hidden">
+                    <DialogContent className="sm:max-w-[1200px] p-0 border-0 bg-transparent shadow-none overflow-hidden h-[85vh] max-h-[900px]">
                         <DialogDescription className="sr-only">
                             Interactive AI Tutor session where you can ask questions and get real-time feedback.
                         </DialogDescription>
+
+                        {/* Background Ambient Glow */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-cyan-500/5 to-transparent pointer-events-none" />
+
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-slate-950/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex h-[700px]"
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            className="bg-[#030712]/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex h-full relative z-10"
                         >
-                            {/* Sidebar - Student View */}
-                            <div className="w-80 border-r border-white/10 bg-black/20 p-6 flex flex-col gap-6">
+                            {/* Sidebar - Student View & HUD */}
+                            <div className="w-80 border-r border-white/5 bg-black/40 p-6 flex flex-col gap-6 relative overflow-hidden">
+                                {/* Decorative elements */}
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-50" />
+
                                 <div>
-                                    <h3 className="text-lg font-semibold text-white mb-1">Student View</h3>
-                                    <p className="text-xs text-gray-400">Real-time engagement analysis</p>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                        <h3 className="text-sm font-semibold text-white tracking-widest uppercase opacity-80">Live Session</h3>
+                                    </div>
+                                    <p className="text-xs text-gray-400 font-mono">ID: {sessionId.current}</p>
                                 </div>
 
-                                {/* 
-                                    TODO: Switch between MoodDetector (Local Prototype) and ClassroomRoom (LiveKit Production)
-                                    For now, we keep MoodDetector as the default for the prototype demo.
-                                    Uncomment the below line to enable LiveKit when keys are configured.
-                                */}
-                                <MoodDetector />
-                                {/* <ClassroomRoom roomName="math-101" participantName="Student" /> */}
+                                <div className="space-y-6">
+                                    <div className="p-1 rounded-2xl bg-gradient-to-br from-white/5 to-transparent border border-white/5 shadow-inner">
+                                        <MoodDetector />
+                                    </div>
 
-                                <div className="mt-auto p-4 rounded-xl bg-white/5 border border-white/5">
-                                    <h4 className="text-sm font-medium text-white mb-2">Emotional Insights</h4>
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <Heart className="w-4 h-4 text-red-400" />
-                                            <div className="flex-1">
-                                                <div className="flex justify-between text-xs">
-                                                    <span className="text-gray-300">Engagement</span>
-                                                    <span className="text-white font-medium">{emotionalState.engagement}</span>
+                                    <div className="space-y-4">
+                                        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-1">Neurometric Analysis</h4>
+
+                                        {/* Radial Stats HUD */}
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {/* Engagement */}
+                                            <div className="bg-white/5 rounded-xl p-3 border border-white/5 relative overflow-hidden group">
+                                                <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors" />
+                                                <Heart className="w-4 h-4 text-red-400 mb-2" />
+                                                <div className="text-xl font-bold text-white mb-1">{emotionalState.engagement}</div>
+                                                <div className="text-[10px] text-gray-400 uppercase">Engagement</div>
+                                            </div>
+
+                                            {/* Confidence */}
+                                            <div className="bg-white/5 rounded-xl p-3 border border-white/5 relative overflow-hidden group">
+                                                <div className="absolute inset-0 bg-amber-500/5 group-hover:bg-amber-500/10 transition-colors" />
+                                                <Sparkles className="w-4 h-4 text-amber-400 mb-2" />
+                                                <div className="text-xl font-bold text-white mb-1">{emotionalState.confidence}</div>
+                                                <div className="text-[10px] text-gray-400 uppercase">Confidence</div>
+                                            </div>
+
+                                            {/* Curiosity */}
+                                            <div className="col-span-2 bg-white/5 rounded-xl p-3 border border-white/5 relative overflow-hidden group">
+                                                <div className="absolute inset-0 bg-cyan-500/5 group-hover:bg-cyan-500/10 transition-colors" />
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <Bot className="w-4 h-4 text-cyan-400 mb-2" />
+                                                        <div className="text-[10px] text-gray-400 uppercase">Curiosity Level</div>
+                                                    </div>
+                                                    <div className="text-xl font-bold text-white">{emotionalState.curiosity}</div>
                                                 </div>
-                                                <div className="w-full bg-gray-700 rounded-full h-1.5 mt-1">
-                                                    <div
-                                                        className="bg-red-500 h-1.5 rounded-full"
-                                                        style={{
-                                                            width: emotionalState.engagement === 'High' ? '90%' :
-                                                                emotionalState.engagement === 'Medium' ? '60%' : '30%'
-                                                        }}
-                                                    ></div>
+                                                <div className="w-full bg-black/50 h-1 mt-2 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-cyan-500 w-[75%]" />
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Sparkles className="w-4 h-4 text-yellow-400" />
-                                            <div className="flex-1">
-                                                <div className="flex justify-between text-xs">
-                                                    <span className="text-gray-300">Confidence</span>
-                                                    <span className="text-white font-medium">{emotionalState.confidence}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-700 rounded-full h-1.5 mt-1">
-                                                    <div
-                                                        className="bg-yellow-500 h-1.5 rounded-full"
-                                                        style={{
-                                                            width: emotionalState.confidence === 'High' ? '90%' :
-                                                                emotionalState.confidence === 'Medium' ? '60%' : '30%'
-                                                        }}
-                                                    ></div>
-                                                </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-auto">
+                                    <div className="text-[10px] font-mono text-center space-y-1 bg-black/20 py-2 rounded-lg border border-white/5 mx-2">
+                                        <div className="flex items-center justify-center gap-2 text-green-400">
+                                            <div className="relative flex h-2 w-2">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                             </div>
+                                            <span className="tracking-widest opacity-90">SYSTEM ONLINE</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Bot className="w-4 h-4 text-cyan-400" />
-                                            <div className="flex-1">
-                                                <div className="flex justify-between text-xs">
-                                                    <span className="text-gray-300">Curiosity</span>
-                                                    <span className="text-white font-medium">{emotionalState.curiosity}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-700 rounded-full h-1.5 mt-1">
-                                                    <div
-                                                        className="bg-cyan-500 h-1.5 rounded-full"
-                                                        style={{
-                                                            width: emotionalState.curiosity === 'High' ? '90%' :
-                                                                emotionalState.curiosity === 'Medium' ? '60%' : '30%'
-                                                        }}
-                                                    ></div>
-                                                </div>
-                                            </div>
+                                        <div className="text-gray-500 flex justify-center gap-3">
+                                            <span>LATENCY: <span className={latency < 30 ? "text-green-400/80" : "text-yellow-400/80"}>{latency}ms</span></span>
+                                            <span className="text-white/20">|</span>
+                                            <span className="text-cyan-400/80">LIVE</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Main Content - AI Chat */}
-                            <div className="flex-1 flex flex-col min-w-0">
+                            <div className="flex-1 flex flex-col min-w-0 bg-gradient-to-b from-transparent to-black/20">
                                 {/* Header */}
-                                <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                                            <Bot className="w-6 h-6 text-white" />
+                                <div className="flex items-center justify-between px-8 py-5 border-b border-white/5 backdrop-blur-sm sticky top-0 z-20">
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative">
+                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-amber-500 p-[2px] overflow-hidden">
+                                                <div className="w-full h-full rounded-full bg-black flex items-center justify-center relative">
+                                                    <Image
+                                                        src="/assets/mr5-logo-neon.png"
+                                                        alt="MR5 AI"
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="absolute -bottom-1 -right-1 bg-black p-1 rounded-full">
+                                                <span className="block w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                                            </div>
                                         </div>
                                         <div>
-                                            <DialogTitle className="text-lg font-bold text-white">AI Tutor</DialogTitle>
+                                            <DialogTitle className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
+                                                AI Tutor
+                                            </DialogTitle>
                                             <div className="flex items-center gap-2">
-                                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                                <span className="text-xs text-cyan-400">Online & Listening</span>
+                                                <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-medium text-cyan-300 uppercase tracking-widest">
+                                                    Interactive
+                                                </span>
+                                                {listening && (
+                                                    <span className="text-xs text-red-400 font-medium animate-pulse flex items-center gap-1">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                                                        LIVE INPUT
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -386,11 +444,16 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                             variant="ghost"
                                             size="icon"
                                             onClick={toggleMute}
-                                            className="text-gray-400 hover:text-white hover:bg-white/10"
+                                            className="w-10 h-10 rounded-full border border-white/5 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-all hover:scale-105"
                                         >
                                             {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                                         </Button>
-                                        <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-400 hover:text-white hover:bg-white/10">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={onClose}
+                                            className="w-10 h-10 rounded-full border border-white/5 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all hover:scale-105 hover:rotate-90"
+                                        >
                                             <X className="w-5 h-5" />
                                         </Button>
                                     </div>
@@ -398,16 +461,25 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
 
                                 {/* Chat Area */}
                                 <div className="flex-1 overflow-hidden relative flex flex-col">
-                                    <ScrollArea className="flex-1 px-6 py-6">
-                                        <div className="space-y-6">
+                                    <ScrollArea
+                                        className="flex-1 px-8 py-6"
+                                        viewportRef={viewportRef}
+                                        onScroll={handleScroll}
+                                    >
+                                        <div className="space-y-8 pb-4">
                                             {messages.length === 0 && (
-                                                <div className="text-center py-12">
-                                                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-                                                        <Sparkles className="w-10 h-10 text-cyan-400" />
+                                                <div className="h-full flex flex-col items-center justify-center py-20 opacity-0 animate-in fade-in zoom-in duration-700">
+                                                    <div className="relative mb-8">
+                                                        <div className="absolute inset-0 bg-cyan-500/20 blur-3xl rounded-full" />
+                                                        <div className="relative w-24 h-24 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-3xl rotate-12 flex items-center justify-center shadow-2xl shadow-cyan-500/20">
+                                                            <Sparkles className="w-12 h-12 text-white" />
+                                                        </div>
                                                     </div>
-                                                    <h3 className="text-xl font-semibold text-white mb-2">How can I help you today?</h3>
-                                                    <p className="text-gray-400 max-w-md mx-auto">
-                                                        Ask me anything about your studies. I can help with math, science, history, and more.
+                                                    <h3 className="text-3xl font-bold text-white mb-3 text-center">
+                                                        Ready when you are
+                                                    </h3>
+                                                    <p className="text-gray-400 text-center max-w-sm leading-relaxed">
+                                                        I&apos;m analyzing your learning patterns. Ask me anything about your coursework or upload an image to get started.
                                                     </p>
                                                 </div>
                                             )}
@@ -415,31 +487,50 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                             {messages.map((msg, idx) => (
                                                 <motion.div
                                                     key={idx}
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                                                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    className={`flex gap-5 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
                                                 >
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'user'
-                                                        ? 'bg-purple-600'
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden relative ${msg.role === 'user'
+                                                        ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600'
                                                         : 'bg-gradient-to-br from-cyan-500 to-blue-600'
                                                         }`}>
-                                                        {msg.role === 'user' ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-white" />}
+                                                        {msg.role === 'user' ? (
+                                                            <User className="w-5 h-5 text-white" />
+                                                        ) : (
+                                                            <Image
+                                                                src="/assets/mr5-logo-neon.png"
+                                                                alt="AI"
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        )}
                                                     </div>
-                                                    <div className={`rounded-2xl px-5 py-3 max-w-[80%] ${msg.role === 'user'
-                                                        ? 'bg-purple-600/20 border border-purple-500/30 text-white'
-                                                        : 'bg-white/10 border border-white/10 text-gray-100'
-                                                        }`}>
-                                                        {msg.type === 'image' && msg.content ? (
-                                                            <div className="mb-2">
-                                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                                <img
-                                                                    src={msg.content}
-                                                                    alt="Uploaded content"
-                                                                    className="rounded-lg max-w-xs max-h-40 object-contain"
-                                                                />
+
+                                                    <div className={`group relative max-w-[75%] space-y-2`}>
+                                                        <div className={`rounded-3xl px-6 py-4 shadow-xl backdrop-blur-md ${msg.role === 'user'
+                                                            ? 'bg-violet-600/10 border border-violet-500/20 text-white rounded-tr-sm'
+                                                            : 'bg-white/5 border border-white/5 text-gray-100 rounded-tl-sm'
+                                                            }`}>
+                                                            {msg.type === 'image' && msg.content ? (
+                                                                <div className="mb-3 overflow-hidden rounded-xl border border-white/10">
+                                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                                    <img
+                                                                        src={msg.content}
+                                                                        alt="Uploaded content"
+                                                                        className="max-w-xs max-h-60 object-contain bg-black/20"
+                                                                    />
+                                                                </div>
+                                                            ) : null}
+                                                            <div className="prose prose-invert prose-sm leading-relaxed max-w-none">
+                                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                                    {msg.content}
+                                                                </ReactMarkdown>
                                                             </div>
-                                                        ) : null}
-                                                        <p className="leading-relaxed">{msg.content}</p>
+                                                        </div>
+                                                        <div className={`text-[10px] text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity ${msg.role === 'user' ? 'text-right pr-2' : 'pl-2'}`}>
+                                                            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </div>
                                                     </div>
                                                 </motion.div>
                                             ))}
@@ -449,13 +540,18 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                                 <motion.div
                                                     initial={{ opacity: 0 }}
                                                     animate={{ opacity: 1 }}
-                                                    className="flex gap-4 flex-row-reverse"
+                                                    className="flex gap-5 flex-row-reverse items-end"
                                                 >
-                                                    <div className="w-8 h-8 rounded-full bg-purple-600/50 flex items-center justify-center flex-shrink-0 animate-pulse">
-                                                        <User className="w-4 h-4 text-white" />
+                                                    <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center flex-shrink-0 animate-pulse">
+                                                        <Mic className="w-5 h-5 text-red-400" />
                                                     </div>
-                                                    <div className="rounded-2xl px-5 py-3 max-w-[80%] bg-purple-600/10 border border-purple-500/20 text-gray-300 italic">
-                                                        <p>{transcript}...</p>
+                                                    <div className="rounded-3xl rounded-tr-sm px-6 py-4 max-w-[75%] bg-red-500/5 border border-red-500/10 text-gray-300">
+                                                        <div className="flex space-x-1 items-center mb-1">
+                                                            <span className="w-1 h-1 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+                                                            <span className="w-1 h-1 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+                                                            <span className="w-1 h-1 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+                                                        </div>
+                                                        <p className="italic">{transcript}</p>
                                                     </div>
                                                 </motion.div>
                                             )}
@@ -463,17 +559,25 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                             {/* AI Processing/Speaking Indicator */}
                                             {(isProcessing || isSpeaking || isSending) && (
                                                 <motion.div
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    className="flex gap-4"
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    className="flex gap-5"
                                                 >
-                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-                                                        <Bot className="w-4 h-4 text-white" />
+                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/20 overflow-hidden relative">
+                                                        <Image
+                                                            src="/assets/mr5-logo-neon.png"
+                                                            alt="AI Processing"
+                                                            fill
+                                                            className="object-cover"
+                                                        />
                                                     </div>
-                                                    <div className="flex items-center gap-2 h-10">
-                                                        <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
-                                                        <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                                                        <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                                                    <div className="flex items-center gap-3 h-10 px-4 rounded-full bg-white/5 border border-white/5">
+                                                        <span className="text-xs text-cyan-300 font-medium tracking-wide">AI IS THINKING</span>
+                                                        <div className="flex gap-1">
+                                                            <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-[bounce_1s_infinite_0ms]" />
+                                                            <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-[bounce_1s_infinite_200ms]" />
+                                                            <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-[bounce_1s_infinite_400ms]" />
+                                                        </div>
                                                     </div>
                                                 </motion.div>
                                             )}
@@ -482,60 +586,106 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                         </div>
                                     </ScrollArea>
 
-                                    {/* Image Preview */}
-                                    {imagePreview && (
-                                        <div className="px-6 pb-4">
-                                            <div className="relative inline-block">
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
-                                                    src={imagePreview}
-                                                    alt="User uploaded preview"
-                                                    className="rounded-lg max-h-32 object-contain border border-white/20"
-                                                />
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => setImagePreview(null)}
-                                                    className="absolute -top-2 -right-2 h-6 w-6 bg-red-500 hover:bg-red-600 text-white rounded-full"
-                                                >
-                                                    <X className="w-3 h-3" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )}
+                                    {/* Scroll to Bottom Button */}
+                                    <AnimatePresence>
+                                        {showScrollButton && (
+                                            <motion.button
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 10 }}
+                                                onClick={scrollToBottom}
+                                                className="absolute bottom-4 right-8 z-30 p-2 rounded-full bg-cyan-500 text-white shadow-lg hover:bg-cyan-600 transition-colors"
+                                            >
+                                                <ArrowDown className="w-5 h-5" />
+                                            </motion.button>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {/* Image Preview Area */}
+                                    <AnimatePresence>
+                                        {imagePreview && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 20 }}
+                                                className="px-8 pb-2"
+                                            >
+                                                <div className="relative inline-block group">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 blur-md rounded-xl" />
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img
+                                                        src={imagePreview}
+                                                        alt="User uploaded preview"
+                                                        className="relative rounded-xl max-h-40 object-contain border border-white/20 shadow-xl"
+                                                    />
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => setImagePreview(null)}
+                                                        className="absolute -top-3 -right-3 h-8 w-8 bg-red-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity transform hover:scale-110"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
 
                                     {/* Input Area */}
                                     <div
-                                        className="p-6 bg-black/20 border-t border-white/10"
+                                        className="p-6 bg-gradient-to-t from-[#030712] to-transparent"
                                         onDragOver={handleDragOver}
                                         onDragLeave={handleDragLeave}
                                         onDrop={handleDrop}
                                     >
-                                        {/* Drag and drop indicator */}
-                                        {isDragging && (
-                                            <div className="absolute inset-0 bg-cyan-500/10 border-2 border-dashed border-cyan-500 rounded-lg flex items-center justify-center z-10">
-                                                <div className="text-center">
-                                                    <ImageIcon className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
-                                                    <p className="text-cyan-400 font-medium">Drop your image here</p>
-                                                </div>
-                                            </div>
-                                        )}
+                                        {/* Drag and drop overlay */}
+                                        <AnimatePresence>
+                                            {isDragging && (
+                                                <motion.div
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                    className="absolute inset-6 bg-cyan-500/10 border-2 border-dashed border-cyan-500 rounded-2xl flex items-center justify-center z-20 backdrop-blur-sm"
+                                                >
+                                                    <div className="text-center">
+                                                        <div className="w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-3 animate-bounce">
+                                                            <ImageIcon className="w-8 h-8 text-cyan-400" />
+                                                        </div>
+                                                        <p className="text-cyan-400 font-bold text-lg">Drop image to upload</p>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
 
-                                        <div className="relative max-w-3xl mx-auto">
-                                            <input
-                                                type="text"
-                                                value={inputMessage}
-                                                onChange={(e) => setInputMessage(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                                        e.preventDefault();
-                                                        handleSendMessage();
-                                                    }
-                                                }}
-                                                placeholder="Type your question or drop an image..."
-                                                className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 pr-24 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all"
+                                        <div className="relative max-w-4xl mx-auto flex items-end gap-2 p-1.5 rounded-[24px] bg-white/5 border border-white/10 shadow-2xl focus-within:border-cyan-500/50 focus-within:bg-white/[0.07] transition-all duration-300">
+
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                onClick={triggerFileInput}
+                                                className="h-12 w-12 rounded-full text-gray-400 hover:text-white hover:bg-white/10 flex-shrink-0"
                                                 disabled={isSending}
-                                            />
+                                            >
+                                                <ImageIcon className="w-5 h-5" />
+                                            </Button>
+
+                                            <div className="flex-1 py-1">
+                                                <input
+                                                    type="text"
+                                                    value={inputMessage}
+                                                    onChange={(e) => setInputMessage(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                                            e.preventDefault();
+                                                            handleSendMessage();
+                                                        }
+                                                    }}
+                                                    placeholder={listening ? "Listening..." : "Ask me anything about your studies..."}
+                                                    className="w-full bg-transparent border-none text-white placeholder-gray-500 focus:ring-0 text-base py-2.5 px-2"
+                                                    disabled={isSending}
+                                                    autoFocus
+                                                />
+                                            </div>
 
                                             {/* Hidden file input */}
                                             <input
@@ -546,51 +696,43 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                                 className="hidden"
                                             />
 
-                                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                                                <Button
-                                                    size="icon"
-                                                    variant="ghost"
-                                                    onClick={triggerFileInput}
-                                                    className="h-8 w-8 hover:bg-white/10 text-gray-400 hover:text-white"
-                                                    disabled={isSending}
-                                                >
-                                                    <ImageIcon className="w-4 h-4" />
-                                                </Button>
-
+                                            <div className="flex items-center gap-1 pr-1 pb-1">
                                                 {browserSupportsSpeechRecognition ? (
                                                     <Button
                                                         size="icon"
                                                         variant="ghost"
                                                         onClick={listening ? stopListening : startListening}
-                                                        className={`h-8 w-8 rounded-lg transition-all ${listening
-                                                            ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                                                            : 'hover:bg-white/10 text-gray-400 hover:text-white'
+                                                        className={`h-11 w-11 rounded-full transition-all duration-300 ${listening
+                                                            ? 'bg-red-500 text-white animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]'
+                                                            : 'text-gray-400 hover:text-white hover:bg-white/10'
                                                             }`}
                                                         disabled={isSending}
                                                     >
-                                                        {listening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                                                        {listening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                                                     </Button>
                                                 ) : null}
 
                                                 <Button
                                                     size="icon"
                                                     onClick={isSending ? cancelRequest : () => handleSendMessage()}
-                                                    className={`h-8 w-8 rounded-lg transition-all ${isSending
+                                                    className={`h-11 w-11 rounded-full transition-all duration-300 shadow-lg ${isSending
                                                         ? 'bg-red-500 hover:bg-red-600 text-white'
-                                                        : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                                                        : inputMessage.trim() || imagePreview
+                                                            ? 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:scale-105 hover:shadow-cyan-500/25'
+                                                            : 'bg-white/10 text-gray-500 cursor-not-allowed'
                                                         }`}
-                                                    disabled={!inputMessage.trim() && !imagePreview}
+                                                    disabled={(!inputMessage.trim() && !imagePreview) && !isSending}
                                                 >
                                                     {isSending ? (
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <Loader2 className="w-5 h-5 animate-spin" />
                                                     ) : (
-                                                        <Send className="w-4 h-4" />
+                                                        <Send className="w-5 h-5 ml-0.5" />
                                                     )}
                                                 </Button>
                                             </div>
                                         </div>
-                                        <p className="text-center text-xs text-gray-500 mt-3">
-                                            AI can make mistakes. Consider checking important information.
+                                        <p className="text-center text-[10px] text-gray-600 mt-4 tracking-wide uppercase">
+                                            AI-Powered Study Assistant • Mr5 School
                                         </p>
                                     </div>
                                 </div>

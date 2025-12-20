@@ -58,7 +58,7 @@ export function RealTimeNotifications() {
     };
 
     setNotifications(prev => [newNotification, ...prev.slice(0, 9)]); // Keep only last 10 notifications
-    
+
     // Show toast notification
     toast(notification.title, {
       description: notification.message,
@@ -69,44 +69,26 @@ export function RealTimeNotifications() {
     });
   }, []);
 
-  // Simulate receiving real-time notifications
+  // Initialize notifications
   useEffect(() => {
-    const interval = setInterval(() => {
-      // In a real app, this would come from WebSocket or Server-Sent Events
-      const shouldAddNotification = Math.random() > 0.95; // 5% chance every interval
-      
-      if (shouldAddNotification) {
-        const types: Notification["type"][] = ["info", "success", "warning", "error"];
-        const randomType = types[Math.floor(Math.random() * types.length)];
-        
-        const mockNotifications = [
-          { title: "New Course Available", message: "Check out our new React Advanced Patterns course!", type: "info" as const },
-          { title: "Assignment Due Soon", message: "Your JavaScript fundamentals assignment is due tomorrow", type: "warning" as const },
-          { title: "Achievement Unlocked", message: "You've completed 10 lessons! Keep going!", type: "success" as const },
-          { title: "System Maintenance", message: "Scheduled maintenance tonight at 2AM UTC", type: "info" as const },
-          { title: "Payment Received", message: "Your subscription payment was processed successfully", type: "success" as const },
-        ];
-        
-        const randomNotification = mockNotifications[Math.floor(Math.random() * mockNotifications.length)];
-        
-        addNotification({
-          ...randomNotification,
-          type: randomType
-        });
-      }
-    }, 30000); // Check every 30 seconds
-
-    return () => clearInterval(interval);
-  }, [addNotification]);
+    // Only add a welcome notification if the user has no notifications
+    if (notifications.length === 0) {
+      addNotification({
+        title: "Welcome to MR5 School!",
+        message: "Explore our courses and start learning today.",
+        type: "info"
+      });
+    }
+  }, [addNotification, notifications.length]); // Run once on mount if empty
 
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(n => ({ ...n, read: true }))
     );
   };
@@ -218,7 +200,7 @@ export function RealTimeNotifications() {
                         >
                           <X className="h-3 w-3" />
                         </button>
-                        
+
                         <div className="flex gap-3">
                           <div className="flex-shrink-0 pt-0.5">
                             {getIcon(notification.type)}
@@ -233,7 +215,7 @@ export function RealTimeNotifications() {
                             <p className="text-xs text-muted-foreground mt-2">
                               {notification.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </p>
-                            
+
                             {notification.action && (
                               <Button
                                 variant="link"
@@ -250,7 +232,7 @@ export function RealTimeNotifications() {
                             )}
                           </div>
                         </div>
-                        
+
                         {!notification.read && (
                           <button
                             onClick={() => markAsRead(notification.id)}

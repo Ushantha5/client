@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX, ArrowRight, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ interface IntroVideoProps {
 
 export function IntroVideo({ onComplete }: IntroVideoProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const [showStartButton, setShowStartButton] = useState(true);
 
@@ -19,7 +18,6 @@ export function IntroVideo({ onComplete }: IntroVideoProps) {
         if (videoRef.current) {
             videoRef.current.muted = false;
             videoRef.current.play().then(() => {
-                setIsPlaying(true);
                 setShowStartButton(false);
                 setIsMuted(false);
             }).catch((err) => {
@@ -27,7 +25,6 @@ export function IntroVideo({ onComplete }: IntroVideoProps) {
                 // Fallback if play with sound fails
                 videoRef.current!.muted = true;
                 videoRef.current!.play();
-                setIsPlaying(true);
                 setShowStartButton(false);
                 setIsMuted(true);
             });

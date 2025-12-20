@@ -58,6 +58,6 @@ export const config = {
          * - assets (public assets)
          * - css/js files
          */
-        "/((?!api|_next/static|_next/image|favicon.ico|images|assets|.*\.png|.*\.jpg|.*\.jpeg|.*\.gif|.*\.svg|.*\.css|.*\.js).*)",
+        "/((?!api|_next/static|_next/image|favicon.ico|images|assets|.*.png|.*.jpg|.*.jpeg|.*.gif|.*.svg|.*.css|.*.js).*)",
     ],
 };

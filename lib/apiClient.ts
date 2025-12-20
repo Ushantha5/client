@@ -1,8 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
-// Use the baseURL as-is from environment variable
+// Use relative path to leverage Next.js rewrites and avoid port mismatch issues
 const getBaseURL = () => {
-    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    return "";
 };
 
 // Rate limiting for auth/me calls
@@ -26,15 +26,15 @@ apiClient.interceptors.request.use(
         if (config.url?.endsWith('/auth/me')) {
             const now = Date.now();
             const timeSinceLastCall = now - lastAuthCall;
-            
+
             if (timeSinceLastCall < AUTH_CALL_DELAY) {
                 // Delay the request to enforce minimum time between calls
                 await new Promise(resolve => setTimeout(resolve, AUTH_CALL_DELAY - timeSinceLastCall));
             }
-            
+
             lastAuthCall = Date.now();
         }
-        
+
         return config;
     },
     (error) => {

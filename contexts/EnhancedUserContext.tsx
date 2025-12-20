@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { User } from "@/types/user";
 import { authService } from "@/services/auth.service";
 import { useAdvancedCache } from "@/hooks/useAdvancedCache";
@@ -100,13 +100,13 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true);
   const [userPreferences, setUserPreferences] = useState<UserPreferences>(defaultUserContext.userPreferences);
   const [userStats, setUserStats] = useState<UserStats>(defaultUserContext.userStats);
-  
+
   // Use advanced caching for user data
   const userCache = useAdvancedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes cache
-  
+
   const isAuthenticated = !!user;
   const userRoles = useMemo(() => user ? [user.role] : [], [user]);
-  
+
   // Load user preferences from localStorage
   useEffect(() => {
     const savedPreferences = localStorage.getItem("userPreferences");
@@ -118,12 +118,12 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
       }
     }
   }, []);
-  
+
   // Save user preferences to localStorage
   useEffect(() => {
     localStorage.setItem("userPreferences", JSON.stringify(userPreferences));
   }, [userPreferences]);
-  
+
   /**
    * Refresh user data from the server
    */
@@ -135,7 +135,7 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
         setUser(cachedUser as User | null);
         return;
       }
-      
+
       const response = await authService.getCurrentUser();
       if (response.success && response.data) {
         // Update cache
@@ -151,10 +151,19 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
       setLoading(false);
     }
   }, [userCache]);
-  
+
   // Initialize auth state on mount
   useEffect(() => {
     const initAuth = async () => {
+      // Small delay to allow cookies to settle if needed
+      const hasToken = typeof window !== 'undefined' &&
+        (document.cookie.includes('token=') || localStorage.getItem('token'));
+
+      if (!hasToken) {
+        setLoading(false);
+        return;
+      }
+
       try {
         await refreshUser();
       } catch (error) {
@@ -164,45 +173,40 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
         setLoading(false);
       }
     };
-    
+
     initAuth();
   }, [refreshUser]);
-  
+
   /**
    * Login with email and password
    */
   const login = useCallback(async (email: string, password: string) => {
-    try {
-      const response = await authService.login({ email, password });
-      
-      if (response.success && response.data) {
-        const { user: userData } = response.data;
-        // Note: accessToken/refreshToken are set as httpOnly cookies by the server
-        
-        setUser(userData);
-        // Update cache
-        userCache.set("currentUser", userData);
-        
-        // Redirect based on role
-        switch (userData.role) {
-          case "admin":
-            window.location.href = "/admin";
-            break;
-          case "AI-TEACHER":
-            window.location.href = "/dashboard";
-            break;
-          case "student":
-            window.location.href = "/student";
-            break;
-          default:
-            window.location.href = "/";
-        }
+    const response = await authService.login({ email, password });
+    if (response.success && response.data) {
+      const { user: userData } = response.data;
+      // Note: accessToken/refreshToken are set as httpOnly cookies by the server
+
+      setUser(userData);
+      // Update cache
+      userCache.set("currentUser", userData);
+
+      // Redirect based on role
+      switch (userData.role) {
+        case "admin":
+          window.location.href = "/admin";
+          break;
+        case "AI-TEACHER":
+          window.location.href = "/dashboard";
+          break;
+        case "student":
+          window.location.href = "/student";
+          break;
+        default:
+          window.location.href = "/";
       }
-    } catch (error) {
-      throw error;
     }
   }, [userCache]);
-  
+
   /**
    * Register a new user
    */
@@ -212,24 +216,20 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
     password: string,
     role?: "student" | "AI-TEACHER",
   ) => {
-    try {
-      const response = await authService.register({
-        name,
-        email,
-        password,
-        role,
-      });
-      
-      if (response.success && response.data) {
-        // Backend now auto-logs in after register (sets cookies)
-        await refreshUser(); // Fetch user data
-        window.location.href = "/dashboard"; // Redirect to dashboard
-      }
-    } catch (error) {
-      throw error;
+    const response = await authService.register({
+      name,
+      email,
+      password,
+      role,
+    });
+
+    if (response.success && response.data) {
+      // Backend now auto-logs in after register (sets cookies)
+      await refreshUser(); // Fetch user data
+      window.location.href = "/dashboard"; // Redirect to dashboard
     }
   }, [refreshUser]);
-  
+
   /**
    * Logout user
    */
@@ -247,29 +247,25 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
       window.location.href = "/login";
     }
   }, [userCache]);
-  
+
   /**
    * Clear user cache (useful after profile updates)
    */
   const clearUserCache = useCallback(() => {
     userCache.clear();
   }, [userCache]);
-  
+
   /**
    * Update user profile
    */
   const updateUserProfile = useCallback(async (data: Partial<User>) => {
-    try {
-      const response = await authService.updateProfile(data);
-      if (response.success && response.data) {
-        setUser(prev => prev ? { ...prev, ...response.data } : null);
-        userCache.set("currentUser", response.data);
-      }
-    } catch (error) {
-      throw error;
+    const response = await authService.updateProfile(data);
+    if (response.success && response.data) {
+      setUser(prev => prev ? { ...prev, ...response.data } : null);
+      userCache.set("currentUser", response.data);
     }
   }, [userCache]);
-  
+
   /**
    * Update user preferences
    */
@@ -279,7 +275,7 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
       ...preferences
     }));
   }, []);
-  
+
   /**
    * Refresh user stats
    */
@@ -293,33 +289,33 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
       achievements: ["First Course", "Quick Learner", "Streak Master"],
       lastActive: new Date()
     };
-    
+
     setUserStats(mockStats);
   }, []);
-  
+
   /**
    * Check if user has a specific permission
    */
   const hasPermission = useCallback((permission: string) => {
     if (!user) return false;
-    
+
     // Simple permission checking based on role
     const permissions: Record<string, string[]> = {
       "admin": ["manage_users", "manage_courses", "view_analytics", "manage_payments"],
       "AI-TEACHER": ["create_courses", "manage_students", "view_progress"],
       "student": ["enroll_courses", "complete_lessons", "track_progress"]
     };
-    
+
     return permissions[user.role]?.includes(permission) || false;
   }, [user]);
-  
+
   // Refresh stats on user change
   useEffect(() => {
     if (user) {
       refreshUserStats();
     }
   }, [user, refreshUserStats]);
-  
+
   const contextValue = useMemo(() => ({
     user,
     loading,
@@ -354,7 +350,7 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
     hasPermission,
     userRoles
   ]);
-  
+
   return (
     <EnhancedUserContext.Provider value={contextValue}>
       {children}

@@ -73,8 +73,10 @@ export function SignupModal({ _open: isOpen, onOpenChange }: SignupModalProps) {
 				});
 				setErrors(fieldErrors);
 			} else {
+				// Extract error message from backend response if available
+				const errorMessage = err.response?.data?.message || err.message || "Registration failed. Please try again.";
 				setErrors({
-					general: err.message || "Registration failed. Please try again.",
+					general: errorMessage,
 				});
 			}
 		} finally {

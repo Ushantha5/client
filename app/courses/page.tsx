@@ -44,23 +44,23 @@ const gradientColors = [
 
 export default function CoursesPage() {
   const { user } = useEnhancedUser();
-    const { data: coursesData, loading: coursesLoading } = useAPICache(
-      "allCourses",
-      () => courseService.getAllCourses(),
-      { ttl: 5 * 60 * 1000 } // 5 minutes cache
-    );
-  
-    // Update courses state when data changes
-    useEffect(() => {
-      if (coursesData) {
-        setCourses(coursesData.data || []);
-      }
-    }, [coursesData]);
-  
-    // Update loading state
-    useEffect(() => {
-      setLoading(coursesLoading);
-    }, [coursesLoading]);
+  const { data: coursesData, loading: coursesLoading } = useAPICache(
+    "allCourses",
+    () => courseService.getAllCourses(),
+    { ttl: 5 * 60 * 1000 } // 5 minutes cache
+  );
+
+  // Update courses state when data changes
+  useEffect(() => {
+    if (coursesData) {
+      setCourses(coursesData.data || []);
+    }
+  }, [coursesData]);
+
+  // Update loading state
+  useEffect(() => {
+    setLoading(coursesLoading);
+  }, [coursesLoading]);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -86,22 +86,33 @@ export default function CoursesPage() {
 
   // Handle enrollment
   const handleEnroll = async (courseId: string) => {
+    console.log("Attempting to enroll in course:", courseId);
+    console.log("Current user state:", user);
+
     if (!user) {
+      console.warn("Enroll failed: User not logged in");
       toast.error("Please login to enroll in courses");
-      router.push("/");
+      router.push("/auth/login?redirect=/courses"); // Fixed redirect path
       return;
     }
 
     if (user.role !== "student") {
-      toast.error("Only students can enroll in courses");
+      console.warn("Enroll failed: User role is", user.role);
+      toast.error(`Only students can enroll in courses (Current role: ${user.role})`);
       return;
     }
 
     try {
       setEnrollingCourseId(courseId);
+      console.log("Calling paymentService.createCheckoutSession...");
       const response = await paymentService.createCheckoutSession(courseId);
+      console.log("Checkout session response:", response);
+
       if (response.url) {
         window.location.href = response.url;
+      } else {
+        console.error("No URL returned in checkout session response");
+        toast.error("Failed to redirect to payment gateway");
       }
     } catch (error: any) {
       console.error("Enrollment error:", error);

@@ -21,6 +21,7 @@ export function Footer({ year = 2025 }: { year?: number }) {
                                 src="/assets/mr5-logo-neon.png"
                                 alt="Mr5_LMS logo"
                                 fill
+                                sizes="40px"
                                 className="object-contain drop-shadow-[0_0_10px_rgba(0,184,255,0.5)]"
                             />
                         </div>
@@ -77,6 +78,7 @@ export function Footer({ year = 2025 }: { year?: number }) {
                                 src="/assets/dashboard/footer-avatar.png"
                                 alt="AI Assistant"
                                 fill
+                                sizes="32px"
                                 className="object-contain rounded-full"
                             />
                         </div>

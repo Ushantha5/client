@@ -12,22 +12,15 @@ interface Metric {
   entries: PerformanceEntry[];
 }
 
-const reportHandler = (metric: Metric) => {
-  // In development, log to console
+const reportHandler = (_metric: Metric) => {
+  // In development, we can optionally log to console or silence it
   if (process.env.NODE_ENV === "development") {
-    console.log("[Web Vitals]", metric);
+    // console.log("[Web Vitals]", metric);
   }
 
   // In production, send to analytics service
   if (process.env.NODE_ENV === "production") {
     // Example: Send to your analytics service
-    // fetch('/api/analytics/web-vitals', {
-    //   method: 'POST',
-    //   body: JSON.stringify(metric),
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   }
-    // });
   }
 };
 

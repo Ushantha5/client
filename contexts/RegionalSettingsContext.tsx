@@ -58,20 +58,55 @@ export const RegionalSettingsProvider: React.FC<{ children: React.ReactNode }> =
 
     const detectLocation = async () => {
         try {
-            // Priority 1: ipapi.co (Geographic location from IP)
-            const res = await fetch('https://ipapi.co/json/');
-            if (res.ok) {
-                const data = await res.json();
-                return `${data.city}, ${data.region}, ${data.country_name}`;
+            // Priority 1: Browser geolocation API (most accurate)
+            if (navigator.geolocation) {
+                return new Promise<string>((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            const { latitude, longitude } = position.coords;
+                            try {
+                                // Use nominatim for reverse geocoding (no CORS issues)
+                                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`);
+                                if (res.ok) {
+                                    const data = await res.json();
+                                    const location = `${data.address.city || data.address.town || data.address.village || 'Unknown'}, ${data.address.state || data.address.region || 'Unknown'}, ${data.address.country || 'Unknown'}`;
+                                    resolve(location);
+                                } else {
+                                    throw new Error('Reverse geocoding failed');
+                                }
+                            } catch (e) {
+                                console.warn("Reverse geocoding failed, using coordinates", e);
+                                resolve(`Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`);
+                            }
+                        },
+                        () => {
+                            // Geolocation denied, fall back to IP
+                            resolve("Geolocation denied");
+                        },
+                        { timeout: 10000 }
+                    );
+                });
             }
-        } catch (e) {
-            console.warn("IP Geolocation failed, falling back to browser settings", e);
-        }
 
-        // Priority 2: Browser settings
-        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const language = navigator.language;
-        return `Browser Location (TZ: ${timeZone}, Lang: ${language})`;
+            // Priority 2: IP-based location (fallback with better error handling)
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                if (res.ok) {
+                    const data = await res.json();
+                    return `${data.city || 'Unknown City'}, ${data.region || 'Unknown Region'}, ${data.country_name || 'Unknown Country'}`;
+                }
+            } catch (e) {
+                console.warn("IP Geolocation failed, falling back to browser settings", e);
+            }
+
+            // Priority 3: Browser settings
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const language = navigator.language;
+            return `Browser Location (TZ: ${timeZone}, Lang: ${language})`;
+        } catch (error) {
+            console.error("Location detection failed:", error);
+            return "Location detection failed";
+        }
     };
 
     const fetchRegionalInfo = useCallback(async (forcedUser?: any) => {
@@ -80,11 +115,23 @@ export const RegionalSettingsProvider: React.FC<{ children: React.ReactNode }> =
         setIsLoading(true);
         setError(null);
         try {
-            // 1. Detect location
+            // 1. Detect location with better error handling
             const location = await detectLocation();
 
-            // 2. Fetch AI-powered regional info
-            const aiData = await aiService.detectRegionalInfo(location);
+            // 2. Fetch AI-powered regional info with error handling
+            let aiData;
+            try {
+                aiData = await aiService.detectRegionalInfo(location);
+            } catch (aiError) {
+                console.warn("AI regional detection failed, using defaults:", aiError);
+                // Use fallback data if AI fails
+                aiData = {
+                    language: navigator.language,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    gradingSystem: "Standard",
+                    regionalPreferences: DEFAULT_REGIONAL_SETTINGS.regionalPreferences
+                };
+            }
 
             const processedSettings: RegionalSettings = {
                 location,
@@ -107,12 +154,16 @@ export const RegionalSettingsProvider: React.FC<{ children: React.ReactNode }> =
                 const shouldSync = !currentUser.timezone || currentUser.timezone === 'UTC';
 
                 if (shouldSync) {
-                    await authService.updateProfile({
-                        language: processedSettings.language.split(',')[0].trim(),
-                        timezone: processedSettings.timezone,
-                        gradingSystem: processedSettings.gradingSystem,
-                        regionalPreferences: processedSettings.regionalPreferences
-                    });
+                    try {
+                        await authService.updateProfile({
+                            language: processedSettings.language.split(',')[0].trim(),
+                            timezone: processedSettings.timezone,
+                            gradingSystem: processedSettings.gradingSystem,
+                            regionalPreferences: processedSettings.regionalPreferences
+                        });
+                    } catch (syncError) {
+                        console.warn("Failed to sync regional settings to profile:", syncError);
+                    }
                 }
             }
 

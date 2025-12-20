@@ -4,85 +4,82 @@
 
 @layer base {
   :root {
-    /* OKLCH Palette - Light Mode (Inverted Deep Space if needed, but we focus on Dark) */
-    --bg-app: 98% 0.00 0; 
-    --bg-surface: 100% 0.00 0;
-    --bg-surface-highlight: 96% 0.00 0;
-    
-    --foreground: 0% 0.00 0;
-    --card: 100% 0.00 0;
-    --card-foreground: 0% 0.00 0;
-    --popover: 100% 0.00 0;
-    --popover-foreground: 0% 0.00 0;
-    --primary: 60% 0.2 280;
-    --primary-foreground: 98% 0.00 0;
-    --secondary: 96% 0.00 0;
-    --secondary-foreground: 0% 0.00 0;
-    --muted: 96% 0.00 0;
-    --muted-foreground: 45% 0.00 0;
-    --accent: 96% 0.00 0;
-    --accent-foreground: 0% 0.00 0;
-    --destructive: 60% 0.2 20;
-    --destructive-foreground: 98% 0.00 0;
-    --border: 90% 0.00 0;
-    --input: 90% 0.00 0;
-    --ring: 60% 0.2 280;
-    --radius: 0.75rem;
+    /* Premium Antigravity Palette - Minimalist Base */
+    --bg-app: 98% 0.005 260;
+    --bg-surface: 100% 0 0;
+    --bg-surface-highlight: 95% 0.005 260;
 
-    /* RGB Channels for Alpha */
-    --primary-channel: 99, 102, 241;
+    --foreground: 15% 0.01 260;
+    --card: 100% 0 0;
+    --card-foreground: 15% 0.01 260;
+    --popover: 100% 0 0;
+    --popover-foreground: 15% 0.01 260;
+    --primary: 60% 0.18 260;
+    --primary-foreground: 98% 0 0;
+    --secondary: 92% 0.01 260;
+    --secondary-foreground: 15% 0.01 260;
+    --muted: 92% 0.01 260;
+    --muted-foreground: 45% 0.01 260;
+    --accent: 92% 0.01 260;
+    --accent-foreground: 15% 0.01 260;
+    --destructive: 55% 0.16 20;
+    --destructive-foreground: 98% 0 0;
+    --border: 88% 0.01 260;
+    --input: 88% 0.01 260;
+    --ring: 60% 0.18 260;
+    --radius: 1rem;
+
+    --primary-channel: 88, 80, 236;
     --border-channel: 255, 255, 255;
   }
- 
+
   .dark {
-    /* Huly "Deep Space" Palette */
-    /* Base: 18% Lightness, 0.01 Chroma, 260 Hue (Cool Charcoal) */
-    --bg-app: 18% 0.01 260;
-    
-    /* Surface Elevation Levels */
-    /* Level 1: Card */
-    --bg-surface: 22% 0.01 260;
-    /* Level 2: Popover/Highlight */
-    --bg-surface-highlight: 25% 0.01 260;
+    /* Antigravity Deep Space Theme */
+    /* Base: Very deep cool gray-black */
+    --bg-app: 12% 0.015 260;
 
-    --foreground: 95% 0.01 260; /* Off-white for readability */
-    
-    --card: 22% 0.01 260;
-    --card-foreground: 95% 0.01 260;
-    
-    --popover: 25% 0.01 260;
-    --popover-foreground: 95% 0.01 260;
-    
-    /* Vibrant Neon Purple/Indigo */
-    --primary: 65% 0.22 280;
+    /* Precision Surface Elevations */
+    --bg-surface: 15% 0.018 260;
+    --bg-surface-highlight: 18% 0.02 260;
+
+    --foreground: 98% 0.005 260;
+
+    --card: 15% 0.018 260;
+    --card-foreground: 98% 0.005 260;
+
+    --popover: 14% 0.018 260;
+    --popover-foreground: 98% 0.005 260;
+
+    /* Vibrant Electric Indigo */
+    --primary: 68% 0.22 285;
     --primary-foreground: 100% 0 0;
-    
-    --secondary: 25% 0.01 260;
-    --secondary-foreground: 98% 0 0;
-    
-    --muted: 25% 0.01 260;
-    --muted-foreground: 70% 0.01 260;
-    
-    --accent: 25% 0.01 260;
-    --accent-foreground: 98% 0 0;
-    
-    --destructive: 50% 0.2 25;
-    --destructive-foreground: 98% 0 0;
-    
-    --border: 30% 0.01 260;
-    --input: 30% 0.01 260;
-    --ring: 65% 0.22 280;
 
-    /* RGB Channels */
-    --primary-channel: 120, 110, 255; /* Neon Indigo */
+    --secondary: 18% 0.02 260;
+    --secondary-foreground: 98% 0 0;
+
+    --muted: 18% 0.02 260;
+    --muted-foreground: 65% 0.015 260;
+
+    --accent: 20% 0.025 260;
+    --accent-foreground: 98% 0 0;
+
+    --destructive: 45% 0.18 25;
+    --destructive-foreground: 98% 0 0;
+
+    --border: 20% 0.02 260;
+    --input: 20% 0.02 260;
+    --ring: 68% 0.22 285;
+
+    --primary-channel: 139, 92, 246;
     --border-channel: 255, 255, 255;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground tracking-tight;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -90,28 +87,28 @@
   }
 }
 
-/* Utilities */
 @layer utilities {
   .glass {
-    @apply bg-black/40 backdrop-blur-xl border border-white/10;
+    @apply bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0, 0, 0, 0.37)];
     position: relative;
     overflow: hidden;
   }
-  
+
   .glass::before {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(255,255,255,0.02));
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
     pointer-events: none;
   }
 
-  /* Noise Texture */
+  /* Premium Noise/Grain Texture */
   .noise-bg {
     position: fixed;
     top: 0;
@@ -120,12 +117,23 @@
     height: 100%;
     pointer-events: none;
     z-index: 50;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    mix-blend-mode: soft-light;
   }
 
-  /* Huly Text Gradient */
+  /* Antigravity Text Glow - Premium Gradient */
   .text-glow {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white/80 to-white/60 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)];
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/40;
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
+    letter-spacing: -0.02em;
+  }
+
+  .spotlight-card {
+    @apply relative border border-white/5 bg-surface/50 backdrop-blur-sm transition-all duration-500 hover:border-primary/30;
+  }
+
+  .spotlight-card:hover {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.1);
   }
 }

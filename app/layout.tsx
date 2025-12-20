@@ -58,6 +58,40 @@ export default function RootLayout({
 				<meta name="msapplication-TileColor" content="#18181b" />
 				<meta name="msapplication-config" content="/browserconfig.xml" />
 				<meta name="format-detection" content="telephone=no" />
+
+				{/* 
+					FIXED: Aggressive Kill Switch for Service Worker (fixing 503 errors).
+					We place this in <head> to run as early as possible.
+				*/}
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
+							(function() {
+								if ('serviceWorker' in navigator) {
+									navigator.serviceWorker.getRegistrations().then(function(registrations) {
+										if (registrations.length > 0) {
+											for(let registration of registrations) {
+												console.log('Antigravity: Killing Service Worker', registration.scope);
+												registration.unregister();
+											}
+											// Clear caches as well
+											if ('caches' in window) {
+												caches.keys().then(function(names) {
+													for (let name of names) caches.delete(name);
+												});
+											}
+											// Force a clean reload to bypass the intercept
+											if (!sessionStorage.getItem('sw_killed')) {
+												sessionStorage.setItem('sw_killed', 'true');
+												window.location.reload();
+											}
+										}
+									});
+								}
+							})();
+						`,
+					}}
+				/>
 			</head>
 			<body className="bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary" suppressHydrationWarning>
 				{/* Global Noise Texture */}
@@ -85,23 +119,6 @@ export default function RootLayout({
 						</UIPreferencesProvider>
 					</ThemeColorProvider>
 				</ThemeProvider>
-				<script
-					dangerouslySetInnerHTML={{
-						__html: `
-							if ('serviceWorker' in navigator) {
-								window.addEventListener('load', function() {
-									navigator.serviceWorker.register('/sw.js')
-										.then(function(registration) {
-											console.log('SW registered: ', registration);
-										})
-										.catch(function(registrationError) {
-											console.log('SW registration failed: ', registrationError);
-										});
-								});
-							}
-						`,
-					}}
-				/>
 			</body>
 		</html>
 	);

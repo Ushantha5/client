@@ -48,18 +48,65 @@ export async function POST(request: NextRequest) {
 		}
 
 		const genAI = getGenAI();
-		const model = genAI.getGenerativeModel({
-			model: "gemini-1.5-flash",
-			generationConfig: {
-				temperature: options?.temperature || 0.7,
-				maxOutputTokens: options?.max_tokens || 1000,
+
+		// 1. Define fallback models in order of preference (Updated for 2025 environment)
+		const modelsToTry = [
+			"gemini-3-flash-preview",
+			"gemini-2.5-flash-preview-09-2025",
+			"gemini-3-pro-preview",
+			"gemini-1.5-flash", // Keep legacy just in case
+			"gemini-pro"
+		];
+
+		let lastError: any;
+		let responseText: string | null = null;
+
+		// 2. Iterate and try
+		for (const modelName of modelsToTry) {
+			try {
+				const model = genAI.getGenerativeModel({
+					model: modelName,
+					generationConfig: {
+						temperature: options?.temperature || 0.7,
+						maxOutputTokens: options?.max_tokens || 1000,
+					}
+				});
+
+				const result = await model.generateContent(prompt);
+				const response = await result.response;
+				responseText = response.text();
+
+				// If we succeed, break the loop
+				if (responseText) break;
+
+			} catch (error: any) {
+				lastError = error;
+				// Only retry on 404 (Not Found) or 400 (Bad Request - typically model mismatch)
+				const isModelError = error.message?.includes("404") || error.message?.includes("not found") || error.message?.includes("unsupported");
+
+				if (isModelError) {
+					console.warn(`Gemini model '${modelName}' failed (not found/supported). Trying next fallback...`);
+					continue;
+				}
+
+				// If it's another error (e.g. Quota, API Key, 500), throw immediately
+				throw error;
 			}
-		});
+		}
 
-		const result = await model.generateContent(prompt);
-		const response = result.response.text();
+		// 3. If all attempts fail, try to help debug by listing models (if possible)
+		if (!responseText) {
+			console.error("All model fallbacks failed.");
+			// Optional: Try to list models to help debugging
+			// try {
+			// 	 const models = await genAI.listModels();
+			// 	 console.log("Available models:", models);
+			// } catch (e) { /* ignore list error */ }
 
-		return NextResponse.json({ response });
+			throw lastError || new Error("Failed to generate content with any available model.");
+		}
+
+		return NextResponse.json({ response: responseText });
 	} catch (error) {
 		console.error("Gemini API error:", error);
 		const errorMessage = error instanceof Error ? error.message : "Unknown error";

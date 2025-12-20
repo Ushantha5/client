@@ -20,37 +20,27 @@ interface PageViewData {
 
 export function useAnalytics() {
   const pathname = usePathname();
-  
-  // Track page views
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const pageData: PageViewData = {
-        path: pathname,
-        title: document.title,
-        referrer: document.referrer,
-        customData: {}
-      };
-      
-      trackPageView(pageData);
-    }
-  }, [pathname]);
-  
+
+
+
   // Track custom events
-  const trackEvent = useCallback((data: EventData) => {
+  const trackEvent = useCallback((_data: EventData) => {
     if (typeof window === "undefined") return;
-    
+
+    /*
     const eventData = {
       ...data,
       timestamp: new Date().toISOString(),
       url: window.location.href,
       userAgent: navigator.userAgent
     };
-    
+    */
+
     // In development, log to console
     if (process.env.NODE_ENV === "development") {
-      console.log("[Analytics Event]", eventData);
+      // console.log("[Analytics Event]", eventData);
     }
-    
+
     // In production, send to analytics service
     if (process.env.NODE_ENV === "production") {
       // Example: Send to your analytics service
@@ -63,11 +53,12 @@ export function useAnalytics() {
       // });
     }
   }, []);
-  
-  // Track page views
-  const trackPageView = useCallback((data: PageViewData) => {
+
+  // Track page views (function definition)
+  const trackPageView = useCallback((_data: PageViewData) => {
     if (typeof window === "undefined") return;
-    
+
+    /*
     const pageViewData = {
       ...data,
       timestamp: new Date().toISOString(),
@@ -77,12 +68,13 @@ export function useAnalytics() {
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight
     };
-    
+    */
+
     // In development, log to console
     if (process.env.NODE_ENV === "development") {
-      console.log("[Analytics PageView]", pageViewData);
+      // console.log("[Analytics PageView]", pageViewData);
     }
-    
+
     // In production, send to analytics service
     if (process.env.NODE_ENV === "production") {
       // Example: Send to your analytics service
@@ -95,11 +87,26 @@ export function useAnalytics() {
       // });
     }
   }, []);
-  
+
+  // Track page views (effect)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const pageData: PageViewData = {
+        path: pathname,
+        title: document.title,
+        referrer: document.referrer,
+        customData: {}
+      };
+
+      trackPageView(pageData);
+    }
+  }, [pathname, trackPageView]);
+
   // Track user timing
-  const trackTiming = useCallback((category: string, variable: string, value: number, label?: string) => {
+  const trackTiming = useCallback((_category: string, _variable: string, _value: number, _label?: string) => {
     if (typeof window === "undefined") return;
-    
+
+    /*
     const timingData = {
       category,
       variable,
@@ -107,12 +114,13 @@ export function useAnalytics() {
       label,
       timestamp: new Date().toISOString()
     };
-    
+    */
+
     // In development, log to console
     if (process.env.NODE_ENV === "development") {
-      console.log("[Analytics Timing]", timingData);
+      // console.log("[Analytics Timing]", timingData);
     }
-    
+
     // In production, send to analytics service
     if (process.env.NODE_ENV === "production") {
       // Example: Send to your analytics service
@@ -125,23 +133,23 @@ export function useAnalytics() {
       // });
     }
   }, []);
-  
+
   // Track exceptions
   const trackException = useCallback((description: string, fatal = false) => {
     if (typeof window === "undefined") return;
-    
+
     const exceptionData = {
       description,
       fatal,
       timestamp: new Date().toISOString(),
       url: window.location.href
     };
-    
+
     // In development, log to console
     if (process.env.NODE_ENV === "development") {
       console.error("[Analytics Exception]", exceptionData);
     }
-    
+
     // In production, send to analytics service
     if (process.env.NODE_ENV === "production") {
       // Example: Send to your analytics service
@@ -154,34 +162,34 @@ export function useAnalytics() {
       // });
     }
   }, []);
-  
+
   // Track user engagement (scroll depth, time on page, etc.)
   useEffect(() => {
     if (typeof window === "undefined") return;
-    
-    let startTime = Date.now();
+
+    const startTime = Date.now();
     let maxScrollDepth = 0;
-    
+
     const handleScroll = () => {
       const scrollPercent = Math.round(
         (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
       );
-      
+
       if (scrollPercent > maxScrollDepth) {
         maxScrollDepth = scrollPercent;
       }
     };
-    
+
     const handleBeforeUnload = () => {
       const timeOnPage = Date.now() - startTime;
-      
+
       trackEvent({
         category: "Engagement",
         action: "Time on Page",
         value: Math.round(timeOnPage / 1000), // seconds
         label: pathname
       });
-      
+
       if (maxScrollDepth > 0) {
         trackEvent({
           category: "Engagement",
@@ -191,16 +199,16 @@ export function useAnalytics() {
         });
       }
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("beforeunload", handleBeforeUnload);
-    
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [pathname, trackEvent]);
-  
+
   return {
     trackEvent,
     trackPageView,
@@ -212,7 +220,7 @@ export function useAnalytics() {
 // Predefined tracking functions for common events
 export function useCommonTracking() {
   const { trackEvent } = useAnalytics();
-  
+
   const trackButtonClick = useCallback((buttonName: string, location: string) => {
     trackEvent({
       category: "UI",
@@ -220,7 +228,7 @@ export function useCommonTracking() {
       label: `${location} - ${buttonName}`
     });
   }, [trackEvent]);
-  
+
   const trackFormSubmission = useCallback((formName: string, success: boolean) => {
     trackEvent({
       category: "Forms",
@@ -228,7 +236,7 @@ export function useCommonTracking() {
       label: formName
     });
   }, [trackEvent]);
-  
+
   const trackNavigation = useCallback((from: string, to: string) => {
     trackEvent({
       category: "Navigation",
@@ -236,7 +244,7 @@ export function useCommonTracking() {
       label: `${from} -> ${to}`
     });
   }, [trackEvent]);
-  
+
   const trackSearch = useCallback((query: string, resultsCount: number) => {
     trackEvent({
       category: "Search",
@@ -245,7 +253,7 @@ export function useCommonTracking() {
       value: resultsCount
     });
   }, [trackEvent]);
-  
+
   const trackVideoPlay = useCallback((videoTitle: string, duration: number) => {
     trackEvent({
       category: "Media",
@@ -254,7 +262,7 @@ export function useCommonTracking() {
       value: Math.round(duration)
     });
   }, [trackEvent]);
-  
+
   const trackCourseProgress = useCallback((courseId: string, lessonId: string, progress: number) => {
     trackEvent({
       category: "Learning",
@@ -263,7 +271,7 @@ export function useCommonTracking() {
       value: Math.round(progress)
     });
   }, [trackEvent]);
-  
+
   return {
     trackButtonClick,
     trackFormSubmission,

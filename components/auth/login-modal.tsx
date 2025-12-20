@@ -51,9 +51,9 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 				});
 				setErrors(fieldErrors);
 			} else {
+				const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials.";
 				setErrors({
-					general:
-						err.message || "Login failed. Please check your credentials.",
+					general: errorMessage,
 				});
 			}
 		} finally {
@@ -151,7 +151,7 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 						variant="outline"
 						className="w-full flex items-center gap-2 h-11 border-white/10 hover:bg-white/5"
 						onClick={() => {
-							window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/google`;
+							window.location.href = '/api/auth/google';
 						}}
 					>
 						<svg className="h-5 w-5" viewBox="0 0 24 24">

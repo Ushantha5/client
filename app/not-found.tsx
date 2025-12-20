@@ -1,84 +1,97 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { Footer } from "@/components/layout/footer";
+import { motion } from "framer-motion";
+import { ArrowLeft, Compass, Rocket } from "lucide-react";
+import Spline from "@splinetool/react-spline";
 
 export default function NotFound() {
 	return (
-		<div className="min-h-screen w-full bg-[#0b1226] overflow-hidden relative selection:bg-cyan-500/30 font-sans">
-			{/* Deep Space Gradient Background */}
-			<div className="absolute inset-0 bg-gradient-to-br from-[#0b1226] via-[#0f172a] to-[#06383a]" />
+		<div className="min-h-screen w-full bg-[#030712] overflow-hidden relative selection:bg-cyan-500/30 font-sans flex flex-col">
+			{/* Nebula Background */}
+			<div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-20" />
+			<div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/80 to-transparent" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#030712]/50 to-[#030712]" />
 
-			{/* Floating Background Particles/Orbs */}
-			<div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[100px] animate-[pulse_8s_ease-in-out_infinite]" />
-			<div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-cyan-500/10 rounded-full blur-[100px] animate-[pulse_8s_ease-in-out_infinite_delay-1000]" />
+			<main className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 sm:p-10">
+				<div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-			{/* Floating Glass Shards (Decorative) */}
-			<div className="absolute top-[20%] right-[15%] w-24 h-24 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl transform rotate-12 animate-[float_10s_ease-in-out_infinite]" />
-			<div className="absolute bottom-[30%] left-[10%] w-16 h-16 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg transform -rotate-12 animate-[float_12s_ease-in-out_infinite_delay-500]" />
-
-			<main className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6">
-
-				{/* Main Content Container */}
-				<div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-					{/* Text Content (Left) */}
-					<div className="space-y-8 text-center lg:text-left order-2 lg:order-1">
+					{/* Text Content */}
+					<motion.div
+						initial={{ opacity: 0, x: -50 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.8, ease: "easeOut" }}
+						className="space-y-8 text-center lg:text-left order-2 lg:order-1"
+					>
 						<div className="space-y-4">
-							<h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-white drop-shadow-[0_0_15px_rgba(0,184,255,0.5)]">
-								Oops!
+							<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-mono tracking-wider mb-2">
+								<span className="relative flex h-2 w-2">
+									<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+									<span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+								</span>
+								ERROR 404: SECTOR NOT FOUND
+							</div>
+
+							<h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500 tracking-tighter drop-shadow-2xl">
+								LOST IN <br /> SPACE?
 							</h1>
-							<p className="text-3xl md:text-4xl font-bold text-white/90">
-								You&apos;re off the learning path.
-							</p>
-							<p className="text-lg text-blue-200/60 max-w-lg mx-auto lg:mx-0 font-medium">
-								This page doesn&apos;t exist — let&apos;s get you back on track to your space odyssey.
+
+							<p className="text-lg md:text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+								The coordinates you entered led us to a black hole. Don&apos;t worry, even the best explorers get lost sometimes. Let&apos;s recalibrate your trajectory.
 							</p>
 						</div>
 
-						{/* CTAs */}
-						<div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start pt-4">
-							<Link href="/dashboard" className="group relative">
-								<div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full blur opacity-40 group-hover:opacity-100 transition duration-300 animate-pulse" />
-								<div className="relative px-8 py-4 rounded-full bg-[#0b1226] ring-1 ring-white/10 flex items-center justify-center text-white font-bold tracking-wide shadow-2xl transition-transform transform group-hover:scale-105 active:scale-95">
-									<span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent group-hover:text-white transition-colors">Return to Dashboard</span>
+						{/* Action Cards */}
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto lg:mx-0">
+							<Link href="/dashboard" className="group">
+								<div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-500/30 transition-all duration-300 flex items-center gap-4 group-hover:translate-x-1">
+									<div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+										<Rocket className="w-6 h-6" />
+									</div>
+									<div className="text-left">
+										<h3 className="text-white font-semibold">Mission Control</h3>
+										<p className="text-xs text-gray-400">Return to Dashboard</p>
+									</div>
 								</div>
 							</Link>
 
 							<Link href="/courses" className="group">
-								<div className="px-8 py-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 text-white font-semibold flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all transform hover:-translate-y-1">
-									Browse Courses
+								<div className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/30 transition-all duration-300 flex items-center gap-4 group-hover:translate-x-1">
+									<div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+										<Compass className="w-6 h-6" />
+									</div>
+									<div className="text-left">
+										<h3 className="text-white font-semibold">Explore</h3>
+										<p className="text-xs text-gray-400">Browse Courses</p>
+									</div>
 								</div>
 							</Link>
 						</div>
-					</div>
 
-					{/* 3D Hero Element (Right) */}
-					<div className="relative h-[400px] md:h-[600px] w-full flex items-center justify-center order-1 lg:order-2 animate-[float_6s_ease-in-out_infinite]">
-						{/* Background Glow Ring */}
-						<div className="absolute w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full border border-blue-500/20 bg-gradient-to-b from-blue-500/5 to-transparent blur-3xl" />
-
-						{/* Image */}
-						<div className="relative w-full h-full max-w-[500px] drop-shadow-[0_20px_50px_rgba(0,184,255,0.2)]">
-							<Image
-								src="/assets/404-robot.png"
-								alt="Lost AI Robot 404"
-								fill
-								sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-								className="object-contain"
-								priority
-							/>
+						<div className="pt-4 flex justify-center lg:justify-start">
+							<Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-white transition-colors">
+								<ArrowLeft className="w-4 h-4" />
+								Back to Home Base
+							</Link>
 						</div>
-					</div>
+					</motion.div>
+
+					{/* 3D Visual */}
+					<motion.div
+						initial={{ opacity: 0, scale: 0.8 }}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={{ duration: 1, delay: 0.2 }}
+						className="relative h-[400px] md:h-[600px] w-full flex items-center justify-center order-1 lg:order-2"
+					>
+						<div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-purple-500/20 rounded-full blur-[120px] animate-pulse" />
+
+						{/* Spline 3D Scene or high-quality image fallback */}
+						<div className="relative w-full h-full max-w-[600px] drop-shadow-2xl">
+							<Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" />
+						</div>
+					</motion.div>
 				</div>
-
 			</main>
-
-			{/* Floating Footer */}
-			<div className="absolute bottom-0 w-full z-20">
-				<Footer />
-			</div>
 		</div>
 	);
 }

@@ -51,8 +51,11 @@ export function SplineScene({
     }, []);
 
     const handleLoad = useCallback((splineApp: Application) => {
-        setIsLoading(false);
-        onLoad?.(splineApp);
+        // Wrap in setTimeout to avoid state updates during render phase
+        setTimeout(() => {
+            setIsLoading(false);
+            onLoad?.(splineApp);
+        }, 0);
     }, [onLoad]);
 
     const handleError = useCallback((err: any) => {
@@ -60,18 +63,22 @@ export function SplineScene({
         if (process.env.NODE_ENV === "development") {
             console.warn("Spline Load Error:", err?.message || err);
         }
-        setIsLoading(false);
 
-        // Detailed error messages
-        if (err?.message?.includes("end of buffer")) {
-            setError("3D Model temporarily unavailable");
-        } else if (err?.status === 403) {
-            setError("Access to 3D scene was denied");
-        } else {
-            setError("Failed to load 3D scene");
-        }
+        // Wrap in setTimeout to avoid state updates during render phase
+        setTimeout(() => {
+            setIsLoading(false);
 
-        onError?.(err);
+            // Detailed error messages
+            if (err?.message?.includes("end of buffer")) {
+                setError("3D Model temporarily unavailable");
+            } else if (err?.status === 403) {
+                setError("Access to 3D scene was denied");
+            } else {
+                setError("Failed to load 3D scene");
+            }
+
+            onError?.(err);
+        }, 0);
     }, [onError]);
 
     const defaultFallback = (
@@ -136,7 +143,7 @@ export function SplineScene({
             >
                 <Suspense fallback={fallback || defaultFallback}>
                     <Spline
-                        scene={scene + (scene.includes('?') ? '&' : '?') + 'v=' + Date.now()}
+                        scene={scene}
                         onLoad={handleLoad}
                         onSplineMouseDown={onMouseDown}
                         onSplineMouseHover={onMouseHover}

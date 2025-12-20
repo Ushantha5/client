@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SplineScene } from "./SplineScene";
+import Image from "next/image";
 import {
   getTamilGreeting,
   type TamilGreeting,
@@ -13,12 +13,10 @@ import { Volume2, VolumeX, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LocationData } from "@/services/location.service";
 
-// Default Spline scene URL - replace with actual avatar scene
-// Using a known working public Spline scene
-const DEFAULT_AVATAR_SCENE = "https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode";
+// Default Spline scene URL - using a working public character model
+const DEFAULT_AVATAR_SCENE = "https://prod.spline.design/kZ6uOt0uEiyHTBaD/scene.splinecode";
 
-// Fallback scene URL in case the default is unavailable
-const FALLBACK_AVATAR_SCENE = "https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode";
+
 
 interface WelcomeAvatarProps {
   /** Override the Spline scene URL */
@@ -60,7 +58,6 @@ export function WelcomeAvatar({
   const [gestureState, setGestureState] = useState<AvatarGestureState>("idle");
   const [isMuted, setIsMuted] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
-  const [actualSceneUrl, setActualSceneUrl] = useState(sceneUrl + "?v=" + Date.now());
   const speechSynthRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Get current greeting on mount
@@ -142,13 +139,7 @@ export function WelcomeAvatar({
     };
   }, []);
 
-  const handleError = useCallback((error: any) => {
-    console.warn("Failed to load Spline scene, trying fallback:", error);
-    // Try fallback URL if different from current
-    if (actualSceneUrl !== FALLBACK_AVATAR_SCENE) {
-      setActualSceneUrl(FALLBACK_AVATAR_SCENE);
-    }
-  }, [actualSceneUrl]);
+
 
   const toggleMute = () => {
     if (!enableVoice) return; // Don't toggle mute if voice is disabled
@@ -179,11 +170,32 @@ export function WelcomeAvatar({
     >
       {/* 3D Avatar Scene */}
       <div className="absolute inset-0 rounded-3xl overflow-hidden bg-gradient-to-b from-card/50 to-background/50 border border-primary/10 backdrop-blur-xl shadow-2xl">
+        {/* 
+            Safe fallback for 3D Scene to prevent crashes due to 403 Forbidden errors 
+            when the external Spline URL is inaccessible.
+            TODO: Restore this when valid .splinecode file is hosted locally.
+          */}
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
+          <div className="text-center p-8">
+            <div className="relative w-32 h-32 mx-auto mb-4 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur-2xl opacity-50 animate-pulse" />
+            <div className="relative w-32 h-32 mx-auto mb-4 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur-2xl opacity-50 animate-pulse" />
+            <Image
+              src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1000&auto=format&fit=crop"
+              alt="AI Assistant"
+              width={128}
+              height={128}
+              className="relative w-32 h-32 mx-auto rounded-full object-cover border-4 border-white/10 shadow-xl"
+            />
+          </div>
+        </div>
+
+        {/*
         <SplineScene
           scene={actualSceneUrl}
           className="w-full h-full"
           onError={handleError}
-        />
+        /> 
+        */}
 
         {/* Glassmorphism overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />

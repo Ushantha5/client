@@ -20,10 +20,14 @@ if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
         originalError.apply(console, args);
     };
 
-    // Suppress Spline-related uncaught errors
+    // Suppress Spline-related uncaught errors and network failures
     window.addEventListener('error', (event) => {
         const errorMessage = event.error?.message || event.message || "";
-        if (errorMessage.includes("end of buffer") || errorMessage.includes("Spline")) {
+        if (
+            errorMessage.includes("end of buffer") ||
+            errorMessage.includes("Spline") ||
+            (errorMessage.includes("403") && errorMessage.includes(".splinecode"))
+        ) {
             event.preventDefault();
             return false;
         }

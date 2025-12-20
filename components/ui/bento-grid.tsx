@@ -114,26 +114,26 @@ export const BentoItem = ({
             className={cn(
                 colSpanClass[colSpan],
                 rowSpanClass,
-                "rounded-xl group/bento transition duration-200 shadow-input dark:shadow-none bg-surface border border-white/5 justify-between flex flex-col space-y-4",
+                "group/bento",
                 className
             )}
         >
-            <SpotlightCard className="h-full w-full">
-                <div className="flex flex-col h-full p-6">
-                    {header && <div className="mb-4 flex-1">{header}</div>}
+            <SpotlightCard className="h-full w-full spotlight-card">
+                <div className="flex flex-col h-full p-8 transition-all duration-300">
+                    {header && <div className="mb-6 flex-1">{header}</div>}
 
-                    <div className="group-hover/bento:translate-x-2 transition duration-200">
-                        <div className="flex items-center gap-2 mb-2">
-                            {icon && <div className="text-primary">{icon}</div>}
-                            {title && <h3 className="font-bold text-neutral-100 tracking-wide">{title}</h3>}
+                    <div className="group-hover/bento:translate-x-1.5 transition duration-500 ease-in-out">
+                        <div className="flex items-center gap-3 mb-3">
+                            {icon && <div className="text-primary drop-shadow-[0_0_8px_rgba(139,92,246,0.4)]">{icon}</div>}
+                            {title && <h3 className="font-bold text-neutral-100 tracking-tight text-lg">{title}</h3>}
                         </div>
                         {subtitle && (
-                            <p className="text-muted-foreground text-sm leading-relaxed">
+                            <p className="text-muted-foreground/80 text-sm leading-relaxed font-light">
                                 {subtitle}
                             </p>
                         )}
                         {/* Render children if no header/title provided or as extra content */}
-                        {!header && !title && children}
+                        {!header && !title && <div className="relative z-10">{children}</div>}
                     </div>
                 </div>
             </SpotlightCard>

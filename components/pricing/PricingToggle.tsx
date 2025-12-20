@@ -10,28 +10,47 @@ interface PricingToggleProps {
 
 export const PricingToggle = ({ isAnnual, onToggle }: PricingToggleProps) => {
     return (
-        <div className="flex items-center justify-center space-x-4 mb-10">
-            <span className={cn("text-sm font-medium transition-colors", !isAnnual ? "text-white" : "text-white/50")}>
-                Monthly
-            </span>
-
-            <button
-                onClick={() => onToggle(!isAnnual)}
-                className="relative h-8 w-14 rounded-full bg-white/10 border border-white/20 p-1 transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
+        <div className="flex flex-col items-center justify-center space-y-4 mb-12">
+            <div className="relative p-1 bg-white/5 border border-white/10 rounded-full flex items-center backdrop-blur-md">
+                {/* Sliding Background */}
                 <motion.div
-                    className="h-5 w-5 rounded-full bg-primary shadow-lg shadow-primary/50"
-                    animate={{ x: isAnnual ? 24 : 0 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="absolute top-1 bottom-1 bg-primary rounded-full shadow-lg shadow-primary/25 z-0"
+                    initial={false}
+                    animate={{
+                        left: isAnnual ? "50%" : "4px",
+                        right: isAnnual ? "4px" : "50%",
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
-            </button>
 
-            <span className={cn("text-sm font-medium transition-colors flex items-center gap-2", isAnnual ? "text-white" : "text-white/50")}>
-                Annual
-                <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full">
-                    Save 20%
+                <button
+                    onClick={() => onToggle(false)}
+                    className={cn(
+                        "relative z-10 px-6 py-2 text-sm font-medium rounded-full transition-colors duration-200 min-w-[100px]",
+                        !isAnnual ? "text-white" : "text-white/60 hover:text-white"
+                    )}
+                >
+                    Monthly
+                </button>
+                <button
+                    onClick={() => onToggle(true)}
+                    className={cn(
+                        "relative z-10 px-6 py-2 text-sm font-medium rounded-full transition-colors duration-200 min-w-[100px]",
+                        isAnnual ? "text-white" : "text-white/60 hover:text-white"
+                    )}
+                >
+                    Yearly
+                </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground font-medium">
+                    Save up to 20% with yearly billing
                 </span>
-            </span>
+                <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.4)] animate-pulse">
+                    Best Value
+                </span>
+            </div>
         </div>
     );
 };
