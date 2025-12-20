@@ -2,8 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter
+} from "@/components/ui/dialog";
 import { ShieldCheck, Bot } from "lucide-react";
+// import { VisuallyHidden } from '@radix-ui/react-visually-hidden'; // Example if using Radix primitive directly
 
 export function AIConsentModal() {
     const [open, setOpen] = useState(false);
@@ -30,13 +38,30 @@ export function AIConsentModal() {
                         <div className="p-2 bg-blue-500/20 rounded-lg">
                             <Bot className="h-6 w-6 text-blue-400" />
                         </div>
+                        {/* 
+                            (1) Visible Title Example 
+                        */}
                         <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                             AI-Powered Learning
                         </DialogTitle>
                     </div>
+
+                    {/* 
+                        (1) Visible Description Example:
+                        Used when the description provides context that strictly must be seen.
+                    */}
                     <DialogDescription className="text-blue-100/70 pt-2">
                         Webe Advanst LMS uses Artificial Intelligence to enhance your learning experience.
                     </DialogDescription>
+
+                    {/* 
+                        (2) Visually Hidden Description Example (using sr-only class):
+                        Use this if the UI design excludes text but screen readers need context.
+                        
+                        <DialogDescription className="sr-only">
+                            Please accept the AI terms of service to continue.
+                        </DialogDescription>
+                    */}
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">

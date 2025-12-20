@@ -13,8 +13,7 @@ import { Volume2, VolumeX, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LocationData } from "@/services/location.service";
 
-// Default Spline scene URL - using a working public character model
-const DEFAULT_AVATAR_SCENE = "https://prod.spline.design/kZ6uOt0uEiyHTBaD/scene.splinecode";
+
 
 
 
@@ -45,7 +44,6 @@ interface WelcomeAvatarProps {
  * - Personalized greeting with user name
  */
 export function WelcomeAvatar({
-  sceneUrl = DEFAULT_AVATAR_SCENE,
   showGreetingText = true,
   enableVoice = false, // Default to false to respect the requirement
   className = "",

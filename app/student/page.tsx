@@ -51,7 +51,7 @@ export default function StudentDashboard() {
 		try {
 			// Fetch student enrollments
 			const enrollmentResponse = await enrollmentService.getMyEnrollments();
-			
+
 			// Transform enrollment data to match the existing structure
 			const transformedEnrollments = enrollmentResponse.data.map(enrollment => ({
 				name: enrollment.course.title,
@@ -150,7 +150,7 @@ export default function StudentDashboard() {
 					navigation={studentNavigation}
 				/>
 
-				<main className="flex-1 p-6 space-y-8 max-w-7xl mx-auto w-full">
+				<main className="flex-1 p-4 md:p-6 space-y-8 max-w-7xl mx-auto w-full">
 					{/* Stats Grid */}
 					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 						{stats.map((stat, index) => (

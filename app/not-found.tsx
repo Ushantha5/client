@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, Compass, Rocket } from "lucide-react";
-import Spline from "@splinetool/react-spline";
+import Image from "next/image";
 
 export default function NotFound() {
 	return (
@@ -85,9 +85,18 @@ export default function NotFound() {
 					>
 						<div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-purple-500/20 rounded-full blur-[120px] animate-pulse" />
 
-						{/* Spline 3D Scene or high-quality image fallback */}
-						<div className="relative w-full h-full max-w-[600px] drop-shadow-2xl">
-							<Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" />
+						{/* Static Image Fallback */}
+						<div className="relative w-full h-full max-w-[600px] drop-shadow-2xl flex items-center justify-center">
+							<div className="relative w-64 h-64 md:w-96 md:h-96 animate-float">
+								<Image
+									src="https://illustrations.popsy.co/amber/floating-in-space.svg"
+									alt="Lost in Space"
+									fill
+									sizes="(max-width: 768px) 100vw, 600px"
+									className="object-contain"
+									unoptimized
+								/>
+							</div>
 						</div>
 					</motion.div>
 				</div>

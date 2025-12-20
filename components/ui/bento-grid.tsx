@@ -119,21 +119,20 @@ export const BentoItem = ({
             )}
         >
             <SpotlightCard className="h-full w-full spotlight-card">
-                <div className="flex flex-col h-full p-8 transition-all duration-300">
-                    {header && <div className="mb-6 flex-1">{header}</div>}
+                <div className="flex flex-col h-full p-4 md:p-8 transition-all duration-300">
+                    {header && <div className="mb-4 md:mb-6 flex-1">{header}</div>}
 
-                    <div className="group-hover/bento:translate-x-1.5 transition duration-500 ease-in-out">
-                        <div className="flex items-center gap-3 mb-3">
+                    <div className="group-hover/bento:translate-x-1.5 transition duration-500 ease-in-out h-full flex flex-col">
+                        <div className="flex items-center gap-3 mb-2 md:mb-3">
                             {icon && <div className="text-primary drop-shadow-[0_0_8px_rgba(139,92,246,0.4)]">{icon}</div>}
                             {title && <h3 className="font-bold text-neutral-100 tracking-tight text-lg">{title}</h3>}
                         </div>
                         {subtitle && (
-                            <p className="text-muted-foreground/80 text-sm leading-relaxed font-light">
+                            <p className="text-muted-foreground/80 text-sm leading-relaxed font-light mb-4">
                                 {subtitle}
                             </p>
                         )}
-                        {/* Render children if no header/title provided or as extra content */}
-                        {!header && !title && <div className="relative z-10">{children}</div>}
+                        <div className="relative z-10 flex-1">{children}</div>
                     </div>
                 </div>
             </SpotlightCard>

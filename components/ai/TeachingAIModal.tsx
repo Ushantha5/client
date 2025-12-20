@@ -414,6 +414,7 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                                         src="/assets/mr5-logo-neon.png"
                                                         alt="MR5 AI"
                                                         fill
+                                                        sizes="48px"
                                                         className="object-cover"
                                                     />
                                                 </div>
@@ -502,6 +503,7 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                                                 src="/assets/mr5-logo-neon.png"
                                                                 alt="AI"
                                                                 fill
+                                                                sizes="40px"
                                                                 className="object-cover"
                                                             />
                                                         )}
@@ -568,6 +570,7 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                                             src="/assets/mr5-logo-neon.png"
                                                             alt="AI Processing"
                                                             fill
+                                                            sizes="40px"
                                                             className="object-cover"
                                                         />
                                                     </div>

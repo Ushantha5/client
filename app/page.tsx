@@ -23,6 +23,8 @@ import TeachingAIModal from "@/components/ai/TeachingAIModal";
 import { useVoiceInteraction } from "@/hooks/useVoiceInteraction";
 import { getTamilGreeting } from "@/lib/tamil-greetings";
 import { useCommonTracking } from "@/hooks/useAnalytics";
+import { motion } from "framer-motion";
+import { Menu } from "lucide-react";
 
 // Dynamically import 3D Avatar
 const WelcomeAvatar = nextDynamic(() => import("@/components/3d/WelcomeAvatar").then(m => ({ default: m.WelcomeAvatar })), { ssr: false });
@@ -76,25 +78,46 @@ export default function HomePage() {
       <main className="flex-1 container mx-auto px-4 py-8 pb-20">
 
         {/* Header / Command Bar Area */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div className="flex flex-col">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
-              Dashboard
-            </h1>
-            <p className="text-muted-foreground text-sm">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/80 to-white/50 tracking-tight">
+                Dashboard
+              </h1>
+            </motion.div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-muted-foreground text-sm mt-1 font-medium"
+            >
               {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-            </p>
+            </motion.p>
           </div>
 
-          {/* Huly-style Search Bar */}
-          <div className="relative group w-full md:w-96">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-500" />
-            <div className="relative flex items-center bg-surface border border-white/10 rounded-lg px-4 py-2 text-sm text-foreground/50 shadow-inner">
-              <Search className="w-4 h-4 mr-3" />
-              <span>Search courses, students, or ask AI...</span>
-              <span className="ml-auto text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded text-muted-foreground">⌘K</span>
+          {/* Huly-style Search Bar with 3D Interaction */}
+          {/* Huly-style Search Bar with 3D Interaction */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="relative group w-full md:w-96 perspective-1000 mt-4 md:mt-0"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-purple-500/30 to-blue-500/30 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition duration-700 will-change-transform" />
+            <div className="relative flex items-center bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-foreground/70 shadow-2xl backdrop-blur-md transition-transform duration-300 group-hover:scale-[1.02] group-hover:border-white/20">
+              <Search className="w-5 h-5 mr-3 text-muted-foreground group-hover:text-primary transition-colors" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="bg-transparent border-none outline-none flex-1 placeholder:text-muted-foreground/50 text-foreground w-full"
+              />
+              <span className="ml-auto text-[10px] font-bold bg-black/20 border border-white/5 px-2 py-1 rounded text-muted-foreground/70 tracking-widest hidden md:inline-block">⌘K</span>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         <BentoGrid>
@@ -105,7 +128,7 @@ export default function HomePage() {
             </div>
 
             <div className="relative z-10 flex flex-col md:flex-row h-full">
-              <div className="flex-1 p-8 flex flex-col justify-center space-y-6">
+              <div className="flex-1 p-5 md:p-8 flex flex-col justify-center space-y-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 self-start">
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                   <span className="text-xs font-medium text-primary-foreground">System Online</span>

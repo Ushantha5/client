@@ -18,6 +18,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeCustomizer } from "@/components/theme-customizer";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 export function Navbar() {
 	const { user, logout } = useEnhancedUser();
@@ -103,7 +105,7 @@ export function Navbar() {
 									</DropdownMenuLabel>
 									<DropdownMenuSeparator className="bg-white/10" />
 									<DropdownMenuItem asChild className="focus:bg-primary/20 focus:text-white cursor-pointer">
-										<Link href={`/${user.role}`}>Dashboard</Link>
+										<Link href={`/${user.role}`}>{user.role}</Link>
 									</DropdownMenuItem>
 									<DropdownMenuItem asChild className="focus:bg-primary/20 focus:text-white cursor-pointer">
 										<Link href="/profile">Profile settings</Link>
@@ -132,6 +134,56 @@ export function Navbar() {
 								</Button>
 							</div>
 						)}
+					</div>
+
+					{/* Mobile Menu */}
+					<div className="md:hidden flex items-center ml-2">
+						<Sheet>
+							<SheetTrigger asChild>
+								<Button variant="ghost" size="icon" className="text-muted-foreground hover:text-white">
+									<Menu className="w-6 h-6" />
+								</Button>
+							</SheetTrigger>
+							<SheetContent side="right" className="bg-background/95 backdrop-blur-xl border-white/10 w-[300px]">
+								<div className="flex flex-col gap-6 mt-10">
+									<div className="flex flex-col gap-2">
+										<h3 className="text-sm font-medium text-muted-foreground mb-2 px-2 uppercase tracking-wider">Navigation</h3>
+										<Link
+											href="/courses"
+											className="px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-lg transition-colors flex items-center justify-between group"
+										>
+											Library
+											<span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+										</Link>
+										<Link
+											href="/about"
+											className="px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-lg transition-colors flex items-center justify-between group"
+										>
+											Manifesto
+											<span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+										</Link>
+										<Link
+											href="/contact"
+											className="px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-lg transition-colors flex items-center justify-between group"
+										>
+											Connect
+											<span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+										</Link>
+									</div>
+
+									{!user && (
+										<div className="flex flex-col gap-3 mt-4 px-2">
+											<Button onClick={() => setShowLogin(true)} variant="secondary" className="w-full justify-center">
+												Sign In
+											</Button>
+											<Button onClick={() => setShowSignup(true)} className="w-full justify-center">
+												Start Learning
+											</Button>
+										</div>
+									)}
+								</div>
+							</SheetContent>
+						</Sheet>
 					</div>
 				</div>
 			</nav>
