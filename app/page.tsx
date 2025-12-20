@@ -27,9 +27,12 @@ import { useCommonTracking } from "@/hooks/useAnalytics";
 // Dynamically import 3D Avatar
 const WelcomeAvatar = nextDynamic(() => import("@/components/3d/WelcomeAvatar").then(m => ({ default: m.WelcomeAvatar })), { ssr: false });
 
+const IntroVideo = nextDynamic(() => import("@/components/intro/IntroVideo").then(m => ({ default: m.IntroVideo })), { ssr: false });
+
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   // We use 'any' here to bypass the strict type mismatch if the type definitions are outdated
   // in a real scenario we should update the Greeting type definition
@@ -40,12 +43,30 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
+    const hasSeenIntro = localStorage.getItem("hasSeenIntro_v1");
+    if (!hasSeenIntro) {
+      setShowIntro(true);
+      // If we are showing intro, we can skip the standard mock loading screen logic or keep it
+      // Let's keep loading true so that if they skip intro, the app might still be "ready" or load briefly
+    }
+
     setGreeting(getTamilGreeting());
     const interval = setInterval(() => setGreeting(getTamilGreeting()), 60000);
     return () => clearInterval(interval);
   }, []);
 
   if (!mounted) return null;
+
+  if (showIntro) {
+    return (
+      <IntroVideo
+        onComplete={() => {
+          setShowIntro(false);
+          setLoading(false); // Skip the secondary loading screen if they just watched the intro
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">

@@ -11,7 +11,8 @@ if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
                 errorMessage.includes("/api/auth/login") ||
                 errorMessage.includes("/api/auth/refresh") ||
                 errorMessage.includes("/api/context/sync") ||
-                errorMessage.includes("/api/context/me"))
+                errorMessage.includes("/api/context/me") ||
+                errorMessage.includes("/api/ai/detect-regional-info"))
         ) {
             // Silently ignore expected auth check failures
             return;
