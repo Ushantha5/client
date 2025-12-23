@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { studentNavigation } from "@/data/navigation";
@@ -34,7 +34,7 @@ import { enrollmentService } from "@/services/enrollment.service";
 import { toast } from "sonner";
 
 export default function StudentDashboard() {
-	const { user } = useAuth();
+	const { user } = useEnhancedUser();
 	const router = useRouter();
 	const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);

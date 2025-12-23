@@ -8,7 +8,9 @@ import { BentoGrid, BentoItem } from "@/components/ui/bento-grid";
 import { Navbar } from "@/components/layout/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import nextDynamic from "next/dynamic";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import {
   Sparkles,
   BookOpen,
@@ -32,29 +34,41 @@ const IntroVideo = nextDynamic(() => import("@/components/intro/IntroVideo").the
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !sessionStorage.getItem("hasSeenGlobalLoading");
+    }
+    return true;
+  });
   const [showIntro, setShowIntro] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   // We use 'any' here to bypass the strict type mismatch if the type definitions are outdated
   // in a real scenario we should update the Greeting type definition
   const [greeting, setGreeting] = useState<any>(null);
 
+  const { user } = useEnhancedUser();
+  const router = useRouter();
+
   const voiceInteraction = useVoiceInteraction("gemini");
-  const { trackButtonClick, trackNavigation } = useCommonTracking();
+  const { trackNavigation } = useCommonTracking();
 
   useEffect(() => {
     setMounted(true);
+
+    // If user is already logged in, redirect to dashboard
+    if (user && mounted) {
+      router.replace("/dashboard");
+    }
+
     const hasSeenIntro = localStorage.getItem("hasSeenIntro_v1");
     if (!hasSeenIntro) {
       setShowIntro(true);
-      // If we are showing intro, we can skip the standard mock loading screen logic or keep it
-      // Let's keep loading true so that if they skip intro, the app might still be "ready" or load briefly
     }
 
     setGreeting(getTamilGreeting());
     const interval = setInterval(() => setGreeting(getTamilGreeting()), 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user, mounted, router]);
 
   if (!mounted) return null;
 
@@ -63,7 +77,8 @@ export default function HomePage() {
       <IntroVideo
         onComplete={() => {
           setShowIntro(false);
-          setLoading(false); // Skip the secondary loading screen if they just watched the intro
+          setLoading(false);
+          sessionStorage.setItem("hasSeenGlobalLoading", "true");
         }}
       />
     );
@@ -71,7 +86,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
+      {loading && <LoadingScreen onComplete={() => {
+        setLoading(false);
+        sessionStorage.setItem("hasSeenGlobalLoading", "true");
+      }} />}
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8 pb-20">
@@ -85,7 +103,7 @@ export default function HomePage() {
               transition={{ duration: 0.5 }}
             >
               <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/80 to-white/50 tracking-tight">
-                Dashboard
+                Master AI Avatars
               </h1>
             </motion.div>
             <motion.p
@@ -138,30 +156,29 @@ export default function HomePage() {
                     {greeting?.transliteration || greeting?.english || "Vanakkam"}
                   </h2>
                   <p className="text-2xl text-muted-foreground font-light mb-4 text-glow">
-                    {greeting?.primary || "Welcome"}
+                    The Future of Digital Education
                   </p>
                   <p className="text-foreground/80 max-w-md leading-relaxed">
-                    Welcome to your AI-powered learning OS. Your personal tutor is ready to assist you with real-time feedback.
+                    Welcome to the Real AI Avatar School. Master the art of generating, animating, and deploying lifelike AI avatars for your digital projects.
                   </p>
                 </div>
 
                 <div className="flex gap-4 pt-4">
                   <Button
-                    onClick={() => {
-                      trackButtonClick("Open Workspace", "Homepage Hero");
-                      setIsAIModalOpen(true);
-                    }}
+                    asChild
                     className="bg-primary hover:bg-primary/90 text-white rounded-lg shadow-[0_0_20px_rgba(120,110,255,0.3)] border border-white/10"
                   >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Open Workspace
+                    <Link href="/register" onClick={() => trackNavigation("Homepage", "/register")}>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Get Started
+                    </Link>
                   </Button>
                   <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10" asChild>
                     <Link
-                      href="/courses"
-                      onClick={() => trackNavigation("Homepage", "/courses")}
+                      href="/login"
+                      onClick={() => trackNavigation("Homepage", "/login")}
                     >
-                      Browse Library
+                      Sign In
                     </Link>
                   </Button>
                 </div>

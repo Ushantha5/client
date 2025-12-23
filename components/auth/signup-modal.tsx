@@ -21,7 +21,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { registerSchema } from "@/lib/schemas";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 interface SignupModalProps {
 	_open: boolean;
@@ -39,6 +39,8 @@ export function SignupModal({ _open: isOpen, onOpenChange }: SignupModalProps) {
 	});
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [loading, setLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -148,13 +150,24 @@ export function SignupModal({ _open: isOpen, onOpenChange }: SignupModalProps) {
 								<Input
 									id="password"
 									name="password"
-									type="password"
+									type={showPassword ? "text" : "password"}
 									placeholder="hgufv^_^1234"
 									value={formData.password}
 									onChange={handleChange}
 									required
-									className="pl-9 bg-background/50"
+									className="pl-9 bg-background/50 pr-10"
 								/>
+								<button
+									type="button"
+									onClick={() => setShowPassword(!showPassword)}
+									className="absolute right-3 top-2.5 text-muted-foreground hover:text-white transition-colors"
+								>
+									{showPassword ? (
+										<EyeOff className="h-4 w-4" />
+									) : (
+										<Eye className="h-4 w-4" />
+									)}
+								</button>
 							</div>
 							{errors.password && (
 								<p className="text-destructive text-sm">
@@ -169,13 +182,24 @@ export function SignupModal({ _open: isOpen, onOpenChange }: SignupModalProps) {
 								<Input
 									id="confirmPassword"
 									name="confirmPassword"
-									type="password"
+									type={showConfirmPassword ? "text" : "password"}
 									placeholder="hgufv^_^1234"
 									value={formData.confirmPassword}
 									onChange={handleChange}
 									required
-									className="pl-9 bg-background/50"
+									className="pl-9 bg-background/50 pr-10"
 								/>
+								<button
+									type="button"
+									onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+									className="absolute right-3 top-2.5 text-muted-foreground hover:text-white transition-colors"
+								>
+									{showConfirmPassword ? (
+										<EyeOff className="h-4 w-4" />
+									) : (
+										<Eye className="h-4 w-4" />
+									)}
+								</button>
 							</div>
 							{errors.confirmPassword && (
 								<p className="text-destructive text-sm">

@@ -19,15 +19,15 @@ export function Footer({ year = 2025 }: { year?: number }) {
                         <div className="relative w-10 h-10">
                             <Image
                                 src="/assets/mr5-logo-neon.png"
-                                alt="Mr5_LMS logo"
+                                alt="MR5 School logo"
                                 fill
                                 sizes="40px"
                                 className="object-contain drop-shadow-[0_0_10px_rgba(0,184,255,0.5)]"
                             />
                         </div>
                         <div>
-                            <div className="text-sm font-bold text-white tracking-wide">Mr5_LMS</div>
-                            <div className="text-xs text-blue-200/70 font-medium">Teach smarter, not harder.</div>
+                            <div className="text-sm font-bold text-white tracking-wide">MR5 School</div>
+                            <div className="text-xs text-blue-200/70 font-medium">Smart Way to Grow.</div>
                         </div>
                     </div>
 
@@ -88,7 +88,7 @@ export function Footer({ year = 2025 }: { year?: number }) {
 
             {/* Bottom Legal Row */}
             <div className="mx-auto max-w-7xl mt-4 px-4 text-[10px] text-blue-200/40 flex flex-col md:flex-row justify-between items-center gap-2">
-                <div>© {year} Mr5_LMS. All rights reserved.</div>
+                <div>© {year} MR5 School. All rights reserved.</div>
                 <div className="flex gap-6">
                     <Link href="/terms" className="hover:text-blue-200 transition-colors">Terms</Link>
                     <Link href="/privacy" className="hover:text-blue-200 transition-colors">Privacy</Link>

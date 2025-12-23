@@ -4,7 +4,7 @@ import {
   Users,
   GraduationCap,
   BookOpen,
-  BarChart,
+  BarChart3,
   Settings,
   CreditCard,
   FileText,
@@ -33,7 +33,7 @@ export const adminNavigation: NavigationItem[] = [
   {
     title: "Analytics",
     href: "/admin/analytics",
-    icon: BarChart,
+    icon: BarChart3,
   },
   {
     title: "Management",
@@ -154,6 +154,6 @@ export const teacherNavigation: NavigationItem[] = [
   {
     title: "Analytics",
     href: "/teacher/analytics",
-    icon: BarChart,
+    icon: BarChart3,
   },
 ];

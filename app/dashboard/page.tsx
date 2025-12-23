@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import LoadingScreen from "@/components/loading/LoadingScreen";
 
 /**
@@ -18,7 +18,7 @@ import LoadingScreen from "@/components/loading/LoadingScreen";
  */
 export default function DashboardPage() {
     const router = useRouter();
-    const { user, loading } = useAuth();
+    const { user, loading } = useEnhancedUser();
 
     useEffect(() => {
         if (loading) return;
@@ -35,7 +35,7 @@ export default function DashboardPage() {
                 router.replace("/admin");
                 break;
             case "student":
-                router.replace("/student");
+                router.replace("/student/portal");
                 break;
             default:
                 router.replace("/courses");

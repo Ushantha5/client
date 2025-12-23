@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { loginSchema } from "@/lib/schemas";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 
 interface LoginModalProps {
 	_open: boolean;
@@ -26,6 +26,7 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 	const [formData, setFormData] = useState({ email: "", password: "" });
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [loading, setLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -107,13 +108,24 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 								<Input
 									id="password"
 									name="password"
-									type="password"
+									type={showPassword ? "text" : "password"}
 									placeholder="hgufv^_^9494..."
 									value={formData.password}
 									onChange={handleChange}
 									required
-									className="pl-9 bg-background/50"
+									className="pl-9 bg-background/50 pr-10"
 								/>
+								<button
+									type="button"
+									onClick={() => setShowPassword(!showPassword)}
+									className="absolute right-3 top-2.5 text-muted-foreground hover:text-white transition-colors"
+								>
+									{showPassword ? (
+										<EyeOff className="h-4 w-4" />
+									) : (
+										<Eye className="h-4 w-4" />
+									)}
+								</button>
 							</div>
 							{errors.password && (
 								<p className="text-destructive text-sm">

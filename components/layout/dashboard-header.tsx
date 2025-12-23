@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -26,7 +26,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ title, navigation }: DashboardHeaderProps) {
-    const { user, logout } = useAuth();
+    const { user, logout } = useEnhancedUser();
 
     const getInitials = (name: string) => {
         return name

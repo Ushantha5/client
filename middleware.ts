@@ -11,17 +11,28 @@ export function middleware(request: NextRequest) {
         "/api/auth/register",
         "/api/auth/refresh",
         "/about",
-        "/contact"
+        "/contact",
+        "/courses",
+        "/course"
     ];
 
-    const isPublicPath = publicPaths.some((path) =>
-        request.nextUrl.pathname.startsWith(path) && request.nextUrl.pathname !== "/admin"
-    );
+    const isPublicPath = publicPaths.some((path) => {
+        if (path === "/") {
+            return request.nextUrl.pathname === "/";
+        }
+        return request.nextUrl.pathname.startsWith(path);
+    });
 
-    // If resource request (images, etc), skip
+    // If resource request (images, static files, etc), skip
     if (request.nextUrl.pathname.startsWith("/_next") ||
         request.nextUrl.pathname.startsWith("/assets") ||
-        request.nextUrl.pathname.startsWith("/favicon.ico")) {
+        request.nextUrl.pathname.startsWith("/images") ||
+        request.nextUrl.pathname.startsWith("/favicon.ico") ||
+        request.nextUrl.pathname.endsWith(".png") ||
+        request.nextUrl.pathname.endsWith(".jpg") ||
+        request.nextUrl.pathname.endsWith(".svg") ||
+        request.nextUrl.pathname.endsWith(".ico") ||
+        request.nextUrl.pathname.includes("manifest")) {
         return NextResponse.next();
     }
 

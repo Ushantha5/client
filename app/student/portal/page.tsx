@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { Navbar } from "@/components/layout/navbar";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { Button } from "@/components/ui/button";
@@ -28,8 +28,8 @@ import {
   Zap,
   Users,
   MessageSquare,
-  Settings,
-  CheckCircle
+  CheckCircle,
+  Sparkles
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -263,7 +263,7 @@ const AchievementCard: React.FC<Achievement> = ({ title, description, icon, earn
 
 
 export default function StudentPortal() {
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -637,10 +637,10 @@ export default function StudentPortal() {
                       <span className="text-xs">Grades</span>
                     </Link>
                   </Button>
-                  <Button variant="outline" className="h-16 flex flex-col gap-1" asChild>
-                    <Link href="/profile">
-                      <Settings className="w-5 h-5" />
-                      <span className="text-xs">Settings</span>
+                  <Button variant="outline" className="h-16 flex flex-col gap-1 hover:border-primary/50 transition-colors" asChild>
+                    <Link href="/apps/avatar-creator">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                      <span className="text-xs">Avatar Studio</span>
                     </Link>
                   </Button>
                 </CardContent>

@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import apiClient from "@/lib/apiClient";
 import { Button } from "@/components/ui/button";
 import { Loader2, Lock } from "lucide-react";
 
 export default function SchoolPage() {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading } = useEnhancedUser();
     const router = useRouter();
     const params = useParams();
     const courseId = params.id as string;

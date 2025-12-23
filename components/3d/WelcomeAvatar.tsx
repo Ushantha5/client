@@ -8,7 +8,7 @@ import {
   type TamilGreeting,
   type AvatarGestureState
 } from "@/lib/tamil-greetings";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { Volume2, VolumeX, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LocationData } from "@/services/location.service";
@@ -51,7 +51,7 @@ export function WelcomeAvatar({
   compact = false,
   location,
 }: WelcomeAvatarProps) {
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
   const [greeting, setGreeting] = useState<TamilGreeting | null>(null);
   const [gestureState, setGestureState] = useState<AvatarGestureState>("idle");
   const [isMuted, setIsMuted] = useState(false);

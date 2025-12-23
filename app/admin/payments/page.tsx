@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { adminNavigation } from "@/data/navigation";
@@ -45,7 +45,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
 export default function PaymentsManagement() {
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [payments, setPayments] = useState<any[]>([]);

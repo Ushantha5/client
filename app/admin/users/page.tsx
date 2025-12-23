@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { adminNavigation } from "@/data/navigation";
@@ -46,7 +46,7 @@ import { Badge } from "@/components/ui/badge";
 
 
 export default function UsersManagement() {
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<any[]>([]);

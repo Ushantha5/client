@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { adminNavigation } from "@/data/navigation";
@@ -56,7 +56,7 @@ interface AnalyticsData {
 }
 
 export default function AnalyticsDashboard() {
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
   const router = useRouter();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
     userGrowth: [],

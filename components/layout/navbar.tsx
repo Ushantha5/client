@@ -8,7 +8,7 @@ import { SignupModal } from "@/components/auth/signup-modal";
 import Image from "next/image";
 import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { RealTimeNotifications } from "@/components/notifications/RealTimeNotifications";
-import { LogOut } from "lucide-react";
+import { LogOut, Sparkles } from "lucide-react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -48,7 +48,7 @@ export function Navbar() {
 								MR5 School
 							</span>
 							<span className="text-[10px] text-muted-foreground/80 tracking-widest font-mono uppercase">
-								Productivity OS
+								Smart Way to Grow
 							</span>
 						</div>
 					</Link>
@@ -73,6 +73,15 @@ export function Navbar() {
 						>
 							Connect
 						</Link>
+						{user?.role === 'student' && (
+							<Link
+								href="/apps/avatar-creator"
+								className="px-4 py-1.5 text-sm text-primary font-bold hover:text-white hover:bg-primary/20 rounded-full transition-all duration-300 flex items-center gap-1.5 group"
+							>
+								<Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
+								Avatar Studio
+							</Link>
+						)}
 					</div>
 
 					{/* Auth Buttons */}

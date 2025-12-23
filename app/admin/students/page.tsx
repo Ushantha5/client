@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { adminNavigation } from "@/data/navigation";
@@ -60,7 +60,7 @@ interface Student {
 }
 
 export default function StudentsManagement() {
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<Student[]>([]);

@@ -1,5 +1,6 @@
 "use client";
 
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { authService } from "@/services/auth.service";
@@ -158,7 +159,7 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
     const initAuth = async () => {
       // Small delay to allow cookies to settle if needed
       const hasToken = typeof window !== 'undefined' &&
-        (document.cookie.includes('token=') || localStorage.getItem('token'));
+        (document.cookie.includes('access_token=') || document.cookie.includes('refresh_token=') || localStorage.getItem('token'));
 
       if (!hasToken) {
         setLoading(false);
@@ -200,7 +201,7 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
           router.push("/dashboard");
           break;
         case "student":
-          router.push("/student");
+          router.push("/student/portal");
           break;
         default:
           router.push("/");

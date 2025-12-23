@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { adminNavigation } from "@/data/navigation";
@@ -20,7 +20,7 @@ import {
   FileText,
   Download,
   Calendar,
-  BarChart,
+  BarChart3,
   LineChart,
   PieChart,
 } from "lucide-react";
@@ -45,7 +45,7 @@ interface ReportData {
 }
 
 export default function ReportsManagement() {
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState<ReportData[]>([]);
@@ -189,7 +189,7 @@ export default function ReportsManagement() {
             <Card className="border-border/50 shadow-sm hover:shadow-md transition-all hover:bg-accent/5 cursor-pointer" onClick={() => generateReport("activity")}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Activity Report</CardTitle>
-                <BarChart className="h-5 w-5 text-muted-foreground" />
+                <BarChart3 className="h-5 w-5 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-lg font-bold">Generate</div>

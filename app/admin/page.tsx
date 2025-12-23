@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { adminNavigation } from "@/data/navigation";
@@ -20,7 +20,7 @@ import {
 	Users,
 	GraduationCap,
 	BookOpen,
-	BarChart,
+	BarChart3,
 	TrendingUp,
 	DollarSign,
 	Plus,
@@ -47,7 +47,7 @@ import { adminService } from "@/services/admin.service";
 
 
 export default function AdminDashboard() {
-	const { user } = useAuth();
+	const { user } = useEnhancedUser();
 	const router = useRouter();
 	const [showCreateCourse, setShowCreateCourse] = useState(false);
 	const [stats, setStats] = useState({
@@ -244,7 +244,7 @@ export default function AdminDashboard() {
 									<CardContent>
 										<div className="h-[250px] flex items-center justify-center text-muted-foreground bg-accent/5 rounded-lg border border-border/20 border-dashed">
 											<div className="text-center">
-												<BarChart className="h-10 w-10 mx-auto mb-2 opacity-20" />
+												<BarChart3 className="h-10 w-10 mx-auto mb-2 opacity-20" />
 												<span className="text-sm">Chart placeholder</span>
 											</div>
 										</div>

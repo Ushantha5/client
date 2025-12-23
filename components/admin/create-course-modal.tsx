@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import apiClient from "@/lib/apiClient";
 import { handleApiError } from "@/lib/errorHandler";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,7 @@ interface CourseFormData {
 }
 
 export function CreateCourseModal({ open: isOpen, onOpenChange, onSuccess }: CreateCourseModalProps) {
-    const { user } = useAuth();
+    const { user } = useEnhancedUser();
     const [loading, setLoading] = useState(false);
     const [imagePreview, setImagePreview] = useState<string>("");
     const [formData, setFormData] = useState<CourseFormData>({

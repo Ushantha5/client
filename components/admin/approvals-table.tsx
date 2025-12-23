@@ -6,7 +6,7 @@ import { handleApiError } from "@/lib/errorHandler";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { z } from "zod";
 import { toast } from "sonner";
 
@@ -30,7 +30,7 @@ export default function AdminApprovalsTable() {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { user } = useEnhancedUser();
 
   useEffect(() => {
     fetchPending();
