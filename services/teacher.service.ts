@@ -5,7 +5,7 @@ export const teacherService = {
      * Get all teachers
      */
     getAllTeachers: async () => {
-        const response = await apiClient.get("/api/avathor/teachers");
+        const response = await apiClient.get("/api/avatar/teachers");
         return response.data;
     },
 
@@ -13,7 +13,7 @@ export const teacherService = {
      * Get teacher by ID
      */
     getTeacherById: async (id: string) => {
-        const response = await apiClient.get(`/api/avathor/teachers/${id}`);
+        const response = await apiClient.get(`/api/avatar/teachers/${id}`);
         return response.data;
     },
 };

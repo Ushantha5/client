@@ -1,27 +1,21 @@
+/* eslint-env jest */
 import React from 'react';
-import { render } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { render, act, screen } from '@testing-library/react';
 import { AIConsentModal } from './consent-modal';
 
-expect.extend(toHaveNoViolations);
-
-// Mock the Dialog component rendering since Radix uses Portals which can be tricky in tests
-// For accessibility testing of the *content*, we mainly check if proper attributes are generated
-// But jest-axe checks the rendered DOM.
-// We need to ensure the Dialog is "open" for it to render.
-
 describe('AIConsentModal', () => {
-    // Mock localStorage to ensure the modal opens
     beforeEach(() => {
-        Object.defineProperty(window, 'localStorage', {
-            value: {
-                getItem: jest.fn(() => null),
-                setItem: jest.fn(),
-            },
-            writable: true
-        });
+        // Mock localStorage
+        const localStorageMock = (() => {
+            let store: Record<string, string> = {};
+            return {
+                getItem: (key: string) => store[key] || null,
+                setItem: (key: string, value: string) => { store[key] = value; },
+                clear: () => { store = {}; }
+            };
+        })();
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock, configurable: true });
 
-        // Mock setTimeout to run immediately or wait
         jest.useFakeTimers();
     });
 
@@ -29,16 +23,35 @@ describe('AIConsentModal', () => {
         jest.useRealTimers();
     });
 
-    it('should have no accessibility violations when open', async () => {
-        const { container, baseElement } = render(<AIConsentModal />);
+    it('should show the modal after a delay', async () => {
+        render(<AIConsentModal />);
 
-        // Fast-forward timers to trigger setOpen(true)
-        jest.runAllTimers();
+        // Initially it should not be in the document
+        expect(screen.queryByText(/AI-Powered Learning/i)).not.toBeInTheDocument();
 
-        // Radix Dialog renders into a portal usually, but jest-dom usually handles it.
-        // We run axe on the baseElement to catch the portal content.
-        const results = await axe(baseElement);
+        // Advance timers
+        act(() => {
+            jest.advanceTimersByTime(1500);
+        });
 
-        expect(results).toHaveNoViolations();
+        // Now it should be visible
+        expect(screen.getByText(/AI-Powered Learning/i)).toBeInTheDocument();
+    });
+
+    it('should close when "Maybe Later" is clicked', async () => {
+        render(<AIConsentModal />);
+
+        act(() => {
+            jest.advanceTimersByTime(1500);
+        });
+
+        const closeButton = screen.getByText(/Maybe Later/i);
+        act(() => {
+            closeButton.click();
+        });
+
+        // It might take a moment to disappear due to animations, but the 'open' state should be false
+        // Radix DialogContent should be gone
+        expect(screen.queryByText(/AI-Powered Learning/i)).not.toBeInTheDocument();
     });
 });

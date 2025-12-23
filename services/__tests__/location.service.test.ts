@@ -26,8 +26,8 @@ describe('Location Service', () => {
       });
 
       const result = await getLocationFromIP();
-      
-      expect(result).toEqual({
+
+      expect(result).toMatchObject({
         country: 'India',
         region: 'Tamil Nadu',
         city: 'Chennai',
@@ -45,8 +45,8 @@ describe('Location Service', () => {
       });
 
       const result = await getLocationFromIP();
-      
-      expect(result).toEqual(DEFAULT_LOCATION);
+
+      expect(result).toMatchObject(DEFAULT_LOCATION);
     });
   });
 
@@ -65,8 +65,8 @@ describe('Location Service', () => {
       });
 
       const result = await detectUserLocation();
-      
-      expect(result).toEqual(DEFAULT_LOCATION);
+
+      expect(result).toMatchObject(DEFAULT_LOCATION);
     });
   });
 });

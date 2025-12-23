@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { authService } from "@/services/auth.service";
 import { useAdvancedCache } from "@/hooks/useAdvancedCache";
@@ -100,6 +100,7 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true);
   const [userPreferences, setUserPreferences] = useState<UserPreferences>(defaultUserContext.userPreferences);
   const [userStats, setUserStats] = useState<UserStats>(defaultUserContext.userStats);
+  const router = useRouter();
 
   // Use advanced caching for user data
   const userCache = useAdvancedCache({ ttl: 5 * 60 * 1000 }); // 5 minutes cache
@@ -190,22 +191,22 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
       // Update cache
       userCache.set("currentUser", userData);
 
-      // Redirect based on role
+      // Redirect based on role using router.push for SPA navigation
       switch (userData.role) {
         case "admin":
-          window.location.href = "/admin";
+          router.push("/admin");
           break;
         case "AI-TEACHER":
-          window.location.href = "/dashboard";
+          router.push("/dashboard");
           break;
         case "student":
-          window.location.href = "/student";
+          router.push("/student");
           break;
         default:
-          window.location.href = "/";
+          router.push("/");
       }
     }
-  }, [userCache]);
+  }, [userCache, router]);
 
   /**
    * Register a new user
@@ -226,9 +227,9 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
     if (response.success && response.data) {
       // Backend now auto-logs in after register (sets cookies)
       await refreshUser(); // Fetch user data
-      window.location.href = "/dashboard"; // Redirect to dashboard
+      router.push("/dashboard"); // Redirect to dashboard
     }
-  }, [refreshUser]);
+  }, [refreshUser, router]);
 
   /**
    * Logout user
@@ -244,9 +245,9 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
       userCache.clear();
       localStorage.removeItem("token");
       localStorage.removeItem("userPreferences");
-      window.location.href = "/login";
+      router.push("/login");
     }
-  }, [userCache]);
+  }, [userCache, router]);
 
   /**
    * Clear user cache (useful after profile updates)

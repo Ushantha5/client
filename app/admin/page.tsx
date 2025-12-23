@@ -215,7 +215,7 @@ export default function AdminDashboard() {
 						<CardHeader>
 							<CardTitle className="text-xl font-semibold">Pending Approvals</CardTitle>
 							<CardDescription>
-								Review and approve AI-TEACHER and Avathor AI registrations
+								Review and approve AI-TEACHER and Avatar AI registrations
 							</CardDescription>
 						</CardHeader>
 						<CardContent>

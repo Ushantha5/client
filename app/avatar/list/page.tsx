@@ -10,7 +10,7 @@ import { teacherService } from "@/services/teacher.service";
 import { Teacher } from "@/types/teacher";
 import { handleApiError } from "@/lib/errorHandler";
 
-export default function AvathorListPage() {
+export default function AvatarListPage() {
 	const [teachers, setTeachers] = useState<Teacher[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export default function AvathorListPage() {
 		<div className="min-h-screen flex flex-col">
 			<Navbar />
 			<main className="flex-1 container mx-auto px-4 py-12">
-				<h1 className="text-3xl font-bold mb-6">Avathor AI Teachers</h1>
+				<h1 className="text-3xl font-bold mb-6">Avatar AI Teachers</h1>
 
 				{loading && <p>Loading...</p>}
 				{error && <div className="text-destructive">{error}</div>}
@@ -47,7 +47,7 @@ export default function AvathorListPage() {
 					{teachers.map((t) => (
 						<Card key={t._id} className="p-4">
 							<h3 className="text-xl font-semibold">
-								{t.user?.name || "Avathor AI"}
+								{t.user?.name || "Avatar AI"}
 							</h3>
 							<p className="text-sm text-muted-foreground">{t.user?.email}</p>
 							<p className="mt-2">{t.specialization}</p>
@@ -57,7 +57,7 @@ export default function AvathorListPage() {
 
 					{!loading && teachers.length === 0 && !error && (
 						<div className="text-muted-foreground">
-							No Avathor AI Teachers found.
+							No Avatar AI Teachers found.
 						</div>
 					)}
 				</div>

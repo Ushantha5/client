@@ -35,7 +35,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { studentNavigation } from "@/data/navigation";
 import { enrollmentService } from "@/services/enrollment.service";
-import { DynamicWeatherDashboard } from "@/components/dashboard/dynamic-weather-dashboard";
+import nextDynamic from "next/dynamic";
+
+const DynamicWeatherDashboard = nextDynamic(
+  () => import("@/components/dashboard/dynamic-weather-dashboard").then(mod => mod.DynamicWeatherDashboard),
+  { ssr: false }
+);
 
 // Types
 interface StatCardProps {

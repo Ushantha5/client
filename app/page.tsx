@@ -24,7 +24,6 @@ import { useVoiceInteraction } from "@/hooks/useVoiceInteraction";
 import { getTamilGreeting } from "@/lib/tamil-greetings";
 import { useCommonTracking } from "@/hooks/useAnalytics";
 import { motion } from "framer-motion";
-import { Menu } from "lucide-react";
 
 // Dynamically import 3D Avatar
 const WelcomeAvatar = nextDynamic(() => import("@/components/3d/WelcomeAvatar").then(m => ({ default: m.WelcomeAvatar })), { ssr: false });

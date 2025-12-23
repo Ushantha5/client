@@ -1,7 +1,7 @@
 import apiClient from "@/lib/apiClient";
 import { ApiResponse } from "@/types/api";
 
-interface AvathorSkillSubmission {
+interface AvatarSkillSubmission {
 	name: string;
 	skillName: string;
 	description: string;
@@ -11,10 +11,10 @@ interface AvathorSkillSubmission {
 
 export const registrationService = {
 	/**
-	 * Submit an Avathor AI skill for review
+	 * Submit an Avatar AI skill for review
 	 */
-	submitAvathorSkill: async (
-		submissionData: AvathorSkillSubmission,
+	submitAvatarSkill: async (
+		submissionData: AvatarSkillSubmission,
 	): Promise<ApiResponse<{ message: string }>> => {
 		const response = await apiClient.post("/api/requests", submissionData);
 		return response.data;

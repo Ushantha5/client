@@ -1,0 +1,29 @@
+
+> client@0.1.0 lint
+> eslint . --ext .js,.jsx,.ts,.tsx
+
+
+/home/ukiscool/MR5/client/app/courses/page.tsx
+  24:3   error  'ShoppingCart' is defined but never used                   @typescript-eslint/no-unused-vars
+  27:10  error  'paymentService' is defined but never used                 @typescript-eslint/no-unused-vars
+  33:10  error  'toast' is defined but never used                          @typescript-eslint/no-unused-vars
+  47:11  error  'user' is assigned a value but never used                  @typescript-eslint/no-unused-vars
+  72:10  error  'enrollingCourseId' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  72:29  error  'setEnrollingCourseId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/ukiscool/MR5/client/components/ErrorBoundary.tsx
+  4:10  error  'Button' is defined but never used     @typescript-eslint/no-unused-vars
+  5:25  error  'RefreshCw' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/ukiscool/MR5/client/components/ai/TeachingAIModal.tsx
+   776:61  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  1003:65  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/home/ukiscool/MR5/client/contexts/RegionalSettingsContext.tsx
+  114:15  error  'currentUser' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/ukiscool/MR5/client/services/cloudinary.service.ts
+  5:11  error  'CloudinaryUploadWidgetResults' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 12 problems (10 errors, 2 warnings)
+

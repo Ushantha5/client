@@ -49,5 +49,13 @@ export const courseService = {
 		);
 		return response.data;
 	},
+
+	createCourse: async (data: Partial<Course>): Promise<{ success: boolean; data: Course }> => {
+		const response = await apiClient.post<{ success: boolean; data: Course }>(
+			"/api/courses",
+			data,
+		);
+		return response.data;
+	},
 };
 

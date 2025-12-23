@@ -28,10 +28,9 @@ const nextConfig = {
 	poweredByHeader: false,
 	generateEtags: true,
 	reactStrictMode: true,
-	swcMinify: true,
+	serverExternalPackages: ["@splinetool/runtime", "@splinetool/react-spline"],
 	experimental: {
 		optimizeCss: true,
-		serverComponentsExternalPackages: ["@splinetool/runtime", "@splinetool/react-spline"],
 	},
 	// Increase chunk loading timeout to prevent ChunkLoadError
 	webpack: (config, { isServer, dev }) => {

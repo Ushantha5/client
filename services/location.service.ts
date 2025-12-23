@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 export interface LocationData {
   country: string;
   state?: string;
@@ -13,14 +11,23 @@ export interface LocationData {
   isTamilRegion?: boolean;
 }
 
+export const DEFAULT_LOCATION: LocationData = {
+  country: 'Universal',
+  region: 'Earth',
+  city: 'Global',
+  isSriLanka: false,
+  isTamilNadu: false,
+  isTamilRegion: false
+};
+
 class LocationService {
   /**
    * Get user location using Browser Geolocation API
    */
   static async getBrowserLocation(): Promise<LocationData> {
     return new Promise<LocationData>((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation not supported'));
+      if (typeof window === 'undefined' || !navigator.geolocation) {
+        return reject(new Error('Geolocation not supported'));
       }
 
       navigator.geolocation.getCurrentPosition(
@@ -28,12 +35,38 @@ class LocationService {
           const { latitude, longitude } = position.coords;
           try {
             // Reverse geocoding using a public API (e.g., Nominatim)
-            const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`);
-            const address = response.data.address;
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`);
+            if (!response.ok) throw new Error('Reverse geocoding failed');
+
+            const data = await response.json();
+            const address = data.address;
+
+            const country = address.country || '';
+            const isSriLanka = country.toLowerCase() === 'sri lanka';
+            const state = address.state || address.region || '';
+            const isTamilNadu = state.toLowerCase().includes('tamil nadu');
+            const city = address.city || address.town || address.village || '';
+            const isTamilRegion = isSriLanka && (
+              city.toLowerCase().includes('vavuniya') ||
+              city.toLowerCase().includes('jaffna') ||
+              city.toLowerCase().includes('mullaitivu') ||
+              city.toLowerCase().includes('kilinochchi') ||
+              city.toLowerCase().includes('mannar') ||
+              city.toLowerCase().includes('batticaloa') ||
+              city.toLowerCase().includes('trincomalee') ||
+              city.toLowerCase().includes('ampara')
+            );
+
             resolve({
-              country: address.country,
-              state: address.state || address.region,
-              city: address.city || address.town || address.village,
+              country,
+              region: state,
+              state: state,
+              city,
+              latitude,
+              longitude,
+              isSriLanka,
+              isTamilNadu,
+              isTamilRegion,
               method: 'browser'
             });
           } catch (error) {
@@ -52,11 +85,29 @@ class LocationService {
    */
   static async getIpLocation(): Promise<LocationData> {
     try {
-      const response = await axios.get('https://ipapi.co/json/');
+      const response = await fetch('https://ipapi.co/json/');
+      if (!response.ok) throw new Error('IP geolocation failed');
+
+      const data = await response.json();
+
+      const isSriLanka = data.country_name?.toLowerCase() === 'sri lanka';
+      const isTamilNadu = data.region?.toLowerCase().includes('tamil nadu');
+      const city = data.city || '';
+      const isTamilRegion = isSriLanka && (
+        city.toLowerCase().includes('vavuniya') ||
+        city.toLowerCase().includes('jaffna')
+      );
+
       return {
-        country: response.data.country_name,
-        state: response.data.region,
-        city: response.data.city,
+        country: data.country_name,
+        region: data.region,
+        state: data.region,
+        city: data.city,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        isSriLanka,
+        isTamilNadu,
+        isTamilRegion,
         method: 'ip'
       };
     } catch (error) {
@@ -79,10 +130,23 @@ class LocationService {
         return await this.getIpLocation();
       } catch (ipError: any) {
         console.error('All location methods failed');
-        return null;
+        return DEFAULT_LOCATION;
       }
     }
   }
 }
+
+// Standalone functions for compatibility with existing tests
+export const getLocationFromIP = async () => {
+  try {
+    return await LocationService.getIpLocation();
+  } catch (error) {
+    return DEFAULT_LOCATION;
+  }
+};
+
+export const detectUserLocation = async () => {
+  return await LocationService.getLocation();
+};
 
 export default LocationService;

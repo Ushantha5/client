@@ -13,18 +13,22 @@ export interface Greeting {
 const TAMIL_GREETINGS = {
   morning: {
     primary: "காலை வணக்கம்",
+    transliteration: "Kalai Vanakkam",
     english: "Good Morning"
   },
   afternoon: {
     primary: "மதிய வணக்கம்",
+    transliteration: "Mathiya Vanakkam",
     english: "Good Afternoon"
   },
   evening: {
     primary: "மாலை வணக்கம்",
+    transliteration: "Maalai Vanakkam",
     english: "Good Evening"
   },
   default: {
     primary: "வணக்கம்",
+    transliteration: "Vanakkam",
     english: "Hello / Welcome"
   }
 };
@@ -33,18 +37,22 @@ const TAMIL_GREETINGS = {
 const TAMIL_NADU_GREETINGS = {
   morning: {
     primary: "காலை வணக்கம்",
+    transliteration: "Kalai Vanakkam",
     english: "Good Morning"
   },
   afternoon: {
     primary: "மதிய வணக்கம்",
+    transliteration: "Mathiya Vanakkam",
     english: "Good Afternoon"
   },
   evening: {
     primary: "மாலை வணக்கம்",
+    transliteration: "Maalai Vanakkam",
     english: "Good Evening"
   },
   default: {
     primary: "வணக்கம்",
+    transliteration: "Vanakkam",
     english: "Hello / Welcome"
   }
 };
@@ -53,18 +61,22 @@ const TAMIL_NADU_GREETINGS = {
 const SINHALA_GREETINGS = {
   morning: {
     primary: "සුබ උදේසනක්",
+    transliteration: "Subha udhasanak",
     english: "Good Morning"
   },
   afternoon: {
     primary: "සුබ දවලක්",
+    transliteration: "Subha dhavalak",
     english: "Good Afternoon"
   },
   evening: {
     primary: "සුබ සවසක්",
+    transliteration: "Subha savasak",
     english: "Good Evening"
   },
   default: {
     primary: "ආයුබෝවන්",
+    transliteration: "Ayubowan",
     english: "Hello / Welcome"
   }
 };
@@ -76,7 +88,7 @@ export function getGreeting(date: Date = new Date(), location: LocationData): Gr
   const hour = date.getHours();
   let greetings;
   let language: "tamil" | "sinhala" | "english" = "english";
-  
+
   // Select appropriate greeting set based on location
   if (location.isTamilRegion) {
     // Tamil-speaking regions in Sri Lanka
@@ -95,10 +107,10 @@ export function getGreeting(date: Date = new Date(), location: LocationData): Gr
     greetings = TAMIL_GREETINGS;
     language = "tamil";
   }
-  
+
   // Determine time of day
   let timeOfDay: "morning" | "afternoon" | "evening" | "default" = "default";
-  
+
   // Morning: 5am - 12pm
   if (hour >= 5 && hour < 12) {
     timeOfDay = "morning";
@@ -111,7 +123,7 @@ export function getGreeting(date: Date = new Date(), location: LocationData): Gr
   else if (hour >= 17 && hour < 21) {
     timeOfDay = "evening";
   }
-  
+
   return {
     ...greetings[timeOfDay],
     language,
@@ -125,7 +137,7 @@ export function getGreeting(date: Date = new Date(), location: LocationData): Gr
  */
 export function getGreetingForTTS(date: Date = new Date(), location: LocationData): string {
   const greeting = getGreeting(date, location);
-  
+
   // Return transliteration for TTS (more compatible with most TTS engines)
   // Format: "Greeting! Welcome to MR5 School."
   return `${greeting.transliteration}! Welcome to MR5 School. set Relax.`;
@@ -141,6 +153,6 @@ export function getPersonalizedGreeting(
 ): string {
   const greeting = getGreeting(date, location);
   const nameSegment = userName ? `, ${userName}` : "";
-  
+
   return `${greeting.transliteration}${nameSegment}! Welcome to MR5 School.`;
 }
