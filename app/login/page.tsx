@@ -38,6 +38,7 @@ function LoginForm() {
             // Redirection is handled by the context or page if needed.
             // But EnhancedUserContext already redirects to /dashboard based on role.
         } catch (err: any) {
+            console.error("Login Page Error:", err);
             if (err instanceof ZodError) {
                 const fieldErrors: Record<string, string> = {};
                 err.errors.forEach((e) => {
@@ -47,7 +48,23 @@ function LoginForm() {
                 });
                 setErrors(fieldErrors);
             } else {
-                const errorMessage = err.response?.data?.message || err.message || "Invalid credentials. Please try again.";
+                let errorMessage = "Invalid credentials. Please try again.";
+
+                if (err.response) {
+                    const data = err.response.data;
+                    if (typeof data === 'string') {
+                        errorMessage = data;
+                    } else if (typeof data === 'object') {
+                        errorMessage = data.message || data.error || JSON.stringify(data);
+                    } else {
+                        errorMessage = err.response.statusText || "Server Error";
+                    }
+                } else if (err.message) {
+                    errorMessage = err.message;
+                }
+
+                if (errorMessage === "{}") errorMessage = "Server returned an empty error. Please try again.";
+
                 setErrors({
                     general: errorMessage,
                 });

@@ -464,7 +464,7 @@ export function TeachingAIModal({ isOpen, onClose, voiceInteraction }: TeachingA
                                 <div className="flex-1 overflow-hidden relative flex flex-col">
                                     <ScrollArea
                                         className="flex-1 px-8 py-6"
-                                        viewportRef={viewportRef}
+                                        viewportRef={viewportRef as React.RefObject<HTMLDivElement>}
                                         onScroll={handleScroll}
                                     >
                                         <div className="space-y-8 pb-4">

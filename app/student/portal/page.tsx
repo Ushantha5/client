@@ -35,12 +35,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { studentNavigation } from "@/data/navigation";
 import { enrollmentService } from "@/services/enrollment.service";
-import nextDynamic from "next/dynamic";
 
-const DynamicWeatherDashboard = nextDynamic(
-  () => import("@/components/dashboard/dynamic-weather-dashboard").then(mod => mod.DynamicWeatherDashboard),
-  { ssr: false }
-);
 
 // Types
 interface StatCardProps {
@@ -492,10 +487,11 @@ export default function StudentPortal() {
             </div>
           </div>
 
-          {/* Dynamic Weather Dashboard */}
+          {/* Dynamic Weather Dashboard
           <div className="mb-8">
             <DynamicWeatherDashboard />
           </div>
+          */}
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

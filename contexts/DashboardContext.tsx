@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import ContextService, { LocationContextData } from '@/services/context.service';
 import LocationService from '@/services/location.service';
-import { useAuth } from './AuthContext';
+import { useEnhancedUser } from './EnhancedUserContext';
 
 interface ContextState {
     context: LocationContextData | null;
@@ -18,7 +18,7 @@ export const DashboardContextProvider: React.FC<{ children: React.ReactNode }> =
     const [context, setContext] = useState<LocationContextData | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { isAuthenticated, loading: authLoading } = useAuth();
+    const { isAuthenticated, loading: authLoading } = useEnhancedUser();
 
     const refreshContext = useCallback(async () => {
         // Only sync context if user is authenticated

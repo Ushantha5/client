@@ -18,7 +18,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeCustomizer } from "@/components/theme-customizer";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 
 export function Navbar() {
@@ -154,6 +154,9 @@ export function Navbar() {
 								</Button>
 							</SheetTrigger>
 							<SheetContent side="right" className="bg-background/95 backdrop-blur-xl border-white/10 w-[300px]">
+								<SheetHeader>
+									<SheetTitle className="text-left text-lg font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Menu</SheetTitle>
+								</SheetHeader>
 								<div className="flex flex-col gap-6 mt-10">
 									<div className="flex flex-col gap-2">
 										<h3 className="text-sm font-medium text-muted-foreground mb-2 px-2 uppercase tracking-wider">Navigation</h3>

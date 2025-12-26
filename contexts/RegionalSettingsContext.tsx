@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { aiService } from "@/services/ai.service";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { authService } from "@/services/auth.service";
 
 export interface RegionalPreferences {
@@ -51,7 +51,7 @@ const DEFAULT_REGIONAL_SETTINGS: RegionalSettings = {
 };
 
 export const RegionalSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated } = useEnhancedUser();
     const [settings, setSettings] = useState<RegionalSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

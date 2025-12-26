@@ -1,6 +1,7 @@
 /* eslint-env jest */
 import React from 'react';
 import { render, act, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { AIConsentModal } from './consent-modal';
 
 describe('AIConsentModal', () => {

@@ -33,55 +33,6 @@ const nextConfig = {
 		optimizeCss: true,
 	},
 	// Increase chunk loading timeout to prevent ChunkLoadError
-	webpack: (config, { isServer, dev }) => {
-		// Adjust chunk request timeout (in milliseconds)
-		config.output.chunkLoadingGlobal = 'webpackJsonpCallback';
-
-		// For client-side, adjust chunk splitting
-		if (!isServer) {
-			// Ensure optimization.splitChunks exists
-			if (!config.optimization) {
-				config.optimization = {};
-			}
-			if (!config.optimization.splitChunks) {
-				config.optimization.splitChunks = {};
-			}
-
-			// Set cacheGroups for chunk splitting
-			config.optimization.splitChunks.cacheGroups = {
-				...config.optimization.splitChunks.cacheGroups,
-				// Split large vendor chunks to prevent loading issues
-				vendor: {
-					test: /[\\/]node_modules[\\/]/,
-					name: 'vendors',
-					chunks: 'all',
-					enforce: true,
-					maxSize: 244000, // 244 KB
-				},
-				// Split framework chunks
-				framework: {
-					test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
-					name: 'framework',
-					chunks: 'all',
-					enforce: true,
-				},
-			};
-		}
-
-		// Enable top level await for server components
-		config.experiments = {
-			...config.experiments,
-			topLevelAwait: true,
-		};
-
-		// Optimize for production
-		if (!dev) {
-			config.optimization.minimize = true;
-			config.optimization.concatenateModules = true;
-		}
-
-		return config;
-	},
 	async headers() {
 		return [
 			{

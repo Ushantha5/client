@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
 import { loginSchema } from "@/lib/schemas";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
+import { ForgotPasswordModal } from "./forgot-password-modal";
 
 interface LoginModalProps {
 	_open: boolean;
@@ -27,6 +28,7 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [loading, setLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
+	const [showForgotPassword, setShowForgotPassword] = useState(false);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -43,6 +45,7 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 			await login(formData.email, formData.password);
 			onOpenChange(false);
 		} catch (err: any) {
+			console.error("Login Error:", err);
 			if (err instanceof ZodError) {
 				const fieldErrors: Record<string, string> = {};
 				err.errors.forEach((e) => {
@@ -52,7 +55,26 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 				});
 				setErrors(fieldErrors);
 			} else {
-				const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials.";
+				// Enhanced error extraction
+				let errorMessage = "Login failed. Please check your credentials.";
+
+				if (err.response) {
+					// Server responded with a status code outside 2xx
+					const data = err.response.data;
+					if (typeof data === 'string') {
+						errorMessage = data; // HTML error page or raw string
+					} else if (typeof data === 'object') {
+						errorMessage = data.message || data.error || JSON.stringify(data);
+					} else {
+						errorMessage = err.response.statusText || "Server Error";
+					}
+				} else if (err.message) {
+					// Network error or other client-side error
+					errorMessage = err.message;
+				}
+
+				if (errorMessage === "{}") errorMessage = "Server returned an empty error. Please contact support.";
+
 				setErrors({
 					general: errorMessage,
 				});
@@ -132,6 +154,16 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 									{errors.password}
 								</p>
 							)}
+							<button
+								type="button"
+								onClick={() => {
+									onOpenChange(false);
+									setShowForgotPassword(true);
+								}}
+								className="text-sm text-primary hover:underline mt-1"
+							>
+								Forgot password?
+							</button>
 						</div>
 					</div>
 					<Button
@@ -188,6 +220,7 @@ export function LoginModal({ _open: isOpen, onOpenChange }: LoginModalProps) {
 					</Button>
 				</form>
 			</DialogContent>
+			<ForgotPasswordModal _open={showForgotPassword} onOpenChange={setShowForgotPassword} />
 		</Dialog>
 	);
 }
