@@ -6,6 +6,8 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useEnhancedUser } from "@/contexts/EnhancedUserContext";
+import { DynamicWeatherDashboard } from "@/components/dashboard/dynamic-weather-dashboard";
+import { AICoach } from "@/components/dashboard/ai-coach";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { studentNavigation } from "@/data/navigation";
@@ -40,9 +42,9 @@ export default function StudentDashboard() {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (!user || user.role !== "student") {
+		if (user && user.role !== "student") {
 			router.push("/");
-		} else {
+		} else if (user) {
 			fetchStudentData();
 		}
 	}, [user, router]);
@@ -53,7 +55,7 @@ export default function StudentDashboard() {
 			const enrollmentResponse = await enrollmentService.getMyEnrollments();
 
 			// Transform enrollment data to match the existing structure
-			const transformedEnrollments = enrollmentResponse.data.map(enrollment => ({
+			const transformedEnrollments = enrollmentResponse.data.map((enrollment: any) => ({
 				name: enrollment.course.title,
 				instructor: enrollment.course.teacher.name,
 				progress: enrollment.progress,
@@ -72,8 +74,8 @@ export default function StudentDashboard() {
 		}
 	};
 
-	if (!user || user.role !== "student") {
-		return null;
+	if (!user) {
+		return null; // Or a loading spinner
 	}
 
 	// Calculate stats based on real data
@@ -112,7 +114,7 @@ export default function StudentDashboard() {
 		{
 			title: "Complete your profile",
 			course: "Getting Started",
-			dueDate: "Whenever you&apos;re ready",
+			dueDate: "Whenever you're ready",
 			status: "pending",
 			priority: "low",
 		},
@@ -150,7 +152,12 @@ export default function StudentDashboard() {
 					navigation={studentNavigation}
 				/>
 
-				<main className="flex-1 p-4 md:p-6 space-y-8 max-w-7xl mx-auto w-full">
+				<main className="flex-1 p-4 md:p-6 space-y-8 max-w-7xl mx-auto w-full relative">
+					{/* Weather Dashboard - Added as per request */}
+					<div className="w-full">
+						<DynamicWeatherDashboard />
+					</div>
+
 					{/* Stats Grid */}
 					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 						{stats.map((stat, index) => (
@@ -351,6 +358,8 @@ export default function StudentDashboard() {
 					</div>
 				</main>
 			</div>
+			{/* AI Coach - Fixed Position for persistent access */}
+			<AICoach />
 		</div>
 	);
 }

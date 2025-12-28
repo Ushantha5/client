@@ -4,3 +4,4 @@ tests/
 coverage/
 playwright.config.ts
 e2e/
+next-env.d.ts

@@ -1,29 +1,34 @@
-# Use Node.js 18 alpine as base image
-FROM node:18-alpine
+FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Install dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
-# Copy application code
 COPY . .
 
-# Build the Next.js application
+# Pass API URL at build time
+ARG NEXT_PUBLIC_API_URL=http://localhost:5000
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+ARG NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=do6sd9nyc
+ENV NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+
+# Generate the build
 RUN npm run build
 
-# Expose port
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Copy necessary files for standalone mode
+COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
 EXPOSE 3000
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-# Change ownership of app directory
-RUN chown -R nextjs:nodejs /app
-USER nextjs
-
-# Start the application
-CMD ["npm", "start"]
+CMD ["node", "server.js"]

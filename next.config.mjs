@@ -28,6 +28,7 @@ const nextConfig = {
 	poweredByHeader: false,
 	generateEtags: true,
 	reactStrictMode: true,
+	output: "standalone",
 	serverExternalPackages: ["@splinetool/runtime", "@splinetool/react-spline"],
 	experimental: {
 		optimizeCss: true,

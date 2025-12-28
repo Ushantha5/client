@@ -249,6 +249,7 @@ function RegisterForm() {
                 <Button
                     type="submit"
                     disabled={loading}
+                    aria-label="Create Account"
                     className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white font-bold h-12 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-95 group"
                 >
                     {loading ? (
