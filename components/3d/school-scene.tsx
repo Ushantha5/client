@@ -2,12 +2,12 @@
 
 import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Environment, Html, useProgress, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, Environment, Html as ThreeHtml, useProgress, PerspectiveCamera } from "@react-three/drei";
 
 function Loader() {
     const { progress } = useProgress();
     return (
-        <Html center>
+        <ThreeHtml center>
             <div className="flex flex-col items-center justify-center p-4 bg-black/80 backdrop-blur-md rounded-xl border border-blue-500/30 w-64">
                 <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
                     <div
@@ -19,7 +19,7 @@ function Loader() {
                     Loading School Environment: {progress.toFixed(0)}%
                 </p>
             </div>
-        </Html>
+        </ThreeHtml>
     );
 }
 

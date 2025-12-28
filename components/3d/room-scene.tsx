@@ -2,14 +2,14 @@
 
 import React, { Suspense, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Environment, Html, useProgress } from "@react-three/drei";
+import { OrbitControls, Environment, Html as ThreeHtml, useProgress } from "@react-three/drei";
 
 function Loader() {
     const { progress } = useProgress();
     return (
-        <Html center>
+        <ThreeHtml center>
             <div className="bg-black/80 text-white p-2 rounded">Loading Room: {progress.toFixed(0)}%</div>
-        </Html>
+        </ThreeHtml>
     );
 }
 
