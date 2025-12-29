@@ -1,0 +1,46 @@
+
+Running 2 tests using 1 worker
+
+Login API status: [33m200[39m
+Fetching Admin Token...
+Fetching Course ID...
+Target Course ID: 695125bff9276cc0c6d0f7ad
+Fetching Student ID...
+Student ID: 6943aa0b2a2a8d05b671704c
+Target course card not found, clicking first available
+Injecting Enrollment via Admin API...
+Injection Status: [33m500[39m
+  ✘  1 [chromium] › e2e/comprehensive-lms.spec.ts:12:9 › LMS E2E System Test › Student Flow (S-01 to S-05) (8.1s)
+  -  2 [chromium] › e2e/comprehensive-lms.spec.ts:183:9 › LMS E2E System Test › Admin Flow (A-01 to A-05)
+
+
+  1) [chromium] › e2e/comprehensive-lms.spec.ts:12:9 › LMS E2E System Test › Student Flow (S-01 to S-05) › S-02: Course Enrollment 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Python Programming').or(locator('h3'))
+    Expected: visible
+    Error: strict mode violation: locator('text=Python Programming').or(locator('h3')) resolved to 2 elements:
+        1) <h3 class="text-white font-semibold">Mission Control</h3> aka getByRole('link', { name: 'Mission Control Return to' })
+        2) <h3 class="text-white font-semibold">Explore</h3> aka getByRole('link', { name: 'Explore Browse Courses' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 30000ms[22m
+    [2m  - waiting for locator('text=Python Programming').or(locator('h3'))[22m
+
+
+      143 |             // Verify enrollment in "My Courses"
+      144 |             await page.goto(`${BASE_URL}/student/my-courses`);
+    > 145 |             await expect(page.locator(`text=${course.title}`).or(page.locator('h3'))).toBeVisible();
+          |                                                                                       ^
+      146 |             await page.screenshot({ path: 'test-results/S-02-enrolled.png' });
+      147 |         });
+      148 |
+        at /home/ukiscool/MR5/client/e2e/comprehensive-lms.spec.ts:145:87
+        at /home/ukiscool/MR5/client/e2e/comprehensive-lms.spec.ts:71:9
+
+    Error Context: test-results/comprehensive-lms-LMS-E2E--14e0d--Student-Flow-S-01-to-S-05--chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/comprehensive-lms.spec.ts:12:9 › LMS E2E System Test › Student Flow (S-01 to S-05) 
+  1 did not run

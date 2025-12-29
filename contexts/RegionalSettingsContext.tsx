@@ -121,7 +121,8 @@ export const RegionalSettingsProvider: React.FC<{ children: React.ReactNode }> =
             // 2. Fetch AI-powered regional info with error handling
             let aiData;
             try {
-                aiData = await aiService.detectRegionalInfo(location);
+                // aiData = await aiService.detectRegionalInfo(location);
+                throw new Error("AI Disabled for stability");
             } catch (aiError) {
                 console.warn("AI regional detection failed, using defaults:", aiError);
                 // Use fallback data if AI fails

@@ -2,37 +2,49 @@
 
 ```yaml
 - generic [active] [ref=e1]:
-  - main [ref=e6]:
-    - generic [ref=e7]:
-      - generic [ref=e8]:
-        - generic [ref=e9]:
-          - generic [ref=e10]: "ERROR 404: SECTOR NOT FOUND"
-          - heading "LOST IN SPACE?" [level=1] [ref=e14]:
-            - text: LOST IN
-            - text: SPACE?
-          - paragraph [ref=e15]: The coordinates you entered led us to a black hole. Don't worry, even the best explorers get lost sometimes. Let's recalibrate your trajectory.
-        - generic [ref=e16]:
-          - link "Mission Control Return to Dashboard" [ref=e17] [cursor=pointer]:
-            - /url: /dashboard
-            - generic [ref=e18]:
-              - img [ref=e20]
-              - generic [ref=e25]:
-                - heading "Mission Control" [level=3] [ref=e26]
-                - paragraph [ref=e27]: Return to Dashboard
-          - link "Explore Browse Courses" [ref=e28] [cursor=pointer]:
-            - /url: /courses
-            - generic [ref=e29]:
-              - img [ref=e31]
-              - generic [ref=e34]:
-                - heading "Explore" [level=3] [ref=e35]
-                - paragraph [ref=e36]: Browse Courses
-        - link "Back to Home Base" [ref=e38] [cursor=pointer]:
-          - /url: /
-          - img [ref=e39]
-          - text: Back to Home Base
-      - img "Lost in Space" [ref=e45]
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - img [ref=e8]
+        - text: Student Access
+      - heading "Welcome Back" [level=1] [ref=e11]
+      - paragraph [ref=e12]: Enter your credentials to continue learning
+    - generic [ref=e13]:
+      - generic [ref=e14]: Internal Server Error
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Email
+          - generic [ref=e19]:
+            - img [ref=e20]
+            - textbox "Email" [ref=e23]:
+              - /placeholder: student@mr5school.com
+              - text: student@mr5school.com
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - generic [ref=e26]: Password
+            - link "Forgot?" [ref=e27] [cursor=pointer]:
+              - /url: /forgot-password
+          - generic [ref=e28]:
+            - img [ref=e29]
+            - textbox "Password" [ref=e32]:
+              - /placeholder: ••••••••
+              - text: Student@123456
+            - button [ref=e33] [cursor=pointer]:
+              - img [ref=e34]
+      - button "Sign In" [ref=e37] [cursor=pointer]:
+        - generic [ref=e38]:
+          - text: Sign In
+          - img
+      - generic [ref=e43]: Or continue with
+      - button "Google" [ref=e44] [cursor=pointer]:
+        - img
+        - text: Google
+    - generic [ref=e45]:
+      - text: New to our galaxy?
+      - link "Register" [ref=e46] [cursor=pointer]:
+        - /url: /register
   - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e51] [cursor=pointer]:
-    - img [ref=e52]
-  - alert [ref=e55]
+  - button "Open Next.js Dev Tools" [ref=e52] [cursor=pointer]:
+    - img [ref=e53]
+  - alert [ref=e56]
 ```
