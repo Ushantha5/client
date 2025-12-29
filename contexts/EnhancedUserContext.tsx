@@ -157,14 +157,9 @@ export function EnhancedUserProvider({ children }: { children: React.ReactNode }
   // Initialize auth state on mount
   useEffect(() => {
     const initAuth = async () => {
-      // Small delay to allow cookies to settle if needed
-      const hasToken = typeof window !== 'undefined' &&
-        (document.cookie.includes('access_token=') || document.cookie.includes('refresh_token=') || localStorage.getItem('token'));
-
-      if (!hasToken) {
-        setLoading(false);
-        return;
-      }
+      // Note: HttpOnly cookies are not visible in document.cookie, so we must rely on the API call
+      // to determine if the user is authenticated. We attempted to check document.cookie here
+      // but it causes false negatives when using secure cookies.
 
       try {
         await refreshUser();

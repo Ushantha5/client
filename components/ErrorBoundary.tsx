@@ -44,7 +44,7 @@ class ErrorBoundary extends Component<Props, State> {
       // Example: Send to your error reporting service
       // fetch('/api/errors', {
       //   method: 'POST',
-      //   body: JSON.stringify({
+      //   : JSON.stringify({
       //     error: error.toString(),
       //     componentStack: errorInfo.componentStack,
       //     url: window.location.href,

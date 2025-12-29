@@ -2,49 +2,258 @@
 
 ```yaml
 - generic [active] [ref=e1]:
-  - generic [ref=e5]:
-    - generic [ref=e6]:
-      - generic [ref=e7]:
-        - img [ref=e8]
-        - text: Student Access
-      - heading "Welcome Back" [level=1] [ref=e11]
-      - paragraph [ref=e12]: Enter your credentials to continue learning
-    - generic [ref=e13]:
-      - generic [ref=e14]: Internal Server Error
-      - generic [ref=e16]:
-        - generic [ref=e17]:
-          - generic [ref=e18]: Email
-          - generic [ref=e19]:
-            - img [ref=e20]
-            - textbox "Email" [ref=e23]:
-              - /placeholder: student@mr5school.com
-              - text: student@mr5school.com
-        - generic [ref=e24]:
-          - generic [ref=e25]:
-            - generic [ref=e26]: Password
-            - link "Forgot?" [ref=e27] [cursor=pointer]:
-              - /url: /forgot-password
-          - generic [ref=e28]:
-            - img [ref=e29]
-            - textbox "Password" [ref=e32]:
-              - /placeholder: ••••••••
-              - text: Student@123456
-            - button [ref=e33] [cursor=pointer]:
-              - img [ref=e34]
-      - button "Sign In" [ref=e37] [cursor=pointer]:
-        - generic [ref=e38]:
-          - text: Sign In
-          - img
-      - generic [ref=e43]: Or continue with
-      - button "Google" [ref=e44] [cursor=pointer]:
-        - img
-        - text: Google
-    - generic [ref=e45]:
-      - text: New to our galaxy?
-      - link "Register" [ref=e46] [cursor=pointer]:
-        - /url: /register
-  - region "Notifications alt+T"
-  - button "Open Next.js Dev Tools" [ref=e52] [cursor=pointer]:
-    - img [ref=e53]
-  - alert [ref=e56]
+  - main [ref=e2]:
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - navigation "Main navigation" [ref=e4]:
+      - heading "Learning Portal" [level=2] [ref=e6]
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - heading "Dashboard" [level=2] [ref=e14]
+          - link "Dashboard" [ref=e16] [cursor=pointer]:
+            - /url: /student/portal
+            - img
+            - generic [ref=e17]: Dashboard
+        - generic [ref=e18]:
+          - heading "My Courses" [level=2] [ref=e19]
+          - link "My Courses" [ref=e21] [cursor=pointer]:
+            - /url: /student/courses
+            - img
+            - generic [ref=e22]: My Courses
+        - generic [ref=e23]:
+          - heading "Assignments" [level=2] [ref=e24]
+          - link "Assignments" [ref=e26] [cursor=pointer]:
+            - /url: /student/assignments
+            - img
+            - generic [ref=e27]: Assignments
+        - generic [ref=e28]:
+          - heading "Grades" [level=2] [ref=e29]
+          - link "Grades" [ref=e31] [cursor=pointer]:
+            - /url: /student/grades
+            - img
+            - generic [ref=e32]: Grades
+        - generic [ref=e33]:
+          - heading "Schedule" [level=2] [ref=e34]
+          - link "Schedule" [ref=e36] [cursor=pointer]:
+            - /url: /student/schedule
+            - img
+            - generic [ref=e37]: Schedule
+      - generic [ref=e38]: Welcome back, Test
+    - generic [ref=e39]:
+      - navigation [ref=e40]:
+        - generic [ref=e41]:
+          - link "MR5 School Logo MR5 School Smart Way to Grow" [ref=e42] [cursor=pointer]:
+            - /url: /
+            - img "MR5 School Logo" [ref=e45]
+            - generic [ref=e46]:
+              - generic [ref=e47]: MR5 School
+              - generic [ref=e48]: Smart Way to Grow
+          - generic [ref=e49]:
+            - link "Library" [ref=e50] [cursor=pointer]:
+              - /url: /courses
+            - link "Manifesto" [ref=e51] [cursor=pointer]:
+              - /url: /about
+            - link "Connect" [ref=e52] [cursor=pointer]:
+              - /url: /contact
+            - link "Avatar Studio" [ref=e53] [cursor=pointer]:
+              - /url: /apps/avatar-creator
+              - img [ref=e54]
+              - text: Avatar Studio
+          - generic [ref=e57]:
+            - button "Customize theme" [ref=e58] [cursor=pointer]:
+              - generic [ref=e59]:
+                - img
+              - generic [ref=e60]: Customize theme
+            - button "1" [ref=e62] [cursor=pointer]:
+              - img
+              - generic [ref=e63]: "1"
+            - button "T" [ref=e64] [cursor=pointer]:
+              - generic [ref=e67]: T
+      - main [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - heading "Welcome back, Test!" [level=1] [ref=e71]
+            - paragraph [ref=e72]: Ready to continue your learning journey?
+          - generic [ref=e73]:
+            - link "Browse Courses" [ref=e74] [cursor=pointer]:
+              - /url: /courses
+              - img
+              - generic [ref=e75]: Browse Courses
+            - link "Notifications" [ref=e76] [cursor=pointer]:
+              - /url: /notifications
+              - img
+              - generic [ref=e77]: Notifications
+        - generic [ref=e78]:
+          - 'region "Active Courses: 4" [ref=e79]':
+            - generic [ref=e80]:
+              - generic [ref=e81]:
+                - paragraph [ref=e82]: Active Courses
+                - paragraph [ref=e83]: "4"
+                - paragraph [ref=e84]: ↑ +1 this month
+              - img [ref=e86]
+          - 'region "Learning Hours: 28.5h" [ref=e88]':
+            - generic [ref=e89]:
+              - generic [ref=e90]:
+                - paragraph [ref=e91]: Learning Hours
+                - paragraph [ref=e92]: 28.5h
+                - paragraph [ref=e93]: ↑ +15%
+              - img [ref=e95]
+          - 'region "Completion Rate: 82%" [ref=e98]':
+            - generic [ref=e99]:
+              - generic [ref=e100]:
+                - paragraph [ref=e101]: Completion Rate
+                - paragraph [ref=e102]: 82%
+                - paragraph [ref=e103]: ↑ +4%
+              - img [ref=e105]
+          - 'region "Current Streak: 9 days" [ref=e111]':
+            - generic [ref=e112]:
+              - generic [ref=e113]:
+                - paragraph [ref=e114]: Current Streak
+                - paragraph [ref=e115]: 9 days
+                - paragraph [ref=e116]: ↑ Keep it up!
+              - img [ref=e118]
+        - generic [ref=e120]:
+          - generic [ref=e121]:
+            - generic [ref=e122]:
+              - heading "Continue Learning View All" [level=3] [ref=e124]:
+                - generic [ref=e125]:
+                  - img [ref=e126]
+                  - text: Continue Learning
+                - link "View All" [ref=e128] [cursor=pointer]:
+                  - /url: /student/courses
+                  - text: View All
+                  - img
+              - 'article "Course: Python Programming" [ref=e131]':
+                - generic [ref=e132]:
+                  - img "Python Programming" [ref=e133]
+                  - generic [ref=e135]:
+                    - heading "Python Programming" [level=3] [ref=e136]
+                    - paragraph [ref=e137]: kaju
+                    - generic [ref=e138]: Beginner
+                - generic [ref=e139]:
+                  - generic [ref=e140]:
+                    - generic [ref=e141]: Progress
+                    - generic [ref=e142]: 0%
+                  - 'progressbar "Progress: 0%" [ref=e143]'
+                  - generic [ref=e145]:
+                    - generic [ref=e146]: "Next: Continue Lesson"
+                    - img [ref=e147]
+                  - link "Continue Learning" [ref=e149] [cursor=pointer]:
+                    - /url: /course/python-programming
+            - generic [ref=e150]:
+              - heading "Achievements View All" [level=3] [ref=e152]:
+                - generic [ref=e153]:
+                  - img [ref=e154]
+                  - text: Achievements
+                - link "View All" [ref=e157] [cursor=pointer]:
+                  - /url: /student/achievements
+                  - text: View All
+                  - img
+              - generic [ref=e159]:
+                - 'region "Quick Learner: Earned" [ref=e160]':
+                  - generic [ref=e161]:
+                    - img [ref=e163]
+                    - generic [ref=e165]:
+                      - heading "Quick Learner Achievement earned" [level=4] [ref=e166]:
+                        - text: Quick Learner
+                        - img "Achievement earned" [ref=e167]
+                      - paragraph [ref=e170]: Complete 5 lessons in one day
+                - 'region "Perfect Score: Earned" [ref=e171]':
+                  - generic [ref=e172]:
+                    - img [ref=e174]
+                    - generic [ref=e176]:
+                      - heading "Perfect Score Achievement earned" [level=4] [ref=e177]:
+                        - text: Perfect Score
+                        - img "Achievement earned" [ref=e178]
+                      - paragraph [ref=e181]: Score 100% on an assignment
+                - 'region "Early Bird: Not earned" [ref=e182]':
+                  - generic [ref=e183]:
+                    - img [ref=e185]
+                    - generic [ref=e188]:
+                      - heading "Early Bird" [level=4] [ref=e189]
+                      - paragraph [ref=e190]: Join a class before it starts
+          - generic [ref=e191]:
+            - generic [ref=e192]:
+              - heading "Upcoming View All" [level=3] [ref=e194]:
+                - generic [ref=e195]:
+                  - img [ref=e196]
+                  - text: Upcoming
+                - link "View All" [ref=e198] [cursor=pointer]:
+                  - /url: /student/schedule
+                  - text: View All
+                  - img
+              - generic [ref=e200]:
+                - listitem [ref=e201]:
+                  - img [ref=e203]
+                  - generic [ref=e208]:
+                    - generic [ref=e209]:
+                      - paragraph [ref=e210]: "Live Session: Advanced Hooks"
+                      - generic [ref=e211]: Class
+                    - paragraph [ref=e212]: Advanced React Patterns
+                    - paragraph [ref=e213]: Tomorrow at 10:00 AM
+                  - button "View details" [ref=e214] [cursor=pointer]:
+                    - img
+                    - generic [ref=e215]: View details
+                - listitem [ref=e216]:
+                  - img [ref=e218]
+                  - generic [ref=e222]:
+                    - generic [ref=e223]:
+                      - paragraph [ref=e224]: "Assignment Due: Redux Patterns"
+                      - generic [ref=e225]: Assignment
+                    - paragraph [ref=e226]: Advanced React Patterns
+                    - paragraph [ref=e227]: Dec 22 at 11:59 PM
+                  - button "View details" [ref=e228] [cursor=pointer]:
+                    - img
+                    - generic [ref=e229]: View details
+            - generic [ref=e230]:
+              - heading "Quick Actions" [level=3] [ref=e232]:
+                - img [ref=e233]
+                - text: Quick Actions
+              - generic [ref=e235]:
+                - link "My Courses" [ref=e236] [cursor=pointer]:
+                  - /url: /student/courses
+                  - img
+                  - generic [ref=e237]: My Courses
+                - link "Assignments" [ref=e238] [cursor=pointer]:
+                  - /url: /student/assignments
+                  - img
+                  - generic [ref=e239]: Assignments
+                - link "Grades" [ref=e240] [cursor=pointer]:
+                  - /url: /student/grades
+                  - img
+                  - generic [ref=e241]: Grades
+                - link "Avatar Studio" [ref=e242] [cursor=pointer]:
+                  - /url: /apps/avatar-creator
+                  - img
+                  - generic [ref=e243]: Avatar Studio
+            - generic [ref=e244]:
+              - heading "Learning Insights" [level=3] [ref=e246]:
+                - img [ref=e247]
+                - text: Learning Insights
+              - generic [ref=e254]:
+                - generic [ref=e255]:
+                  - generic [ref=e256]:
+                    - generic [ref=e257]: Focus Areas
+                    - generic [ref=e258]: 72%
+                  - progressbar [ref=e259]
+                  - paragraph [ref=e261]: JavaScript & React
+                - generic [ref=e262]:
+                  - generic [ref=e263]:
+                    - generic [ref=e264]: Consistency
+                    - generic [ref=e265]: 85%
+                  - progressbar [ref=e266]
+                  - paragraph [ref=e268]: 7-day streak maintained
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e269]:
+        - generic [ref=e270]:
+          - generic [ref=e271]: Welcome to MR5 School!
+          - generic [ref=e272]: Explore our courses and start learning today.
+      - listitem [ref=e273]:
+        - generic [ref=e274]:
+          - generic [ref=e275]: Welcome to MR5 School!
+          - generic [ref=e276]: Explore our courses and start learning today.
+  - button "Open Next.js Dev Tools" [ref=e282] [cursor=pointer]:
+    - img [ref=e283]
+  - alert [ref=e286]
 ```

@@ -44,13 +44,12 @@ test.describe('LMS E2E System Test', () => {
         await test.step('S-02: Course Enrollment', async () => {
             // 1. Get Admin Token and Data
             console.log("Fetching Admin Token...");
-            const adminLoginInfo = await request.post('http://localhost:5000/api/auth/login', { data: ADMIN });
+            const adminLoginInfo = await request.post('http://127.0.0.1:5000/api/auth/login', { data: ADMIN });
             expect(adminLoginInfo.ok()).toBeTruthy();
             const adminToken = (await adminLoginInfo.json()).data.accessToken;
-
             // 2. Get Course ID
             console.log("Fetching Course ID...");
-            const coursesRes = await request.get('http://localhost:5000/api/courses', { headers: { Authorization: `Bearer ${adminToken}` } });
+            const coursesRes = await request.get('http://127.0.0.1:5000/api/courses', { headers: { Authorization: `Bearer ${adminToken}` } });
             const coursesData = await coursesRes.json();
             course = coursesData.data.find((c: any) => c.title.includes('Huly') || c.title.includes('Intro')) || coursesData.data[0];
             const courseId = course._id;
@@ -60,7 +59,7 @@ test.describe('LMS E2E System Test', () => {
             console.log("Fetching Student ID...");
             // We need to use the token stored in localStorage for student, but request context doesn't share localStorage.
             // We can login as student again via API to get ID.
-            const studentLoginInfo = await request.post('http://localhost:5000/api/auth/login', { data: STUDENT });
+            const studentLoginInfo = await request.post('http://127.0.0.1:5000/api/auth/login', { data: STUDENT });
             const studentId = (await studentLoginInfo.json()).data.user.id;
             console.log(`Student ID: ${studentId}`);
 
@@ -100,7 +99,7 @@ test.describe('LMS E2E System Test', () => {
             // 4. Force Enrollment in Backend (Simulate Webhook)
             console.log("Injecting Enrollment via Admin API...");
             try {
-                const enrollRes = await request.post('http://localhost:5000/api/enrollments', {
+                const enrollRes = await request.post('http://127.0.0.1:5000/api/enrollments', {
                     headers: { Authorization: `Bearer ${adminToken}` },
                     data: {
                         student: studentId,
@@ -145,7 +144,12 @@ test.describe('LMS E2E System Test', () => {
 
         // S-03: Launch AI Avatar & Lessons
         await test.step('S-03: Launch Avatar', async () => {
-            await page.goto(`${BASE_URL}/student/courses`);
+            if (page.url() !== `${BASE_URL}/student/courses`) {
+                await page.goto(`${BASE_URL}/student/courses`, { waitUntil: 'domcontentloaded' });
+            }
+
+            // Ensure course is visible before clicking
+            await expect(page.locator(`text=${course.title}`).first()).toBeVisible();
             await page.click(`text=${course.title}`);
             // ...
 
@@ -162,15 +166,26 @@ test.describe('LMS E2E System Test', () => {
 
         // S-04: Profile Management
         await test.step('S-04: Profile Management', async () => {
-            await page.goto(`${BASE_URL}/student/profile`);
+            await page.goto(`${BASE_URL}/profile`);
+            await expect(page.getByText("Loading your profile")).not.toBeVisible({ timeout: 30000 });
+            await page.waitForTimeout(1000);
+
+            // Open Edit Modal
+            await page.click('button:has-text("Edit Profile")');
+
+            await expect(page.locator('h3:has-text("Edit Profile")')).toBeVisible();
+
             // Edit name
             const nameInput = page.locator('input[name="name"]');
             await nameInput.fill('Test Student Updated');
-            await page.click('button:has-text("Save")');
+            await page.click('button:has-text("Save Changes")');
+
+            // Wait for modal to close (or toast)
+            await expect(page.locator('h3:has-text("Edit Profile")')).not.toBeVisible();
 
             // Verify persistence
             await page.reload();
-            await expect(nameInput).toHaveValue('Test Student Updated');
+            await expect(page.locator('h1')).toHaveText(/Test Student Updated/);
             await page.screenshot({ path: 'test-results/S-04-profile.png' });
         });
 
