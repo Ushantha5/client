@@ -46,7 +46,7 @@ import { Badge } from "@/components/ui/badge";
 
 
 export default function UsersManagement() {
-  const { user } = useEnhancedUser();
+  const { user, loading: authLoading } = useEnhancedUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<any[]>([]);
@@ -73,12 +73,13 @@ export default function UsersManagement() {
   }, [currentPage, searchTerm]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user || user.role !== "admin") {
       router.push("/");
     } else {
       fetchUsers();
     }
-  }, [user, router, fetchUsers]);
+  }, [user, authLoading, router, fetchUsers]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +93,9 @@ export default function UsersManagement() {
     }
   };
 
+  if (authLoading) {
+    return <div className="flex h-screen items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
   if (!user || user.role !== "admin") {
     return null;
   }
@@ -176,7 +180,7 @@ export default function UsersManagement() {
                     </TableHeader>
                     <TableBody>
                       {users.map((user: any) => (
-                        <TableRow key={user.id}>
+                        <TableRow key={user.id || user._id || Math.random()}>
                           <TableCell className="font-medium">{user.name}</TableCell>
                           <TableCell>{user.email}</TableCell>
                           <TableCell>

@@ -80,8 +80,12 @@ export const adminService = {
     search?: string;
   }): Promise<PaginationResult<User>> => {
     try {
-      const response = await apiClient.get<{ success: boolean; data: PaginationResult<User> }>("/api/users", { params });
-      return response.data.data;
+      // Backend returns { success, data: User[], pagination: {...} }
+      const response = await apiClient.get<any>("/api/users", { params });
+      return {
+        data: response.data.data,
+        ...response.data.pagination
+      };
     } catch (error) {
       handleApiError(error, "Fetch Users");
       throw error;
@@ -135,8 +139,11 @@ export const adminService = {
     isApproved?: boolean;
   }): Promise<PaginationResult<Course>> => {
     try {
-      const response = await apiClient.get<{ success: boolean; data: PaginationResult<Course> }>("/api/courses", { params });
-      return response.data.data;
+      const response = await apiClient.get<any>("/api/courses", { params });
+      return {
+        data: response.data.data,
+        ...response.data.pagination
+      };
     } catch (error) {
       handleApiError(error, "Fetch Courses");
       throw error;
@@ -193,8 +200,11 @@ export const adminService = {
     search?: string;
   }): Promise<PaginationResult<Payment>> => {
     try {
-      const response = await apiClient.get<{ success: boolean; data: PaginationResult<Payment> }>("/api/payments", { params });
-      return response.data.data;
+      const response = await apiClient.get<any>("/api/payments", { params });
+      return {
+        data: response.data.data,
+        ...response.data.pagination
+      };
     } catch (error) {
       handleApiError(error, "Fetch Payments");
       throw error;

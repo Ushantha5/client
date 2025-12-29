@@ -47,7 +47,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
 export default function CoursesManagement() {
-  const { user } = useEnhancedUser();
+  const { user, loading: authLoading } = useEnhancedUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<any[]>([]);
@@ -74,12 +74,13 @@ export default function CoursesManagement() {
   }, [currentPage, searchTerm]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user || user.role !== "admin") {
       router.push("/");
     } else {
       fetchCourses();
     }
-  }, [user, router, fetchCourses]);
+  }, [user, authLoading, router, fetchCourses]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +94,9 @@ export default function CoursesManagement() {
     }
   };
 
+  if (authLoading) {
+    return <div className="flex h-screen items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
   if (!user || user.role !== "admin") {
     return null;
   }
@@ -225,7 +229,7 @@ export default function CoursesManagement() {
                     </TableHeader>
                     <TableBody>
                       {courses.map((course: any) => (
-                        <TableRow key={course.id}>
+                        <TableRow key={course.id || course._id || Math.random()}>
                           <TableCell className="font-medium">{course.title}</TableCell>
                           <TableCell>{course.instructor || "Unknown"}</TableCell>
                           <TableCell>{course.enrollmentCount || 0}</TableCell>

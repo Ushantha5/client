@@ -34,6 +34,10 @@ export const metadata: Metadata = genMeta({
 	type: "website",
 });
 
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -93,7 +97,7 @@ export default function RootLayout({
 					}}
 				/>
 			</head>
-			<body className="bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary" suppressHydrationWarning>
+			<body className={`${inter.className} bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary`} suppressHydrationWarning>
 				{/* Global Noise Texture */}
 				<div className="noise-bg" />
 
